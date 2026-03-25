@@ -1,0 +1,8 @@
+# =========================
+# Common / MacOS
+# =========================
+.DS_Store
+
+# IDEs and Editors
+.idea/
+.vscode/

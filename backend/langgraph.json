@@ -1,0 +1,10 @@
+{
+    "graphs": {
+        "career_agent_workflow": "./app/graph/entrypoint.py:graph"
+    },
+    "env": ".env",
+    "python_version": "3.12",
+    "dependencies": [
+        "."
+    ]
+}
