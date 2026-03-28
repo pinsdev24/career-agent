@@ -3,6 +3,7 @@
 import logging
 
 from app.models.state import AgentState
+from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -19,5 +20,6 @@ async def router_node(state: AgentState) -> AgentState:
         state.get("run_id"),
         entry_mode,
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Router: Determining pipeline route (Mode: {entry_mode})..."})
 
     return {"status": "started"}

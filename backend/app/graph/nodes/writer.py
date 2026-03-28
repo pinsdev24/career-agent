@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
 from app.models.state import AgentState
+from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,7 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
         revision_count,
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Writer: Drafting personalized cover letter (Revision {revision_count})..."})
 
     cv_text = state.get("cv_text", "")
     offer = state.get("selected_offer", {})
@@ -95,6 +97,7 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
             feedback=feedback.get("feedback", str(feedback)),
         )
 
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Writer instructing LLM with specific tone and gap context..."})
     settings = get_settings()
     llm = ChatOpenAI(
         model=settings.llm_model,
@@ -130,6 +133,7 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
         revision_count,
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Writer: Generated a {len(letter.split())}-word cover letter."})
 
     return {
         "draft_letter": letter.strip(),

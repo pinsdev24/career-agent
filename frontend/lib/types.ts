@@ -56,6 +56,7 @@ export interface JobOffer {
   company: string;
   location?: string | null;
   url: string;
+  contact_email?: string | null;
   pre_score: number;
   snippet?: string | null;
 }

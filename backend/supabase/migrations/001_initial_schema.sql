@@ -1,6 +1,6 @@
 -- ============================================================
 -- CareerAgent — Initial schema
--- Run this in your Supabase SQL editor: https://supabase.com/dashboard/project/nbyxjxjpzvovxhoelkzx/sql
+-- Run this in your Supabase SQL editor
 -- ============================================================
 
 -- Enable pgvector extension

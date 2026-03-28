@@ -9,6 +9,7 @@ import { OfferCard } from "@/components/offer-card";
 import { GapReportCard } from "@/components/gap-report";
 import { CriticScoresCard } from "@/components/critic-scores";
 import { LetterEditor } from "@/components/letter-editor";
+import { LiveAgentLog } from "@/components/live-agent-log";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -22,6 +23,7 @@ import {
   Scale,
   Rocket,
   PartyPopper,
+  Mail,
 } from "lucide-react";
 
 const STATUS_ICONS: Record<string, React.ElementType> = {
@@ -117,6 +119,20 @@ export default function PipelineRunPage({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  const handleOpenEmail = () => {
+    if (!run?.final_letter) return;
+
+    const subject = run.selected_offer 
+      ? `Application for ${run.selected_offer.title} at ${run.selected_offer.company}`
+      : "Job Application";
+    
+    const body = run.final_letter;
+    const recipient = run.selected_offer?.contact_email || "";
+    const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    window.location.href = mailtoUrl;
   };
 
   if (loading && !run) {
@@ -260,19 +276,30 @@ export default function PipelineRunPage({
               <div className="rounded-2xl border border-border/60 bg-card/80 p-6">
                 <h3 className="font-semibold text-lg mb-4 flex justify-between items-center">
                   <span>Final Cover Letter</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 rounded-xl"
-                    onClick={handleCopy}
-                  >
-                    {copied ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5" />
-                    )}
-                    {copied ? "Copied!" : "Copy"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 rounded-xl"
+                      onClick={handleOpenEmail}
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+                      Open in Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 rounded-xl"
+                      onClick={handleCopy}
+                    >
+                      {copied ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" />
+                      )}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                  </div>
                 </h3>
                 <div className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-foreground/85 p-5 bg-secondary/30 rounded-xl border border-border/30">
                   {run.final_letter}
@@ -311,44 +338,34 @@ export default function PipelineRunPage({
       {["started", "scouting", "matching", "writing", "critiquing"].includes(
         run.status
       ) && (
-        <div className="flex flex-col items-center justify-center py-24 space-y-6">
-          {(() => {
-            const Icon = STATUS_ICONS[run.status] || Rocket;
-            return (
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 glow animate-pulse">
-                <Icon className="h-8 w-8 text-primary" />
-              </div>
-            );
-          })()}
-          <h3 className="text-xl font-semibold">
-            {PIPELINE_STATUS_LABELS[run.status]}...
-          </h3>
-          <p className="text-sm text-muted-foreground max-w-sm text-center">
-            The AI agents are hard at work. This usually takes just a moment.
-          </p>
-          <div className="pt-6">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
-              disabled={actionLoading}
-              onClick={async () => {
-                setActionLoading(true);
-                try {
-                  await cancelPipeline(runId);
-                  // The UI will update automatically on the next poll when the status changes to failed
-                } catch (err: unknown) {
-                  setError(err instanceof Error ? err.message : "Failed to cancel pipeline");
-                } finally {
-                  setActionLoading(false);
-                }
-              }}
-            >
-              {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : "Cancel Pipeline"}
-            </Button>
+          <div className="flex flex-col items-center justify-center py-6 space-y-6 w-full">
+            <div className="w-full max-w-5xl mx-auto pt-4 shadow-2xl">
+              <LiveAgentLog runId={runId} />
+            </div>
+
+            <div className="pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+                disabled={actionLoading}
+                onClick={async () => {
+                  setActionLoading(true);
+                  try {
+                    await cancelPipeline(runId);
+                    // The UI will update automatically on the next poll when the status changes to failed
+                  } catch (err: unknown) {
+                    setError(err instanceof Error ? err.message : "Failed to cancel pipeline");
+                  } finally {
+                    setActionLoading(false);
+                  }
+                }}
+              >
+                {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : "Cancel Pipeline"}
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.models.state import AgentState
 from app.tools.tavily_tools import extract_url
+from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class StructuredOffer(BaseModel):
     experience_level: str | None = Field(None, description="e.g. junior, mid, senior")
     description: str = Field(description="Brief summary of the role")
     salary: str | None = Field(None)
+    contact_email: str | None = Field(None, description="Contact email for applications if found")
 
 
 SYSTEM_PROMPT = (
@@ -52,10 +54,12 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         return {"status": "failed"}
 
     logger.info("Scraper: extracting %s for run=%s", offer_url, state.get("run_id"))
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Scraper: Extracting content from URL..."})
 
     # Extract raw content via Tavily
     extracted = await extract_url(offer_url)
     raw_content = extracted.get("raw_content", "")
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Scraper routing raw content to LLM for structured extraction..."})
 
     # Structure via LLM with_structured_output — no JSON parsing needed
     settings = get_settings()
@@ -87,6 +91,7 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "company": structured.company,
         "url": offer_url,
         "location": structured.location,
+        "contact_email": structured.contact_email,
         "snippet": raw_content[:300],
         "pre_score": 0,
         "raw_text": raw_content,
@@ -99,6 +104,7 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         selected_offer["company"],
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Scraper: Successfully extracted job profile for {structured.company}."})
 
     return {
         "selected_offer": selected_offer,

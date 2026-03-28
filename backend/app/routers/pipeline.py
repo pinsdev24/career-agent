@@ -114,3 +114,24 @@ async def cancel_pipeline_run(
 
     cancelled = await cancel_pipeline(run_id=run_id, supabase=supabase)
     return {"status": "success", "cancelled": cancelled}
+
+
+from fastapi.responses import StreamingResponse
+from app.graph.pubsub import log_emitter
+
+@router.get("/{run_id}/stream")
+async def stream_pipeline_logs(
+    run_id: str,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+):
+    """Server-Sent Events endpoint to stream real-time execution logs."""
+    # Ensure they own the run
+    run = await get_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
+    if not run:
+        raise NotFoundError(f"Pipeline run {run_id} not found")
+
+    return StreamingResponse(
+        log_emitter.stream(run_id),
+        media_type="text/event-stream"
+    )

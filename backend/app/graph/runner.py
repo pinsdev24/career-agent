@@ -82,6 +82,8 @@ def _extract_db_updates(state: dict) -> dict:
 # ──────────────────────────────────────────────
 
 
+from app.graph.pubsub import log_emitter
+
 async def _run_graph(
     run_id: str,
     initial_state: dict,
@@ -93,39 +95,68 @@ async def _run_graph(
     config = {"configurable": {"thread_id": run_id}}
 
     try:
+        await log_emitter.emit(run_id, {"type": "info", "message": "Pipeline initialized."})
+        
         if resume_command is not None:
-            stream = graph.astream(resume_command, config=config, stream_mode="updates")
+            stream = graph.astream(resume_command, config=config, stream_mode=["updates", "messages"])
         else:
-            stream = graph.astream(initial_state, config=config, stream_mode="updates")
+            stream = graph.astream(initial_state, config=config, stream_mode=["updates", "messages"])
 
         logger.info("run=%s | starting astream loop", run_id)
-        async for state_update in stream:
-            logger.info("run=%s | Received state_update keys: %s", run_id, list(state_update.keys()))
-            # We use stream_mode="updates", so state_update is {"node_name": {"key": "val", ...}}
-            # Skip "__start__" internal LangGraph events
-            for node_name, node_output in state_update.items():
-                if not isinstance(node_output, dict):
-                    continue
+        async for event in stream:
+            event_type = event[0]
+            event_data = event[1]
+            
+            if event_type == "messages":
+                # event_data is a tuple of (messages, dict)
+                messages = event_data[0]
+                for msg in messages:
+                    if hasattr(msg, "tool_calls") and msg.tool_calls:
+                        for call in msg.tool_calls:
+                            await log_emitter.emit(run_id, {
+                                "type": "agent_action",
+                                "message": f"Agent is calling tool: {call['name']}"
+                            })
+                    elif getattr(msg, "type", "") == "ai" and msg.content and not hasattr(msg, "tool_calls"):
+                        # Only emit if it's an actual direct text response going somewhere, though usually we wait for node finishes
+                        pass
+
+            elif event_type == "updates":
+                state_update = event_data
+                logger.info("run=%s | Received state_update keys: %s", run_id, list(state_update.keys()))
+                
+                # We use stream_mode="updates", so state_update is {"node_name": {"key": "val", ...}}
+                # Skip "__start__" internal LangGraph events
+                for node_name, node_output in state_update.items():
+                    await log_emitter.emit(run_id, {
+                        "type": "node_finish",
+                        "node": node_name,
+                        "message": f"Completed step: {node_name.replace('_', ' ').title()}"
+                    })
                     
-                db_updates = _extract_db_updates(node_output)
-                if db_updates:
-                    logger.debug(
-                        "run=%s | writing to DB (from %s): %s",
-                        run_id,
-                        node_name,
-                        {k: str(v)[:60] for k, v in db_updates.items()},
-                    )
-                    try:
-                        await update_pipeline_run(supabase=supabase, run_id=run_id, **db_updates)
-                    except Exception as exc:
-                        logger.warning("run=%s | DB update failed: %s", run_id, exc)
+                    if not isinstance(node_output, dict):
+                        continue
+                        
+                    db_updates = _extract_db_updates(node_output)
+                    if db_updates:
+                        logger.debug(
+                            "run=%s | writing to DB (from %s): %s",
+                            run_id,
+                            node_name,
+                            {k: str(v)[:60] for k, v in db_updates.items()},
+                        )
+                        try:
+                            await update_pipeline_run(supabase=supabase, run_id=run_id, **db_updates)
+                        except Exception as exc:
+                            logger.warning("run=%s | DB update failed: %s", run_id, exc)
 
         logger.info("run=%s | astream loop finished normally", run_id)
-
+        await log_emitter.emit(run_id, {"type": "info", "message": "Pipeline execution completed or paused."})
 
     except asyncio.CancelledError:
         # Task was cancelled via cancel_pipeline() — mark as failed in DB
         logger.info("run=%s | task cancelled by user", run_id)
+        await log_emitter.emit(run_id, {"type": "error", "message": "Pipeline was cancelled."})
         try:
             await update_pipeline_run(supabase=supabase, run_id=run_id, status="failed")
         except Exception:
@@ -134,6 +165,7 @@ async def _run_graph(
 
     except Exception as exc:
         logger.error("run=%s | graph execution failed: %s", run_id, exc, exc_info=True)
+        await log_emitter.emit(run_id, {"type": "error", "message": f"Pipeline failed: {str(exc)}"})
         try:
             await update_pipeline_run(supabase=supabase, run_id=run_id, status="failed")
         except Exception:
