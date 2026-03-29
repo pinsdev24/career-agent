@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # --- OpenAI ---
     openai_api_key: str
 
+    # --- Moonshot ---
+    moonshot_api_key: str
+
     # --- Tavily ---
     tavily_api_key: str
 
@@ -39,6 +42,7 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     llm_model: str = "gpt-5-mini"
+    writer_model: str = "kimi-k2.5"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 

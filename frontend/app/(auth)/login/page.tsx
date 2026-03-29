@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { UserCircle, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -61,10 +61,10 @@ export default function LoginPage() {
       <div className="relative w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 glow">
-            <Sparkles className="h-7 w-7 text-primary" />
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 transition-transform hover:scale-105">
+            <UserCircle className="h-10 w-10 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight gradient-text">
+          <h1 className="text-4xl font-bold tracking-tight text-primary">
             CareerAgent
           </h1>
           <p className="mt-3 text-muted-foreground">
@@ -88,7 +88,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@example.com"
-                  className="pl-10 h-11 rounded-xl bg-background/50 border-border/60 focus:border-primary/50"
+                  className="pl-10 h-11 rounded-xl bg-transparent border-border/60 focus:border-primary/50"
                 />
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   required
                   minLength={6}
                   placeholder="••••••••"
-                  className="pl-10 h-11 rounded-xl bg-background/50 border-border/60 focus:border-primary/50"
+                  className="pl-10 h-11 rounded-xl bg-transparent border-border/60 focus:border-primary/50"
                 />
               </div>
             </div>

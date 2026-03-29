@@ -100,9 +100,10 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
     await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Writer instructing LLM with specific tone and gap context..."})
     settings = get_settings()
     llm = ChatOpenAI(
-        model=settings.llm_model,
-        api_key=settings.openai_api_key,
-        temperature=0.7,
+        base_url="https://api.moonshot.ai/v1",
+        model=settings.writer_model,
+        api_key=settings.moonshot_api_key,
+        temperature=1,
     )
 
     messages = [

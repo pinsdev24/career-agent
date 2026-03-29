@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Image from 'next/image'
 import { getPipelineRun, selectOffer, reviewLetter, cancelPipeline } from "@/lib/api";
 import type { PipelineRun } from "@/lib/types";
 import { PIPELINE_STATUS_LABELS } from "@/lib/types";
@@ -10,7 +11,14 @@ import { GapReportCard } from "@/components/gap-report";
 import { CriticScoresCard } from "@/components/critic-scores";
 import { LetterEditor } from "@/components/letter-editor";
 import { LiveAgentLog } from "@/components/live-agent-log";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Loader2,
@@ -121,18 +129,26 @@ export default function PipelineRunPage({
     }
   };
 
-  const handleOpenEmail = () => {
+  const handleOpenEmail = (platform: "gmail" | "outlook" | "default") => {
     if (!run?.final_letter) return;
 
-    const subject = run.selected_offer 
+    const subject = run.selected_offer
       ? `Application for ${run.selected_offer.title} at ${run.selected_offer.company}`
       : "Job Application";
-    
+
     const body = run.final_letter;
     const recipient = run.selected_offer?.contact_email || "";
-    const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    window.location.href = mailtoUrl;
+
+    if (platform === "gmail") {
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(url, "_blank");
+    } else if (platform === "outlook") {
+      const url = `https://outlook.office.com/mail/deeplink/compose?to=${recipient}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(url, "_blank");
+    } else {
+      const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+    }
   };
 
   if (loading && !run) {
@@ -277,15 +293,31 @@ export default function PipelineRunPage({
                 <h3 className="font-semibold text-lg mb-4 flex justify-between items-center">
                   <span>Final Cover Letter</span>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 rounded-xl"
-                      onClick={handleOpenEmail}
-                    >
-                      <Mail className="h-3.5 w-3.5" />
-                      Open in Email
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        className={cn(
+                          buttonVariants({ variant: "outline", size: "sm" }),
+                          "gap-2 rounded-xl"
+                        )}
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                        Open in Email
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="cursor-pointer">
+                          <Image src="/google-gmail.svg" alt="Gmail" width={16} height={16} className="mr-2" />
+                          Gmail
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="cursor-pointer">
+                          <Image src="/ms-outlook.svg" alt="Outlook" width={16} height={16} className="mr-2" />
+                          Outlook
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="cursor-pointer">
+                          <Mail className="h-3 w-3 mr-2" />
+                          Default email app
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Button
                       variant="outline"
                       size="sm"
