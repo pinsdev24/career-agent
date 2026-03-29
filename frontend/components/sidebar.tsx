@@ -26,8 +26,8 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/pipeline/new", label: "New Pipeline", icon: Rocket },
+  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/pipeline/new", label: "New Pipeline", icon: Rocket },
 ];
 
 export function Sidebar() {
@@ -111,8 +111,8 @@ export function Sidebar() {
       <nav className="flex-1 space-y-2 px-3 py-4">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
+            item.href === "/"
+              ? pathname === "/"
               : pathname.startsWith(item.href);
 
           const Icon = item.icon;
@@ -178,7 +178,7 @@ export function Sidebar() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => router.push("/dashboard/profile")}
+              onClick={() => router.push("/profile")}
               className="cursor-pointer py-2"
             >
               <UserCircle className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />

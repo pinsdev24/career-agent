@@ -83,7 +83,7 @@ export default function DashboardPage() {
             Your pipeline runs and activity
           </p>
         </div>
-        <Link href="/dashboard/pipeline/new">
+        <Link href="/pipeline/new">
           <Button className="gap-2 rounded-xl font-semibold">
             <Plus className="h-4 w-4" />
             New Pipeline
@@ -107,13 +107,13 @@ export default function DashboardPage() {
               to find jobs and generate cover letters.
             </CardDescription>
             <div className="flex gap-3">
-              <Link href="/dashboard/profile">
+              <Link href="/profile">
                 <Button variant="secondary" className="gap-2 rounded-xl">
                   <UserCircle className="h-4 w-4" />
                   Set Up Profile
                 </Button>
               </Link>
-              <Link href="/dashboard/pipeline/new">
+              <Link href="/pipeline/new">
                 <Button className="gap-2 rounded-xl">
                   <Rocket className="h-4 w-4" />
                   Start First Pipeline
@@ -125,7 +125,7 @@ export default function DashboardPage() {
       ) : (
         <div className="flex flex-col gap-5">
           {runs.map((run) => (
-            <Link key={run.id} href={`/dashboard/pipeline/${run.id}`}>
+            <Link key={run.id} href={`/pipeline/${run.id}`}>
               <Card className="group cursor-pointer transition-all duration-200 hover:border-primary/30 hover:bg-accent/30 hover:glow-sm">
                 <CardContent className="flex items-center justify-between py-4">
                   <div className="flex items-center gap-4">

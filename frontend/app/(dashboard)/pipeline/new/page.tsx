@@ -46,7 +46,7 @@ export default function NewPipelinePage() {
         mode,
         mode === "url" ? url.trim() : undefined
       );
-      router.push(`/dashboard/pipeline/${result.id}`);
+      router.push(`/pipeline/${result.id}`);
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "Failed to start pipeline"
@@ -151,7 +151,7 @@ export default function NewPipelinePage() {
                 We&apos;ll use your profile preferences (job title, location,
                 contract type) to find matching offers. Make sure your{" "}
                 <a
-                  href="/dashboard/profile"
+                  href="/profile"
                   className="text-primary font-medium underline underline-offset-4 decoration-primary/40 hover:decoration-primary"
                 >
                   profile
