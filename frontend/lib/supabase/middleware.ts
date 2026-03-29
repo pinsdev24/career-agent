@@ -34,7 +34,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/callback");
 
-  if (!user && !isAuthRoute && request.nextUrl.pathname !== "/") {
+  if (!user && !isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
@@ -43,7 +43,7 @@ export async function updateSession(request: NextRequest) {
   // Redirect authenticated users away from login
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 

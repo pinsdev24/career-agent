@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.models.state import AgentState
 from app.tools.embedding_tools import embed_text
+from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,8 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     offer_text = selected_offer.get("raw_text", "") or selected_offer.get("snippet", "")
 
     logger.info("Matcher: analyzing gap for run=%s", state.get("run_id"))
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Matcher: Starting gap analysis..."})
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Matcher computing cosine similarity between CV and Offer..."})
 
     # --- Embedding similarity (fast, approximate) ---
     embedding_score = 50.0
@@ -64,6 +67,7 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
             logger.warning("Matcher: embedding similarity failed: %s", exc)
 
     # --- LLM structured gap analysis ---
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Matcher passing CV and Offer to LLM for rigorous gap analysis..."})
     settings = get_settings()
     llm = ChatOpenAI(
         model=settings.llm_model,
@@ -103,6 +107,7 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
         embedding_score,
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Matcher: Final semantic match score calculated at {final_score}%."})
 
     return {
         "gap_report": gap_report,

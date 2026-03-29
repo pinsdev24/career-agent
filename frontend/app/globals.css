@@ -137,15 +137,10 @@
 
 @layer utilities {
   .gradient-text {
-    background: linear-gradient(135deg, oklch(0.7 0.18 270), oklch(0.72 0.2 310));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    @apply text-primary font-bold;
   }
   .glass {
-    background: oklch(0.17 0.02 270 / 50%);
-    backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid oklch(0.3 0.03 270 / 30%);
+    @apply bg-card/50 backdrop-blur-xl border border-border/50;
   }
   .glow {
     box-shadow: 0 0 20px oklch(0.7 0.18 270 / 15%), 0 0 60px oklch(0.7 0.18 270 / 5%);

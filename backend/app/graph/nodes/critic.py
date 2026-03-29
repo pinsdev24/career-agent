@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from app.config import get_settings
 from app.models.state import AgentState
+from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         state.get("revision_count", 0),
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Critic: Evaluating draft letter against 5 quality dimensions..."})
 
     settings = get_settings()
     llm = ChatOpenAI(
@@ -69,6 +71,8 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         f"Company: {offer.get('company', 'Unknown')}\n"
         f"Required skills: {', '.join(required_skills) if required_skills else 'not specified'}"
     )
+
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Critic analyzing letter relevance, tone, persuasiveness..."})
 
     try:
         evaluation: CriticEvaluation = await structured_llm.ainvoke(
@@ -93,6 +97,7 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         settings.critic_threshold,
         state.get("run_id"),
     )
+    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Critic: Overall score is {evaluation.overall} / 100."})
 
     return {
         "critic_score": evaluation.overall,

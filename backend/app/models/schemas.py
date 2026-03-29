@@ -105,6 +105,7 @@ class JobOfferSummary(BaseModel):
     company: str
     location: str | None = None
     url: str
+    contact_email: str | None = None
     pre_score: float = Field(ge=0, le=100)
     snippet: str | None = None
 

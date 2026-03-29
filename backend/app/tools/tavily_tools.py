@@ -19,6 +19,8 @@ def _get_tavily_client() -> AsyncTavilyClient:
 async def search_jobs(
     query: str,
     max_results: int = 10,
+    include_domains: list[str] | None = None,
+    exclude_domains: list[str] | None = None,
 ) -> list[dict]:
     """Search for job offers using Tavily.
 
@@ -26,12 +28,19 @@ async def search_jobs(
     """
     client = _get_tavily_client()
     try:
-        response = await client.search(
-            query=query,
-            max_results=max_results,
-            search_depth="advanced",
-            include_raw_content=False,
-        )
+        from typing import Any
+        kwargs: dict[str, Any] = {
+            "query": query,
+            "max_results": max_results,
+            "search_depth": "advanced",
+            "include_raw_content": False,
+        }
+        if include_domains:
+            kwargs["include_domains"] = include_domains
+        if exclude_domains:
+            kwargs["exclude_domains"] = exclude_domains
+            
+        response = await client.search(**kwargs)
         results = response.get("results", [])
         logger.info("Tavily search returned %d results for query: %s", len(results), query[:80])
         return results
