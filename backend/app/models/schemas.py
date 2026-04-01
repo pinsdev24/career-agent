@@ -146,6 +146,9 @@ class PipelineRunResponse(BaseModel):
     final_letter: str | None = None
     critic_score: CriticScore | None = None
     revision_count: int = 0
+    # Best-of-N tracking — the highest-scoring draft across all revisions
+    best_draft: str | None = None
+    best_score: int = 0
     created_at: datetime | None = None
     updated_at: datetime | None = None
 

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict
+import operator
+from typing import Annotated, Literal, TypedDict
 
 
 class AgentState(TypedDict, total=False):
@@ -35,6 +36,11 @@ class AgentState(TypedDict, total=False):
     gap_report: dict
     match_score: int
 
+    # --- Summaries (generated once by Matcher, reused by Writer & Critic) ---
+    cv_summary: str      # Condensed CV (~200 words) for context-efficient prompts
+    offer_summary: str   # Condensed offer (~150 words) for context-efficient prompts
+    gap_summary: str     # Narrative gap summary for the writer prompt
+
     # --- Writer output ---
     draft_letter: str
 
@@ -42,6 +48,17 @@ class AgentState(TypedDict, total=False):
     critic_score: int
     critic_feedback: dict
     revision_count: int
+
+    # --- Best-of-N tracking ---
+    # Accumulates all drafts with their scores across revisions.
+    # Uses operator.add reducer so each node append doesn't overwrite.
+    draft_history: Annotated[list[dict], operator.add]
+    best_draft: str   # The highest-scoring draft so far
+    best_score: int   # The highest score achieved
+    best_feedback: dict # The feedback matching the highest-scoring draft
+
+    # --- Long-term memory (injected by memory_loader) ---
+    user_preferences: dict  # Preferences from past runs (tone, role types, etc.)
 
     # --- Final output (post HITL-2) ---
     final_letter: str

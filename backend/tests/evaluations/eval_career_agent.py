@@ -75,13 +75,23 @@ async def run_e2e_scraper(inputs: dict) -> dict:
     """Target function for full LangGraph end-to-end scraper test."""
     graph = compile_graph() # Note: No checkpointer for tests
     
-    # Initialize run variables expected by the nodes
+    # Initialize run variables expected by the nodes (v2 with memory_loader)
     run_id = str(uuid.uuid4())
+    cv_profile = inputs.get("cv_profile", {})
+    
+    # Map the dataset input (cv_profile dict) to the state's required fields
+    # Alice Developer's text summary + skills
+    cv_text = f"{cv_profile.get('full_name', 'User')}\n{cv_profile.get('summary', '')}\nSkills: {', '.join(cv_profile.get('skills', []))}"
+
     state_input = {
+        "user_id": "eval_test_user",
         "run_id": run_id,
-        "entry_mode": inputs.get("entry_mode"),
+        "entry_mode": inputs.get("entry_mode", "scraper"),
         "offer_url": inputs.get("offer_url"),
-        "cv_profile": inputs.get("cv_profile"),
+        "cv_text": cv_text,
+        "cv_structured": cv_profile,
+        "tone_of_voice": "professional",
+        "user_preferences": {}, 
         "messages": []
     }
     
@@ -108,6 +118,7 @@ async def run_e2e_scraper(inputs: dict) -> dict:
                 if chunk["type"] == "task":
                     node_name = chunk["payload"].get("name")
                     if node_name not in ["__start__", "__end__", "tools", "_set_status"]:
+                        # Capture trajectory for nodes we care about
                         trajectory.append(node_name)
                         
             # State after stream finishes:

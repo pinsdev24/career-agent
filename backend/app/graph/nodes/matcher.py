@@ -109,11 +109,46 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Matcher: Final semantic match score calculated at {final_score}%."})
 
+    # --- Generate compact summaries for downstream nodes ---
+    # These replace raw CV/offer text in Writer and Critic prompts,
+    # reducing token costs significantly on multi-revision runs.
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Matcher: Generating context summaries for efficient processing..."})
+
+    from app.tools.summarizer import summarize_cv, summarize_offer, summarize_gap_report  # noqa: E402
+
+    cv_summary, offer_summary, gap_summary = await _generate_summaries(
+        cv_text, selected_offer, gap_report
+    )
+
     return {
         "gap_report": gap_report,
         "match_score": final_score,
+        "cv_summary": cv_summary,
+        "offer_summary": offer_summary,
+        "gap_summary": gap_summary,
         "status": "matching",
     }
+
+
+async def _generate_summaries(
+    cv_text: str, offer: dict, gap_report: dict
+) -> tuple[str, str, str]:
+    """Generate all three summaries concurrently for speed."""
+    import asyncio
+    from app.tools.summarizer import summarize_cv, summarize_offer, summarize_gap_report
+
+    try:
+        cv_sum, offer_sum, gap_sum = await asyncio.gather(
+            summarize_cv(cv_text),
+            summarize_offer(offer),
+            summarize_gap_report(gap_report),
+        )
+        return cv_sum, offer_sum, gap_sum
+    except Exception as exc:
+        logger.warning("Matcher: summary generation failed: %s", exc)
+        # Fallback: truncated originals
+        offer_text = offer.get("raw_text", "") or offer.get("snippet", "")
+        return cv_text[:2000], offer_text[:1500], gap_report.get("summary", "")
 
 
 # ---------------------------------------------------------------------------

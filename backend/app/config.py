@@ -40,8 +40,14 @@ class Settings(BaseSettings):
     # --- App ---
     frontend_url: str = "http://localhost:3000"
 
-    # --- LLM ---
+    # --- LLM (tiered model routing) ---
+    # fast_model:   Routing, summaries, memory extraction (cheapest)
+    # llm_model:    Matcher gap analysis (mid-tier, good structured output)
+    # critic_model: Cover letter evaluation (mid-tier, calibrated scoring)
+    # writer_model: Letter generation (best quality, core value)
     llm_model: str = "gpt-5-mini"
+    fast_model: str = "gpt-5-nano"
+    critic_model: str = "gpt-5-mini"
     writer_model: str = "kimi-k2.5"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536

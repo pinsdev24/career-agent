@@ -54,7 +54,7 @@ E2E_SCRAPER_EXAMPLES = [
             }
         },
         "outputs": {
-            "expected_trajectory": ["router", "scraper", "matcher", "writer", "critic"],
+            "expected_trajectory": ["memory_loader", "router", "scraper", "matcher", "writer", "critic", "hitl2", "memory_writer"],
             "requires_hitl2": True,
             "expected_theme": "software engineering"
         }

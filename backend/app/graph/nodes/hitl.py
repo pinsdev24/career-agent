@@ -63,7 +63,10 @@ async def hitl1_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "waiting_offer_selection",
     )
     from app.graph.pubsub import log_emitter
-    await log_emitter.emit(run_id, {"type": "info", "message": "HITL: Searching paused. Waiting for your offer selection..."})
+    await log_emitter.emit(run_id, {
+        "type": "info",
+        "message": "HITL: Searching paused. Waiting for your offer selection...",
+    })
 
     # Bypass interrupt if running evaluation
     if config.get("configurable", {}).get("is_evaluation"):
@@ -86,46 +89,83 @@ async def hitl1_node(state: AgentState, config: RunnableConfig) -> AgentState:
 
 
 async def hitl2_node(state: AgentState, config: RunnableConfig) -> AgentState:
-    """HITL-2: Present the cover letter draft for user review and editing.
+    """HITL-2: Present the BEST cover letter draft for user review and editing.
 
-    Writes `waiting_letter_review` + the draft letter to DB before suspending.
+    Uses Best-of-N tracking: presents `best_draft` (highest scoring) rather than
+    `draft_letter` (which may be a worse later revision).
+
+    Writes `waiting_letter_review` + the best draft to DB before suspending.
     """
     thread_id = config.get("configurable", {}).get("thread_id", "unknown")
     run_id = state.get("run_id", "")
 
+    # Best-of-N: use best_draft if available, fall back to draft_letter
+    best_draft = state.get("best_draft") or state.get("draft_letter", "")
+    best_score = state.get("best_score", state.get("critic_score", 0))
+    current_score = state.get("critic_score", 0)
+    revision_count = state.get("revision_count", 0)
+
     logger.info(
-        "HITL-2: presenting letter for review (score=%s, revisions=%d, thread=%s)",
-        state.get("critic_score"),
-        state.get("revision_count", 0),
+        "HITL-2: presenting best letter (best_score=%s, current_score=%s, "
+        "revisions=%d, thread=%s)",
+        best_score,
+        current_score,
+        revision_count,
         thread_id,
     )
 
-    # Write waiting status to DB before pausing
-    # (other attributes like draft_letter and critic_feedback were already synced by runner)
+    best_feedback = state.get("best_feedback") or state.get("critic_feedback", {})
+
+    # Write waiting status + BEST draft to DB before pausing.
+    # CRITICAL: The frontend polls pipeline_runs.draft_letter to display the letter.
+    # Without this explicit write, the DB contains the LAST writer output (draft_letter),
+    # not the best_draft — causing the user to see the worst revision.
     await _set_status(
         run_id,
         "waiting_letter_review",
+        {
+            "draft_letter": best_draft,   # Overwrite draft_letter with the BEST draft
+            "best_draft": best_draft,
+            "best_score": best_score,
+            "critic_score": best_feedback, # Overwrite critic_score with BEST feedback
+        },
     )
     from app.graph.pubsub import log_emitter
-    await log_emitter.emit(run_id, {"type": "info", "message": "HITL: Draft letter ready. Waiting for your final review and approval..."})
+
+    # Inform user if we're showing a better earlier draft
+    if best_score > current_score and best_draft != state.get("draft_letter", ""):
+        await log_emitter.emit(run_id, {
+            "type": "info",
+            "message": (
+                f"HITL: Presenting your BEST draft (scored {best_score}/100) — "
+                f"the latest revision scored {current_score}/100, so we kept the better one."
+            ),
+        })
+    else:
+        await log_emitter.emit(run_id, {
+            "type": "info",
+            "message": "HITL: Draft letter ready. Waiting for your final review and approval...",
+        })
 
     # Bypass interrupt if running evaluation
     if config.get("configurable", {}).get("is_evaluation"):
         logger.info("HITL-2: Bypassing interrupt for evaluation mode")
-        review = {"edited_letter": state.get("draft_letter", "")}
+        review = {"edited_letter": best_draft}
     else:
         # interrupt() suspends execution; resumes with review dict
         review = interrupt({
             "type": "letter_review",
-            "draft_letter": state.get("draft_letter", ""),
-            "critic_score": state.get("critic_score", 0),
-            "critic_feedback": state.get("critic_feedback", {}),
+            "draft_letter": best_draft,  # Show the best draft, not the last
+            "best_score": best_score,
+            "critic_score": best_score,
+            "critic_feedback": best_feedback,
             "gap_report": state.get("gap_report", {}),
+            "revision_count": revision_count,
             "message": "Please review and optionally edit the cover letter.",
         })
 
     # review is the dict returned by Command(resume=review_data) from the API
-    final_letter = review.get("edited_letter") or state.get("draft_letter", "")
+    final_letter = review.get("edited_letter") or best_draft
 
     logger.info("HITL-2: letter approved (thread=%s)", thread_id)
 

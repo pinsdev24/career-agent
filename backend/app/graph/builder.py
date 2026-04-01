@@ -1,12 +1,12 @@
 """LangGraph graph builder — assembles the full pipeline.
 
-Graph structure:
-    START → router → (scout | scraper)
+Graph structure (MVP):
+    START → memory_loader → router → (scout | scraper)
     scout → hitl1 [interrupt] → matcher
     scraper → matcher
     matcher → writer → critic → score_router
     score_router → writer (retry, max 3) | hitl2 [interrupt]
-    hitl2 → END
+    hitl2 → memory_writer → END
 """
 
 import logging
@@ -18,6 +18,8 @@ from app.config import get_settings
 from app.graph.nodes.critic import critic_node
 from app.graph.nodes.hitl import hitl1_node, hitl2_node
 from app.graph.nodes.matcher import matcher_node
+from app.graph.nodes.memory_loader import memory_loader_node
+from app.graph.nodes.memory_writer import memory_writer_node
 from app.graph.nodes.router import router_node
 from app.graph.nodes.scout import scout_node
 from app.graph.nodes.scraper import scraper_node
@@ -69,6 +71,7 @@ def build_graph() -> StateGraph:
     graph = StateGraph(AgentState)
 
     # --- Nodes ---
+    graph.add_node("memory_loader", memory_loader_node)
     graph.add_node("router", router_node)
     graph.add_node("scout", scout_node)
     graph.add_node("scraper", scraper_node)
@@ -77,9 +80,11 @@ def build_graph() -> StateGraph:
     graph.add_node("writer", writer_node)
     graph.add_node("critic", critic_node)
     graph.add_node("hitl2", hitl2_node)
+    graph.add_node("memory_writer", memory_writer_node)
 
-    # --- Entry: START → router ---
-    graph.add_edge(START, "router")
+    # --- Entry: START → memory_loader → router ---
+    graph.add_edge(START, "memory_loader")
+    graph.add_edge("memory_loader", "router")
 
     # --- Router → Scout or Scraper ---
     graph.add_conditional_edges(
@@ -106,8 +111,9 @@ def build_graph() -> StateGraph:
         {"writer": "writer", "hitl2": "hitl2"},
     )
 
-    # --- HITL-2 → END ---
-    graph.add_edge("hitl2", END)
+    # --- HITL-2 → Memory Writer → END ---
+    graph.add_edge("hitl2", "memory_writer")
+    graph.add_edge("memory_writer", END)
 
     return graph
 
