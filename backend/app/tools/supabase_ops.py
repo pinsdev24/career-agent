@@ -7,9 +7,8 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from supabase import AsyncClient
-
 from app.exceptions import NotFoundError
+from supabase import AsyncClient
 
 logger = logging.getLogger(__name__)
 
@@ -26,15 +25,19 @@ async def upsert_profile(
     cv_structured: dict,
 ) -> dict:
     """Create or update a user profile with parsed CV data."""
-    result = await supabase.table("profiles").upsert(
-        {
-            "id": user_id,
-            "cv_raw_text": cv_raw_text,
-            "cv_structured": cv_structured,
-            "updated_at": datetime.now(timezone.utc).isoformat(),
-        },
-        on_conflict="id",
-    ).execute()
+    result = (
+        await supabase.table("profiles")
+        .upsert(
+            {
+                "id": user_id,
+                "cv_raw_text": cv_raw_text,
+                "cv_structured": cv_structured,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            },
+            on_conflict="id",
+        )
+        .execute()
+    )
 
     if not result.data:
         raise NotFoundError("Failed to upsert profile")
@@ -62,15 +65,19 @@ async def create_pipeline_run(
     offer_url: str | None = None,
 ) -> dict:
     """Create a new pipeline run record."""
-    result = await supabase.table("pipeline_runs").insert(
-        {
-            "id": run_id,
-            "user_id": user_id,
-            "entry_mode": entry_mode,
-            "status": "started",
-            "offer_url": offer_url,
-        }
-    ).execute()
+    result = (
+        await supabase.table("pipeline_runs")
+        .insert(
+            {
+                "id": run_id,
+                "user_id": user_id,
+                "entry_mode": entry_mode,
+                "status": "started",
+                "offer_url": offer_url,
+            }
+        )
+        .execute()
+    )
 
     if not result.data:
         raise NotFoundError("Failed to create pipeline run")
@@ -100,12 +107,7 @@ async def update_pipeline_run(
 ) -> dict:
     """Update fields on a pipeline run."""
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-    result = (
-        await supabase.table("pipeline_runs")
-        .update(updates)
-        .eq("id", run_id)
-        .execute()
-    )
+    result = await supabase.table("pipeline_runs").update(updates).eq("id", run_id).execute()
     if not result.data:
         raise NotFoundError(f"Pipeline run {run_id} not found")
     return result.data[0]
@@ -138,17 +140,21 @@ async def upsert_job_offer(
 ) -> dict:
     """Create or update a job offer with 7-day TTL."""
     expires_at = (datetime.now(timezone.utc) + timedelta(days=7)).isoformat()
-    result = await supabase.table("job_offers").upsert(
-        {
-            "id": offer_id,
-            "url": url,
-            "raw_text": raw_text,
-            "structured": structured,
-            "source": source,
-            "expires_at": expires_at,
-        },
-        on_conflict="url",
-    ).execute()
+    result = (
+        await supabase.table("job_offers")
+        .upsert(
+            {
+                "id": offer_id,
+                "url": url,
+                "raw_text": raw_text,
+                "structured": structured,
+                "source": source,
+                "expires_at": expires_at,
+            },
+            on_conflict="url",
+        )
+        .execute()
+    )
 
     return result.data[0] if result.data else {}
 

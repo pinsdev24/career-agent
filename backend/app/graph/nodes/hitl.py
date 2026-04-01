@@ -26,8 +26,8 @@ async def _set_status(run_id: str, status: str, extra: dict | None = None) -> No
     before the interrupt() call suspends graph execution.
     """
     try:
-        from app.dependencies import create_supabase_client
         from app.config import get_settings
+        from app.dependencies import create_supabase_client
         from app.tools.supabase_ops import update_pipeline_run
 
         settings = get_settings()
@@ -63,7 +63,11 @@ async def hitl1_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "waiting_offer_selection",
     )
     from app.graph.pubsub import log_emitter
-    await log_emitter.emit(run_id, {"type": "info", "message": "HITL: Searching paused. Waiting for your offer selection..."})
+
+    await log_emitter.emit(
+        run_id,
+        {"type": "info", "message": "HITL: Searching paused. Waiting for your offer selection..."},
+    )
 
     # Bypass interrupt if running evaluation
     if config.get("configurable", {}).get("is_evaluation"):
@@ -71,11 +75,13 @@ async def hitl1_node(state: AgentState, config: RunnableConfig) -> AgentState:
         selected_offer = offers[0] if offers else {}
     else:
         # interrupt() suspends graph execution; resumes with user's selected offer dict
-        selected_offer = interrupt({
-            "type": "offer_selection",
-            "offers": offers,
-            "message": "Please select a job offer to analyze.",
-        })
+        selected_offer = interrupt(
+            {
+                "type": "offer_selection",
+                "offers": offers,
+                "message": "Please select a job offer to analyze.",
+            }
+        )
 
     logger.info("HITL-1: resumed with offer selection (thread=%s)", thread_id)
 
@@ -107,7 +113,14 @@ async def hitl2_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "waiting_letter_review",
     )
     from app.graph.pubsub import log_emitter
-    await log_emitter.emit(run_id, {"type": "info", "message": "HITL: Draft letter ready. Waiting for your final review and approval..."})
+
+    await log_emitter.emit(
+        run_id,
+        {
+            "type": "info",
+            "message": "HITL: Draft letter ready. Waiting for your final review and approval...",
+        },
+    )
 
     # Bypass interrupt if running evaluation
     if config.get("configurable", {}).get("is_evaluation"):
@@ -115,14 +128,16 @@ async def hitl2_node(state: AgentState, config: RunnableConfig) -> AgentState:
         review = {"edited_letter": state.get("draft_letter", "")}
     else:
         # interrupt() suspends execution; resumes with review dict
-        review = interrupt({
-            "type": "letter_review",
-            "draft_letter": state.get("draft_letter", ""),
-            "critic_score": state.get("critic_score", 0),
-            "critic_feedback": state.get("critic_feedback", {}),
-            "gap_report": state.get("gap_report", {}),
-            "message": "Please review and optionally edit the cover letter.",
-        })
+        review = interrupt(
+            {
+                "type": "letter_review",
+                "draft_letter": state.get("draft_letter", ""),
+                "critic_score": state.get("critic_score", 0),
+                "critic_feedback": state.get("critic_feedback", {}),
+                "gap_report": state.get("gap_report", {}),
+                "message": "Please review and optionally edit the cover letter.",
+            }
+        )
 
     # review is the dict returned by Command(resume=review_data) from the API
     final_letter = review.get("edited_letter") or state.get("draft_letter", "")

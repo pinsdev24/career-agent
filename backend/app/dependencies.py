@@ -8,9 +8,9 @@ import logging
 from typing import Annotated
 
 from fastapi import Depends, Header, HTTPException, Request, status
-from supabase import AsyncClient, acreate_client
 
-from app.config import Settings, get_settings
+from app.config import Settings
+from supabase import AsyncClient, acreate_client
 
 logger = logging.getLogger(__name__)
 

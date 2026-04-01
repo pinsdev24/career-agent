@@ -4,7 +4,6 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile
-from supabase import AsyncClient
 
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import CVParsingError
@@ -12,6 +11,7 @@ from app.models.schemas import ProfilePreferencesUpdate, ProfileResponse
 from app.tools.cv_parser import parse_pdf, structure_cv
 from app.tools.embedding_tools import chunk_and_embed
 from app.tools.supabase_ops import get_profile, store_cv_embeddings, upsert_profile
+from supabase import AsyncClient
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -84,9 +84,7 @@ async def update_preferences(
             exclude_none=True,
         )
 
-    result = await supabase.table("profiles").update(update_data).eq(
-        "id", user["id"]
-    ).execute()
+    result = await supabase.table("profiles").update(update_data).eq("id", user["id"]).execute()
 
     profile = result.data[0] if result.data else {}
     return ProfileResponse(**profile)

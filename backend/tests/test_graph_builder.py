@@ -1,9 +1,7 @@
 """Tests for the graph builder — structure and compilation."""
 
-import pytest
-
-from app.graph.builder import build_graph, compile_graph, _route_entry, _route_after_critic
 from app.config import get_settings
+from app.graph.builder import _route_after_critic, _route_entry, build_graph, compile_graph
 
 
 class TestGraphStructure:

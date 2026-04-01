@@ -1,13 +1,13 @@
 """Tests for graph nodes — all LLM and API calls are mocked."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from pydantic import BaseModel
 
+import pytest
 
 # ---------------------------------------------------------------------------
 # Router node
 # ---------------------------------------------------------------------------
+
 
 class TestRouterNode:
     """Router is a pure function — no mocking needed."""
@@ -37,6 +37,7 @@ class TestRouterNode:
 # Scout node
 # ---------------------------------------------------------------------------
 
+
 class TestScoutNode:
     """Scout calls Tavily search + embedding — both mocked."""
 
@@ -63,9 +64,13 @@ class TestScoutNode:
         mock_embedding = [0.1] * 1536
 
         with patch("app.graph.nodes.scout.search_jobs", new=AsyncMock(return_value=mock_results)):
-            with patch("app.graph.nodes.scout.embed_text", new=AsyncMock(return_value=mock_embedding)):
+            with patch(
+                "app.graph.nodes.scout.embed_text", new=AsyncMock(return_value=mock_embedding)
+            ):
                 with patch("app.tools.embedding_tools.OpenAIEmbeddings") as MockEmb:
-                    MockEmb.return_value.aembed_documents = AsyncMock(return_value=[mock_embedding, mock_embedding])
+                    MockEmb.return_value.aembed_documents = AsyncMock(
+                        return_value=[mock_embedding, mock_embedding]
+                    )
                     result = await scout_node(sample_agent_state, mock_runnable_config)
 
         assert "discovered_offers" in result
@@ -98,15 +103,27 @@ class TestScoutNode:
         emb_high = [0.9] * 1536
         emb_low = [0.1] * 1536
         mock_results = [
-            {"title": "Low Score Job", "url": "https://a.com", "content": "generic role", "score": 0.1},
-            {"title": "High Score Job", "url": "https://b.com", "content": "Python FastAPI role", "score": 0.9},
+            {
+                "title": "Low Score Job",
+                "url": "https://a.com",
+                "content": "generic role",
+                "score": 0.1,
+            },
+            {
+                "title": "High Score Job",
+                "url": "https://b.com",
+                "content": "Python FastAPI role",
+                "score": 0.9,
+            },
         ]
         cv_emb = [0.9] * 1536
 
         with patch("app.graph.nodes.scout.search_jobs", new=AsyncMock(return_value=mock_results)):
             with patch("app.graph.nodes.scout.embed_text", new=AsyncMock(return_value=cv_emb)):
                 with patch("app.tools.embedding_tools.OpenAIEmbeddings") as MockEmb:
-                    MockEmb.return_value.aembed_documents = AsyncMock(return_value=[emb_low, emb_high])
+                    MockEmb.return_value.aembed_documents = AsyncMock(
+                        return_value=[emb_low, emb_high]
+                    )
                     result = await scout_node(sample_agent_state, mock_runnable_config)
 
         offers = result["discovered_offers"]
@@ -118,6 +135,7 @@ class TestScoutNode:
 # Scraper node
 # ---------------------------------------------------------------------------
 
+
 class TestScraperNode:
     """Scraper calls Tavily extract + LLM with_structured_output — mocked."""
 
@@ -125,7 +143,7 @@ class TestScraperNode:
     async def test_scraper_extracts_and_structures_offer(
         self, sample_agent_state: dict, mock_runnable_config: dict
     ) -> None:
-        from app.graph.nodes.scraper import scraper_node, StructuredOffer
+        from app.graph.nodes.scraper import StructuredOffer, scraper_node
 
         mock_raw = "Backend Engineer at TechCorp. Python, FastAPI required. Paris, CDI."
 
@@ -139,11 +157,18 @@ class TestScraperNode:
             description="Backend role at TechCorp.",
         )
 
-        with patch("app.graph.nodes.scraper.extract_url", new=AsyncMock(return_value={"raw_content": mock_raw})):
+        with patch(
+            "app.graph.nodes.scraper.extract_url",
+            new=AsyncMock(return_value={"raw_content": mock_raw}),
+        ):
             mock_llm_chain = AsyncMock(return_value=mock_structured)
             with patch("app.graph.nodes.scraper.ChatOpenAI") as MockLLM:
                 MockLLM.return_value.with_structured_output.return_value.ainvoke = mock_llm_chain
-                state = {**sample_agent_state, "entry_mode": "url", "offer_url": "https://example.com/job"}
+                state = {
+                    **sample_agent_state,
+                    "entry_mode": "url",
+                    "offer_url": "https://example.com/job",
+                }
                 result = await scraper_node(state, mock_runnable_config)
 
         assert "selected_offer" in result
@@ -168,6 +193,7 @@ class TestScraperNode:
 # Matcher node
 # ---------------------------------------------------------------------------
 
+
 class TestMatcherNode:
     """Matcher calls embedding + LLM structured output — mocked."""
 
@@ -175,7 +201,7 @@ class TestMatcherNode:
     async def test_matcher_produces_gap_report(
         self, sample_agent_state: dict, mock_runnable_config: dict
     ) -> None:
-        from app.graph.nodes.matcher import matcher_node, GapAnalysisResult
+        from app.graph.nodes.matcher import GapAnalysisResult, matcher_node
 
         mock_result = GapAnalysisResult(
             match_score=82,
@@ -185,9 +211,13 @@ class TestMatcherNode:
         )
         mock_emb = [0.5] * 1536
 
-        with patch("app.graph.nodes.matcher._embed_pair", new=AsyncMock(return_value=(mock_emb, mock_emb))):
+        with patch(
+            "app.graph.nodes.matcher._embed_pair", new=AsyncMock(return_value=(mock_emb, mock_emb))
+        ):
             with patch("app.graph.nodes.matcher.ChatOpenAI") as MockLLM:
-                MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(return_value=mock_result)
+                MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(
+                    return_value=mock_result
+                )
                 result = await matcher_node(sample_agent_state, mock_runnable_config)
 
         assert "gap_report" in result
@@ -201,7 +231,7 @@ class TestMatcherNode:
         self, sample_agent_state: dict, mock_runnable_config: dict
     ) -> None:
         """Final score = 60% LLM + 40% embedding."""
-        from app.graph.nodes.matcher import matcher_node, GapAnalysisResult
+        from app.graph.nodes.matcher import GapAnalysisResult, matcher_node
 
         # Perfect cosine similarity (same vector) → embedding_score = 100
         mock_emb = [1.0] + [0.0] * 1535
@@ -213,9 +243,13 @@ class TestMatcherNode:
             summary="Good match.",
         )
 
-        with patch("app.graph.nodes.matcher._embed_pair", new=AsyncMock(return_value=(mock_emb, mock_emb))):
+        with patch(
+            "app.graph.nodes.matcher._embed_pair", new=AsyncMock(return_value=(mock_emb, mock_emb))
+        ):
             with patch("app.graph.nodes.matcher.ChatOpenAI") as MockLLM:
-                MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(return_value=mock_result)
+                MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(
+                    return_value=mock_result
+                )
                 result = await matcher_node(sample_agent_state, mock_runnable_config)
 
         # 60% * 60 + 40% * 100 = 36 + 40 = 76
@@ -225,6 +259,7 @@ class TestMatcherNode:
 # ---------------------------------------------------------------------------
 # Writer node
 # ---------------------------------------------------------------------------
+
 
 class TestWriterNode:
     """Writer calls ChatOpenAI — mocked."""
@@ -301,6 +336,7 @@ class TestWriterNode:
 # Critic node
 # ---------------------------------------------------------------------------
 
+
 class TestCriticNode:
     """Critic calls ChatOpenAI with_structured_output — mocked."""
 
@@ -308,16 +344,22 @@ class TestCriticNode:
     async def test_critic_returns_scores(
         self, sample_agent_state: dict, mock_runnable_config: dict
     ) -> None:
-        from app.graph.nodes.critic import critic_node, CriticEvaluation
+        from app.graph.nodes.critic import CriticEvaluation, critic_node
 
         mock_eval = CriticEvaluation(
-            relevance=85, tone=80, structure=78, specificity=72, persuasiveness=82,
+            relevance=85,
+            tone=80,
+            structure=78,
+            specificity=72,
+            persuasiveness=82,
             overall=80,
             feedback="Good letter. Add specific metrics from your Acme Corp role.",
         )
 
         with patch("app.graph.nodes.critic.ChatOpenAI") as MockLLM:
-            MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(return_value=mock_eval)
+            MockLLM.return_value.with_structured_output.return_value.ainvoke = AsyncMock(
+                return_value=mock_eval
+            )
             result = await critic_node(sample_agent_state, mock_runnable_config)
 
         assert result["critic_score"] == 80
@@ -344,6 +386,7 @@ class TestCriticNode:
 # ---------------------------------------------------------------------------
 # HITL nodes
 # ---------------------------------------------------------------------------
+
 
 class TestHITLNodes:
     """HITL nodes use interrupt() — we test the state they return after resume."""

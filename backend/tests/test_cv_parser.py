@@ -6,7 +6,6 @@ from app.exceptions import CVParsingError
 from app.tools.cv_parser import parse_pdf
 
 
-
 class TestParsePdf:
     """Unit tests for PDF text extraction via PyMuPDF."""
 
@@ -18,6 +17,7 @@ class TestParsePdf:
 
     def test_multipage_pdf_joins_with_newlines(self) -> None:
         import fitz
+
         doc = fitz.open()
         for i in range(3):
             page = doc.new_page()
@@ -41,6 +41,7 @@ class TestParsePdf:
     def test_blank_pdf_raises_cv_parsing_error(self) -> None:
         """A PDF with no text content should raise CVParsingError."""
         import fitz
+
         doc = fitz.open()
         doc.new_page()  # blank page, no text
         pdf_bytes = doc.tobytes()

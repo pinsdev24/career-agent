@@ -1,7 +1,8 @@
 """Tests for FastAPI routes — auth and pipeline endpoints."""
 
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 FAKE_TOKEN = "Bearer fake-valid-jwt-token"
 
@@ -9,6 +10,7 @@ FAKE_TOKEN = "Bearer fake-valid-jwt-token"
 # ---------------------------------------------------------------------------
 # Health check
 # ---------------------------------------------------------------------------
+
 
 class TestHealthEndpoint:
     @pytest.mark.asyncio
@@ -21,6 +23,7 @@ class TestHealthEndpoint:
 # ---------------------------------------------------------------------------
 # Profile endpoints
 # ---------------------------------------------------------------------------
+
 
 class TestProfileEndpoints:
     """Test profile router — auth required."""
@@ -36,15 +39,19 @@ class TestProfileEndpoints:
     ) -> None:
         # Mock profile DB response
         mock_supabase.table.return_value.select.return_value.eq.return_value.execute = AsyncMock(
-            return_value=MagicMock(data=[{
-                "id": "user-abc",
-                "cv_raw_text": "Jane Doe\nPython Developer",
-                "cv_structured": {},
-                "tone_of_voice": "professional",
-                "search_preferences": {},
-                "created_at": "2026-03-24T00:00:00Z",
-                "updated_at": "2026-03-24T00:00:00Z",
-            }])
+            return_value=MagicMock(
+                data=[
+                    {
+                        "id": "user-abc",
+                        "cv_raw_text": "Jane Doe\nPython Developer",
+                        "cv_structured": {},
+                        "tone_of_voice": "professional",
+                        "search_preferences": {},
+                        "created_at": "2026-03-24T00:00:00Z",
+                        "updated_at": "2026-03-24T00:00:00Z",
+                    }
+                ]
+            )
         )
         response = await async_client.get(
             "/profile/",
@@ -63,21 +70,23 @@ class TestProfileEndpoints:
 # Pipeline endpoints
 # ---------------------------------------------------------------------------
 
+
 class TestPipelineEndpoints:
     """Test pipeline router — run creation and status."""
 
     @pytest.mark.asyncio
     async def test_start_pipeline_requires_auth(self, async_client) -> None:
-        response = await async_client.post("/pipeline/start", json={
-            "entry_mode": "url",
-            "offer_url": "https://example.com/job",
-        })
+        response = await async_client.post(
+            "/pipeline/start",
+            json={
+                "entry_mode": "url",
+                "offer_url": "https://example.com/job",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_start_pipeline_creates_run(
-        self, async_client, mock_supabase: MagicMock
-    ) -> None:
+    async def test_start_pipeline_creates_run(self, async_client, mock_supabase: MagicMock) -> None:
         # Mock insert operation
         mock_supabase.table.return_value.insert.return_value.execute = AsyncMock(
             return_value=MagicMock(data=[{"id": "run-new-123"}])
@@ -116,6 +125,7 @@ class TestPipelineEndpoints:
 # ---------------------------------------------------------------------------
 # HITL endpoints
 # ---------------------------------------------------------------------------
+
 
 class TestHITLEndpoints:
     """Test HITL resume endpoints."""

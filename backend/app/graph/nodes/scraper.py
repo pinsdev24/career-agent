@@ -9,9 +9,9 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from app.config import get_settings
+from app.graph.pubsub import log_emitter
 from app.models.state import AgentState
 from app.tools.tavily_tools import extract_url
-from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +54,20 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         return {"status": "failed"}
 
     logger.info("Scraper: extracting %s for run=%s", offer_url, state.get("run_id"))
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Scraper: Extracting content from URL..."})
+    await log_emitter.emit(
+        state.get("run_id"), {"type": "info", "message": "Scraper: Extracting content from URL..."}
+    )
 
     # Extract raw content via Tavily
     extracted = await extract_url(offer_url)
     raw_content = extracted.get("raw_content", "")
-    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Scraper routing raw content to LLM for structured extraction..."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "agent_action",
+            "message": "Scraper routing raw content to LLM for structured extraction...",
+        },
+    )
 
     # Structure via LLM with_structured_output — no JSON parsing needed
     settings = get_settings()
@@ -104,7 +112,13 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         selected_offer["company"],
         state.get("run_id"),
     )
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Scraper: Successfully extracted job profile for {structured.company}."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "info",
+            "message": f"Scraper: Successfully extracted job profile for {structured.company}.",
+        },
+    )
 
     return {
         "selected_offer": selected_offer,

@@ -29,6 +29,7 @@ async def search_jobs(
     client = _get_tavily_client()
     try:
         from typing import Any
+
         kwargs: dict[str, Any] = {
             "query": query,
             "max_results": max_results,
@@ -39,7 +40,7 @@ async def search_jobs(
             kwargs["include_domains"] = include_domains
         if exclude_domains:
             kwargs["exclude_domains"] = exclude_domains
-            
+
         response = await client.search(**kwargs)
         results = response.get("results", [])
         logger.info("Tavily search returned %d results for query: %s", len(results), query[:80])

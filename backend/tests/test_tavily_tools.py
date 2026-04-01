@@ -1,7 +1,8 @@
 """Tests for Tavily tools — mocked HTTP calls."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
 
 from app.exceptions import TavilyError
 
@@ -14,7 +15,12 @@ class TestSearchJobs:
         from app.tools.tavily_tools import search_jobs
 
         mock_results = [
-            {"title": "Backend Engineer", "url": "https://a.com", "content": "Python role", "score": 0.9},
+            {
+                "title": "Backend Engineer",
+                "url": "https://a.com",
+                "content": "Python role",
+                "score": 0.9,
+            },
             {"title": "Python Dev", "url": "https://b.com", "content": "Django role", "score": 0.7},
         ]
 
@@ -55,9 +61,7 @@ class TestExtractUrl:
         mock_extracted = [{"raw_content": "Job posting: Python Engineer at TechCorp..."}]
 
         with patch("app.tools.tavily_tools.AsyncTavilyClient") as MockClient:
-            MockClient.return_value.extract = AsyncMock(
-                return_value={"results": mock_extracted}
-            )
+            MockClient.return_value.extract = AsyncMock(return_value={"results": mock_extracted})
             result = await extract_url("https://example.com/job/123")
 
         assert result["url"] == "https://example.com/job/123"

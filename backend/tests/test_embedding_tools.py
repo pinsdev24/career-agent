@@ -1,8 +1,6 @@
 """Tests for embedding tools — chunking logic (no API calls)."""
 
-import pytest
-
-from app.tools.embedding_tools import _chunk_cv, ChunkEmbedding
+from app.tools.embedding_tools import ChunkEmbedding, _chunk_cv
 
 
 class TestChunkCv:

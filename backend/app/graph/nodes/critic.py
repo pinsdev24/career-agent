@@ -8,8 +8,8 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from app.config import get_settings
-from app.models.state import AgentState
 from app.graph.pubsub import log_emitter
+from app.models.state import AgentState
 
 logger = logging.getLogger(__name__)
 
@@ -48,15 +48,22 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
     offer = state.get("selected_offer", {})
     structured_offer = offer.get("structured", {})
 
-    required_skills = structured_offer.get("required_skills") or \
-        state.get("gap_report", {}).get("missing_skills", [])
+    required_skills = structured_offer.get("required_skills") or state.get("gap_report", {}).get(
+        "missing_skills", []
+    )
 
     logger.info(
         "Critic: evaluating letter (revision=%d) for run=%s",
         state.get("revision_count", 0),
         state.get("run_id"),
     )
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Critic: Evaluating draft letter against 5 quality dimensions..."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "info",
+            "message": "Critic: Evaluating draft letter against 5 quality dimensions...",
+        },
+    )
 
     settings = get_settings()
     llm = ChatOpenAI(
@@ -72,21 +79,29 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         f"Required skills: {', '.join(required_skills) if required_skills else 'not specified'}"
     )
 
-    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Critic analyzing letter relevance, tone, persuasiveness..."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "agent_action",
+            "message": "Critic analyzing letter relevance, tone, persuasiveness...",
+        },
+    )
 
     try:
         evaluation: CriticEvaluation = await structured_llm.ainvoke(
             [
                 SystemMessage(content=SYSTEM_PROMPT),
-                SystemMessage(
-                    content=f"JOB OFFER:\n{offer_context}\n\nCOVER LETTER:\n{letter}"
-                ),
+                SystemMessage(content=f"JOB OFFER:\n{offer_context}\n\nCOVER LETTER:\n{letter}"),
             ]
         )
     except Exception as exc:
         logger.warning("Critic: structured output failed: %s — using fallback score", exc)
         evaluation = CriticEvaluation(
-            relevance=70, tone=70, structure=70, specificity=70, persuasiveness=70,
+            relevance=70,
+            tone=70,
+            structure=70,
+            specificity=70,
+            persuasiveness=70,
             overall=70,
             feedback="Evaluation unavailable. Please review the letter manually.",
         )
@@ -97,7 +112,10 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         settings.critic_threshold,
         state.get("run_id"),
     )
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Critic: Overall score is {evaluation.overall} / 100."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {"type": "info", "message": f"Critic: Overall score is {evaluation.overall} / 100."},
+    )
 
     return {
         "critic_score": evaluation.overall,

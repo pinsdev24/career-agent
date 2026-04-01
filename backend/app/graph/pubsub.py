@@ -7,6 +7,7 @@ from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
 
+
 class LogEmitter:
     def __init__(self):
         # run_id -> list of queues
@@ -19,7 +20,7 @@ class LogEmitter:
             self.subscribers[run_id] = []
         if run_id not in self.history:
             self.history[run_id] = []
-            
+
         q = asyncio.Queue()
         self.subscribers[run_id].append(q)
         return q
@@ -34,9 +35,9 @@ class LogEmitter:
         # We ensure history exists
         if run_id not in self.history:
             self.history[run_id] = []
-            
+
         self.history[run_id].append(message)
-        
+
         # Broadcast to all connected clients
         if run_id in self.subscribers:
             for q in self.subscribers[run_id]:
@@ -50,17 +51,18 @@ class LogEmitter:
             if run_id in self.history:
                 for msg in self.history[run_id]:
                     yield f"data: {json.dumps(msg)}\n\n"
-            
+
             # Yield active items
             while True:
                 msg = await q.get()
                 yield f"data: {json.dumps(msg)}\n\n"
                 q.task_done()
-                
+
         except asyncio.CancelledError:
             logger.info("SSE Stream for run=%s cancelled by client disconnect", run_id)
         finally:
             self.unsubscribe(run_id, q)
+
 
 # Global singleton
 log_emitter = LogEmitter()

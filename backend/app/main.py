@@ -30,7 +30,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Shutting down CareerAgent backend")
 
 
-
 app = FastAPI(
     title="CareerAgent API",
     description="Multi-Agent LLM Job Application Assistant",
@@ -46,7 +45,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,   # must be False when allow_origins=["*"]
+    allow_credentials=False,  # must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

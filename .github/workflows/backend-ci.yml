@@ -10,13 +10,24 @@ on:
     paths:
       - 'backend/**'
 
+# Cancel in-progress runs on same branch (except main) to save action minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Apply least privilege to the GITHUB_TOKEN
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: backend
 
 jobs:
   lint-and-test:
+    name: Lint, Type Check & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15 # Best practice: fail fast on hanging jobs
 
     services:
       postgres:
@@ -41,6 +52,7 @@ jobs:
         with:
           version: "latest"
           enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,7 +63,13 @@ jobs:
         run: uv sync --frozen --all-extras
 
       - name: Run Ruff check
-        run: uv run ruff check .
+        run: uv run ruff check --output-format=github .
+
+      - name: Run Black formatting check
+        run: uv run black --check .
+
+      - name: Run MyPy type check
+        run: uv run mypy .
 
       - name: Run Pytest
         env:

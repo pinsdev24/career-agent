@@ -7,8 +7,8 @@ from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
-from app.models.state import AgentState
 from app.graph.pubsub import log_emitter
+from app.models.state import AgentState
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,13 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
         revision_count,
         state.get("run_id"),
     )
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Writer: Drafting personalized cover letter (Revision {revision_count})..."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "info",
+            "message": f"Writer: Drafting personalized cover letter (Revision {revision_count})...",
+        },
+    )
 
     cv_text = state.get("cv_text", "")
     offer = state.get("selected_offer", {})
@@ -97,7 +103,13 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
             feedback=feedback.get("feedback", str(feedback)),
         )
 
-    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Writer instructing LLM with specific tone and gap context..."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "agent_action",
+            "message": "Writer instructing LLM with specific tone and gap context...",
+        },
+    )
     settings = get_settings()
     llm = ChatOpenAI(
         base_url="https://api.moonshot.ai/v1",
@@ -108,21 +120,22 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
 
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=WRITER_PROMPT.format(
-            tone=tone,
-            tone_instruction=tone_instruction,
-            cv_text=cv_text[:4000],
-            offer_title=offer.get("title", "Unknown"),
-            offer_company=offer.get("company", "Unknown"),
-            offer_description=(
-                offer.get("structured", {}).get("description", "")
-                or offer.get("snippet", "")
-            )[:2000],
-            matching_skills=", ".join(gap.get("matching_skills", [])) or "see CV",
-            missing_skills=", ".join(gap.get("missing_skills", [])) or "none identified",
-            gap_summary=gap.get("summary", "Strong candidate match."),
-            revision_context=revision_context,
-        )),
+        HumanMessage(
+            content=WRITER_PROMPT.format(
+                tone=tone,
+                tone_instruction=tone_instruction,
+                cv_text=cv_text[:4000],
+                offer_title=offer.get("title", "Unknown"),
+                offer_company=offer.get("company", "Unknown"),
+                offer_description=(
+                    offer.get("structured", {}).get("description", "") or offer.get("snippet", "")
+                )[:2000],
+                matching_skills=", ".join(gap.get("matching_skills", [])) or "see CV",
+                missing_skills=", ".join(gap.get("missing_skills", [])) or "none identified",
+                gap_summary=gap.get("summary", "Strong candidate match."),
+                revision_context=revision_context,
+            )
+        ),
     ]
 
     response = await llm.ainvoke(messages)
@@ -134,7 +147,13 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
         revision_count,
         state.get("run_id"),
     )
-    await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Writer: Generated a {len(letter.split())}-word cover letter."})
+    await log_emitter.emit(
+        state.get("run_id"),
+        {
+            "type": "info",
+            "message": f"Writer: Generated a {len(letter.split())}-word cover letter.",
+        },
+    )
 
     return {
         "draft_letter": letter.strip(),

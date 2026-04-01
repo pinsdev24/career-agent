@@ -6,7 +6,6 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from supabase import AsyncClient
 
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import NotFoundError
@@ -18,6 +17,7 @@ from app.models.schemas import (
     PipelineStatusResponse,
 )
 from app.tools.supabase_ops import create_pipeline_run, get_pipeline_run, get_user_runs
+from supabase import AsyncClient
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -117,7 +117,9 @@ async def cancel_pipeline_run(
 
 
 from fastapi.responses import StreamingResponse
+
 from app.graph.pubsub import log_emitter
+
 
 @router.get("/{run_id}/stream")
 async def stream_pipeline_logs(
@@ -131,7 +133,4 @@ async def stream_pipeline_logs(
     if not run:
         raise NotFoundError(f"Pipeline run {run_id} not found")
 
-    return StreamingResponse(
-        log_emitter.stream(run_id),
-        media_type="text/event-stream"
-    )
+    return StreamingResponse(log_emitter.stream(run_id), media_type="text/event-stream")

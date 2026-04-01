@@ -10,13 +10,24 @@ on:
     paths:
       - 'frontend/**'
 
+# Cancel in-progress runs on same branch (except main) to save action minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Apply least privilege to the GITHUB_TOKEN
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: frontend
 
 jobs:
   build-and-lint:
+    name: Build & Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15 # Best practice: fail fast on hanging jobs
 
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +41,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Run type check
+        run: npx tsc --noEmit
 
       - name: Run lint
         run: npm run lint

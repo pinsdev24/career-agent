@@ -22,10 +22,10 @@ CV_PARSING_EXAMPLES = [
         },
         "outputs": {
             "full_name": "John Doe",
-            "skills_count_min": 4, # expecting at least 4 skills
+            "skills_count_min": 4,  # expecting at least 4 skills
             "has_experience": True,
-            "has_education": True
-        }
+            "has_education": True,
+        },
     }
 ]
 
@@ -50,19 +50,17 @@ E2E_SCRAPER_EXAMPLES = [
                 "skills": ["JavaScript", "React", "Node.js", "TypeScript"],
                 "experience": [],
                 "education": [],
-                "languages": []
-            }
+                "languages": [],
+            },
         },
         "outputs": {
             "expected_trajectory": ["router", "scraper", "matcher", "writer", "critic"],
             "requires_hitl2": True,
-            "expected_theme": "software engineering"
-        }
+            "expected_theme": "software engineering",
+        },
     }
 ]
 
+
 def get_datasets():
-    return {
-        "cv_parsing": CV_PARSING_EXAMPLES,
-        "e2e_scraper": E2E_SCRAPER_EXAMPLES
-    }
+    return {"cv_parsing": CV_PARSING_EXAMPLES, "e2e_scraper": E2E_SCRAPER_EXAMPLES}

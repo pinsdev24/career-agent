@@ -5,7 +5,6 @@ import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from supabase import AsyncClient
 
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import HITLError, NotFoundError
@@ -17,6 +16,7 @@ from app.models.schemas import (
     PipelineStatus,
 )
 from app.tools.supabase_ops import get_pipeline_run, update_pipeline_run
+from supabase import AsyncClient
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -43,8 +43,9 @@ async def select_offer(
             f"(current status: {run.get('status')})"
         )
 
-    logger.info("HITL-1: User %s selected offer %s for run %s",
-                user["id"], data.selected_offer_id, run_id)
+    logger.info(
+        "HITL-1: User %s selected offer %s for run %s", user["id"], data.selected_offer_id, run_id
+    )
 
     # Find the selected offer dict from the discovered_offers list
     discovered = run.get("discovered_offers") or []
@@ -101,7 +102,9 @@ async def review_letter(
 
     logger.info(
         "HITL-2: User %s reviewed letter for run %s (approved=%s)",
-        user["id"], run_id, data.approved,
+        user["id"],
+        run_id,
+        data.approved,
     )
 
     # Synchronously update status so frontend unfreezes immediately
@@ -128,4 +131,3 @@ async def review_letter(
     )
 
     return PipelineRunResponse(**run)
-

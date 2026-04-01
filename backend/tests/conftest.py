@@ -2,11 +2,10 @@
 
 import os
 from typing import AsyncGenerator
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 import pytest_asyncio
-from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
 
 # ---------------------------------------------------------------------------
@@ -170,9 +169,9 @@ def mock_supabase() -> MagicMock:
     """Return a MagicMock Supabase client."""
     client = MagicMock()
     client.auth = MagicMock()
-    client.auth.get_user = AsyncMock(return_value=MagicMock(
-        user=MagicMock(id="user-abc", email="jane@example.com")
-    ))
+    client.auth.get_user = AsyncMock(
+        return_value=MagicMock(user=MagicMock(id="user-abc", email="jane@example.com"))
+    )
     # Mock table operations
     table = MagicMock()
     table.select.return_value = table
