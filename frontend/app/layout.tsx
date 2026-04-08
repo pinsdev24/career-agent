@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CareerAgent — AI Job Application Assistant",
+  title: "Ariadne — AI Career Labyrinth Navigator",
   description:
-    "Multi-agent LLM system that analyzes your CV, matches job offers, and generates personalized cover letters.",
+    "Navigate your career labyrinth. Multi-agent LLM system that analyzes your CV, matches job offers, and accelerates your hiring potential.",
 };
 
 export default function RootLayout({
@@ -29,8 +29,11 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

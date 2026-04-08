@@ -91,6 +91,7 @@ export interface PipelineRun {
   final_letter?: string | null;
   critic_score?: CriticScore | null;
   revision_count: number;
+  error_details?: Record<string, unknown> | null;
   created_at?: string | null;
   updated_at?: string | null;
 }
@@ -112,6 +113,17 @@ export interface HITLOfferSelection {
 export interface HITLLetterReview {
   edited_letter: string;
   approved: boolean;
+  user_feedback?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Memory
+// ---------------------------------------------------------------------------
+
+export interface Memory {
+  memory_key: string;
+  memory_data: Record<string, any>;
+  updated_at?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -128,7 +140,7 @@ export const PIPELINE_STATUS_LABELS: Record<PipelineStatus, string> = {
   waiting_letter_review: "Review Letter",
   completed: "Completed",
   failed: "Failed",
-};
+}
 
 export const PIPELINE_STEPS: PipelineStatus[] = [
   "started",

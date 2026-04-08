@@ -9,9 +9,19 @@ from pydantic import BaseModel, Field
 
 from app.config import get_settings
 from app.models.state import AgentState
+from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_critic_llm(structured_llm: object, messages: list, run_id: str) -> object:
+    """Retry-wrapped critic evaluation call."""
+    return await structured_llm.ainvoke(  # type: ignore[union-attr]
+        messages,
+        config={"metadata": {"node": "critic", "run_id": run_id, "model_tier": "critic"}},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -84,17 +94,22 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "message": "Critic analyzing letter relevance, tone, persuasiveness...",
     })
 
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(
+            content=f"JOB OFFER:\n{offer_context}\n\nCOVER LETTER:\n{letter}"
+        ),
+    ]
+
     try:
-        evaluation: CriticEvaluation = await structured_llm.ainvoke(
-            [
-                SystemMessage(content=SYSTEM_PROMPT),
-                SystemMessage(
-                    content=f"JOB OFFER:\n{offer_context}\n\nCOVER LETTER:\n{letter}"
-                ),
-            ]
+        evaluation: CriticEvaluation = await _invoke_critic_llm(  # type: ignore[assignment]
+            structured_llm, messages, run_id=state.get("run_id", "")
         )
     except Exception as exc:
-        logger.warning("Critic: structured output failed: %s — using fallback score", exc)
+        logger.warning(
+            "Critic: evaluation failed after retries for run=%s: %s — using fallback score",
+            state.get("run_id"), exc,
+        )
         evaluation = CriticEvaluation(
             relevance=70, tone=70, structure=70, specificity=70, persuasiveness=70,
             overall=70,

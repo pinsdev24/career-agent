@@ -16,51 +16,50 @@ export function CriticScoresCard({ score }: { score: CriticScore }) {
 
   const colorClass =
     score.overall >= 80
-      ? "text-emerald-400"
+      ? "text-emerald-500"
       : score.overall >= 60
-        ? "text-amber-400"
-        : "text-red-400";
+        ? "text-orange-500"
+        : "text-red-500";
 
   return (
-    <Card className="border-border/60 bg-card/80">
-      <CardHeader className="pb-4 border-b border-border/40">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Star className="h-4.5 w-4.5 text-primary" />
-            <CardTitle className="text-base">AI Critic</CardTitle>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className={`text-2xl font-bold tabular-nums ${colorClass}`}>
-              {score.overall}<span className="text-sm font-normal text-muted-foreground">/100</span>
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-5 space-y-5">
-        <div className="space-y-3.5">
+    <div className="space-y-8">
+      <div className="flex items-end justify-between gap-4 pb-4 border-b border-[#E8E6E1]">
+         <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Critic Yield</span>
+            <div className={`text-5xl font-medium tracking-tighter tabular-nums ${colorClass}`}>
+              {score.overall}<span className="text-xl font-light text-gray-300 ml-1">/100</span>
+            </div>
+         </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="space-y-4">
           {dimensions.map((dim) => (
-            <div key={dim.label} className="space-y-1.5">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium text-muted-foreground">{dim.label}</span>
-                <span className="font-semibold tabular-nums text-xs">{dim.value}/100</span>
+            <div key={dim.label} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111111]">{dim.label}</span>
+                <span className="font-medium tabular-nums text-xs text-gray-400">{dim.value}%</span>
               </div>
-              <Progress value={dim.value} className="h-1.5" />
+              <div className="h-1 w-full bg-[#F4F3F0] rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-[#111111] transition-all duration-1000 ease-out" 
+                  style={{ width: `${dim.value}%` }}
+                />
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="rounded-xl bg-secondary/40 p-4 border border-border/30">
-          <h4 className="text-sm font-semibold mb-1.5 flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 text-amber-400" />
-            Feedback
+        <div className="rounded-[1.2rem] bg-[#F4F3F0]/50 p-6 border border-[#E8E6E1]">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#111111] mb-3 flex items-center gap-2">
+            <Lightbulb className="h-3.5 w-3.5 text-orange-500" />
+            Strategic Feedback
           </h4>
-          <div className="max-h-100 overflow-y-auto pr-2 custom-scrollbar">
-            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-              {score.feedback}
-            </p>
-          </div>
+          <p className="text-gray-500 font-light text-sm leading-relaxed">
+            {score.feedback}
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

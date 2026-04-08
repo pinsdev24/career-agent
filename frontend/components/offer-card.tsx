@@ -14,58 +14,78 @@ interface OfferCardProps {
 export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
   const matchColor =
     offer.pre_score > 80
-      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
+      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
       : offer.pre_score > 60
-        ? "bg-amber-500/15 text-amber-400 border-amber-500/25"
-        : "bg-muted text-muted-foreground border-border";
+        ? "bg-orange-50 text-orange-600 border-orange-100"
+        : "bg-gray-50 text-gray-400 border-gray-100";
 
   return (
-    <Card
-      className={`transition-all duration-200 ${
-        onClick ? "cursor-pointer hover:border-primary/40 hover:bg-accent/20" : ""
-      } ${selected ? "border-primary bg-primary/8 shadow-md glow-sm ring-1 ring-primary/50" : "border-border/60"}`}
+    <div
+      className={`group transition-all duration-300 relative rounded-[1.5rem] border p-8 bg-white ${
+        onClick ? "cursor-pointer" : ""
+      } ${
+        selected 
+          ? "border-[#111111] shadow-lg ring-1 ring-[#111111]/5" 
+          : "border-[#E8E6E1] hover:border-[#111111]/30"
+      }`}
       onClick={onClick}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1.5">
-            <CardTitle className="text-lg line-clamp-2 leading-snug">{offer.title}</CardTitle>
-            <CardDescription className="font-medium text-foreground/70">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+        <div className="space-y-4 flex-1">
+          <div className="space-y-1">
+            <h3 className="text-2xl font-medium tracking-tight text-[#111111] leading-tight">
+              {offer.title}
+            </h3>
+            <p className="text-gray-500 font-light text-lg">
               {offer.company}
-            </CardDescription>
-            {offer.location && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <MapPin className="h-3 w-3" />
-                {offer.location}
-              </p>
-            )}
+            </p>
           </div>
-          <Badge
-            variant="outline"
-            className={`flex-shrink-0 gap-1 ${matchColor}`}
-          >
-            <TrendingUp className="h-3 w-3" />
-            {offer.pre_score}%
-          </Badge>
+
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+            {offer.location && (
+              <span className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                {offer.location}
+              </span>
+            )}
+            <a
+              href={offer.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-[#111111] inline-flex items-center gap-1.5 underline underline-offset-4 decoration-gray-300 hover:decoration-[#111111] transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Original Posting
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+
+          {offer.snippet && (
+            <p className="text-gray-500 font-light text-sm line-clamp-2 leading-relaxed max-w-2xl">
+              {offer.snippet}
+            </p>
+          )}
         </div>
-      </CardHeader>
-      <CardContent>
-        {offer.snippet && (
-          <p className="text-sm text-muted-foreground line-clamp-3 mb-4 leading-relaxed">
-            {offer.snippet}
-          </p>
-        )}
-        <a
-          href={offer.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-primary font-medium inline-flex items-center gap-1.5 underline-offset-4 decoration-primary/30 hover:decoration-primary hover:underline transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          View original posting
-          <ExternalLink className="h-3.5 w-3.5" />
-        </a>
-      </CardContent>
-    </Card>
+
+        <div className="flex flex-col items-end gap-3 shrink-0">
+          <div className={`px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${matchColor} flex items-center gap-2`}>
+            <TrendingUp className="h-3 w-3" />
+            {offer.pre_score}% Match
+          </div>
+          
+          {selected && (
+            <div className="w-10 h-10 rounded-full bg-[#111111] text-white flex items-center justify-center shadow-lg animate-in zoom-in-50 duration-300">
+               <TrendingUp className="h-5 w-5" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {selected && (
+        <div className="absolute top-4 right-4 animate-in fade-in duration-500 pointer-events-none">
+           <div className="w-2 h-2 rounded-full bg-[#111111] shadow-[0_0_10px_rgba(17,17,17,0.4)]" />
+        </div>
+      )}
+    </div>
   );
 }

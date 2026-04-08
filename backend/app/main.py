@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from app.config import get_settings
 from app.dependencies import create_supabase_client
 from app.exceptions import CareerAgentError
-from app.routers import hitl, pipeline, profile
+from app.routers import hitl, memory, pipeline, profile
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -77,6 +77,7 @@ async def career_agent_error_handler(
 app.include_router(profile.router, prefix="/profile", tags=["Profile"])
 app.include_router(pipeline.router, prefix="/pipeline", tags=["Pipeline"])
 app.include_router(hitl.router, prefix="/hitl", tags=["HITL"])
+app.include_router(memory.router, prefix="/memory", tags=["Memory"])
 
 
 # ---------------------------------------------------------------------------

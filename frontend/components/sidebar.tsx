@@ -20,14 +20,15 @@ import {
   UserCircle,
   Rocket,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeft,
   MoreVertical,
 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/pipeline/new", label: "New Pipeline", icon: Rocket },
+  { href: "/dashboard", label: "Missions", icon: LayoutDashboard },
+  { href: "/pipeline/new", label: "New Mission", icon: Rocket },
 ];
 
 export function Sidebar() {
@@ -72,47 +73,41 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`relative flex h-full flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
+      className={`relative flex h-full flex-col border-r border-[#E8E6E1] bg-[#FDFDFC] transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
         }`}
     >
-      {/* Collapse Toggle */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-4 top-5 z-20 h-8 w-8 rounded-full border border-border bg-background shadow-sm hover:bg-accent"
-      >
-        {isCollapsed ? (
-          <ChevronRight className="h-4 w-4" />
-        ) : (
-          <ChevronLeft className="h-4 w-4" />
-        )}
-      </Button>
-
-      {/* Logo */}
+      {/* Header with Logo & Toggle */}
       <div
-        className={`flex h-16 shrink-0 items-center border-b border-sidebar-border ${isCollapsed ? "justify-center px-0" : "justify-start px-6"
+        className={`relative flex h-16 shrink-0 items-center border-b border-[#E8E6E1] px-4 ${isCollapsed ? "justify-center" : "justify-between"
           }`}
       >
-        <span
-          className={`text-lg font-bold tracking-tight gradient-text transition-all ${isCollapsed ? "hidden" : "block"
-            }`}
+        <Logo iconOnly={isCollapsed} className={isCollapsed ? "scale-[0.7]" : "scale-90"} />
+        
+        {/* Toggle Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`h-8 w-8 rounded-lg hover:bg-[#F4F3F0] text-gray-400 ${
+            isCollapsed 
+              ? "absolute -right-4 top-4 z-20 rounded-full border border-[#E8E6E1] bg-white shadow-sm" 
+              : "relative"
+          }`}
         >
-          Career Agent
-        </span>
-        {isCollapsed && (
-          <span className="text-lg font-bold tracking-tight gradient-text">
-            CA
-          </span>
-        )}
+          {isCollapsed ? (
+            <PanelLeft className="h-4 w-4" />
+          ) : (
+            <PanelLeftClose className="h-4 w-4" />
+          )}
+        </Button>
       </div>
 
       {/* Nav links */}
       <nav className="flex-1 space-y-2 px-3 py-4">
         {navItems.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
 
           const Icon = item.icon;
@@ -123,13 +118,12 @@ export function Sidebar() {
               href={item.href}
               title={isCollapsed ? item.label : undefined}
               className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${isActive
-                  ? "bg-primary/15 text-primary shadow-sm glow-sm"
-                  : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  ? "bg-[#111111] text-white shadow-md shadow-black/5"
+                  : "text-gray-500 hover:bg-[#F4F3F0] hover:text-[#111111]"
                 } ${isCollapsed ? "justify-center" : "justify-start"}`}
             >
               <Icon
-                className={`shrink-0 h-5 w-5 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-primary" : ""
-                  }`}
+                className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-white" : ""} ${isCollapsed ? "h-4.5 w-4.5" : "h-5 w-5"}`}
               />
               {!isCollapsed && <span>{item.label}</span>}
             </Link>
@@ -138,29 +132,29 @@ export function Sidebar() {
       </nav>
 
       {/* Profile / Logout */}
-      <div className="border-t border-sidebar-border p-3">
+      <div className="border-t border-[#E8E6E1] p-3">
         <DropdownMenu>
           <DropdownMenuTrigger
-            className={`flex w-full items-center justify-start gap-3 rounded-xl px-2 py-3 text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${isCollapsed ? "justify-center" : ""
+            className={`flex w-full items-center justify-start gap-3 rounded-xl px-2 py-3 text-sm font-medium transition-colors text-gray-700 hover:bg-[#F4F3F0] outline-hidden focus-visible:ring-1 focus-visible:ring-[#111111] disabled:pointer-events-none disabled:opacity-50 ${isCollapsed ? "justify-center" : ""
               }`}
           >
-            <Avatar className="h-8 w-8 rounded-lg shrink-0 border border-primary/20">
+            <Avatar className="h-8 w-8 rounded-lg shrink-0 border border-[#E8E6E1]">
               <AvatarImage src={avatarUrl} alt={userName} />
-              <AvatarFallback className="bg-primary/10 text-primary rounded-lg text-xs font-semibold">
+              <AvatarFallback className="bg-gray-100 text-[#111111] rounded-lg text-xs font-semibold">
                 {getInitials(userName)}
               </AvatarFallback>
             </Avatar>
 
             {!isCollapsed && (
               <div className="flex flex-1 flex-col items-start overflow-hidden leading-tight">
-                <span className="truncate font-semibold">{userName}</span>
-                <span className="truncate text-xs text-muted-foreground w-full text-left">
+                <span className="truncate font-medium text-[#111111]">{userName}</span>
+                <span className="truncate text-xs text-gray-500 w-full text-left">
                   {userEmail}
                 </span>
               </div>
             )}
 
-            {!isCollapsed && <MoreVertical className="h-4 w-4 shrink-0 text-muted-foreground" />}
+            {!isCollapsed && <MoreVertical className="h-4 w-4 shrink-0 text-gray-400" />}
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"

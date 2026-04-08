@@ -5,62 +5,62 @@ import type { PipelineStatus } from "@/lib/types";
 import { Check } from "lucide-react";
 
 export function PipelineProgress({ currentStatus }: { currentStatus: string }) {
-  if (currentStatus === "failed") {
-    return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-5 text-center text-destructive">
-        <p className="font-semibold">Pipeline Failed</p>
-        <p className="text-sm mt-1 opacity-80">An error occurred during execution.</p>
-      </div>
-    );
-  }
+  if (currentStatus === "failed") return null;
 
   const currentIndex = PIPELINE_STEPS.indexOf(currentStatus as PipelineStatus);
 
   return (
-    <div className="relative">
-      {/* Track background */}
-      <div className="absolute top-4 left-0 h-0.5 w-full rounded-full bg-border/50" />
-      {/* Track fill */}
+    <div className="relative pt-8 pb-12 overflow-hidden">
+      {/* Background Track */}
+      <div className="absolute top-[4.2rem] left-0 h-px w-full bg-[#E8E6E1]" />
+      
+      {/* Active Track */}
       <div
-        className="absolute top-4 left-0 h-0.5 rounded-full bg-gradient-to-r from-primary to-chart-2 transition-all duration-700 ease-out"
+        className="absolute top-[4.2rem] left-0 h-px bg-[#111111] transition-all duration-1000 ease-in-out"
         style={{
           width: `${(Math.max(0, currentIndex) / (PIPELINE_STEPS.length - 1)) * 100}%`,
         }}
       />
 
-      <div className="relative flex justify-between">
+      <div className="relative flex justify-between gap-4">
         {PIPELINE_STEPS.map((step, index) => {
           const isCompleted = index < currentIndex;
           const isActive = index === currentIndex;
 
           return (
-            <div key={step} className="flex flex-col items-center gap-2.5 w-24">
+            <div key={step} className="flex flex-col items-center gap-6 flex-1 min-w-0">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-all duration-300 ${
+                className={`z-10 flex h-10 w-10 items-center justify-center rounded-full text-[11px] font-bold transition-all duration-500 border ${
                   isCompleted
-                    ? "bg-primary text-primary-foreground shadow-sm"
+                    ? "bg-[#111111] border-[#111111] text-white shadow-lg shadow-[#111111]/10"
                     : isActive
-                      ? "bg-background border-2 border-primary text-primary shadow-md glow-sm animate-pulse"
-                      : "bg-secondary text-muted-foreground/60"
+                      ? "bg-white border-[#111111] text-[#111111] shadow-xl ring-4 ring-[#F4F3F0]"
+                      : "bg-[#F4F3F0] border-[#E8E6E1] text-gray-400"
                 }`}
               >
                 {isCompleted ? (
                   <Check className="h-4 w-4" />
                 ) : (
-                  index + 1
+                  String(index + 1).padStart(2, '0')
                 )}
               </div>
-              <span
-                className={`text-xs text-center font-medium leading-tight ${
-                  isActive
-                    ? "text-primary"
-                    : isCompleted
-                      ? "text-foreground/70"
-                      : "text-muted-foreground/50"
-                }`}
-              >
-                {PIPELINE_STATUS_LABELS[step]}
-              </span>
+              
+              <div className="flex flex-col items-center gap-1.5 px-2">
+                <span
+                  className={`text-[9px] font-bold uppercase tracking-[0.2em] text-center transition-colors duration-500 ${
+                    isActive
+                      ? "text-[#111111]"
+                      : isCompleted
+                        ? "text-gray-500"
+                        : "text-gray-300"
+                  }`}
+                >
+                  {PIPELINE_STATUS_LABELS[step]}
+                </span>
+                {isActive && (
+                  <div className="w-1 h-1 rounded-full bg-[#111111] animate-pulse" />
+                )}
+              </div>
             </div>
           );
         })}

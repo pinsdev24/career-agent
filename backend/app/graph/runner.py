@@ -12,7 +12,7 @@ Architecture (MVP):
 
 import asyncio
 import logging
-from contextlib import asynccontextmanager
+
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.types import Command
@@ -33,6 +33,10 @@ _compiled_graph = None
 
 # run_id → asyncio.Task  (only active/running tasks)
 _running_tasks: dict[str, asyncio.Task] = {}
+
+# Maximum seconds allowed for a single graph execution segment (between HITL interrupts).
+# HITL pauses do NOT count — _run_graph is re-called fresh on each resume.
+PIPELINE_TIMEOUT_SECONDS = 600
 
 
 async def get_checkpointer():
@@ -106,6 +110,8 @@ _STATE_TO_DB: dict[str, str] = {
     # Best-of-N tracking
     "best_draft": "best_draft",
     "best_score": "best_score",
+    # Error tracking
+    "error_details": "error_details",
 }
 
 
@@ -153,58 +159,78 @@ async def _run_graph(
             )
 
         logger.info("run=%s | starting astream loop", run_id)
-        async for event in stream:
-            event_type = event[0]
-            event_data = event[1]
+        async with asyncio.timeout(PIPELINE_TIMEOUT_SECONDS):
+            async for event in stream:
+                event_type = event[0]
+                event_data = event[1]
 
-            if event_type == "messages":
-                messages = event_data[0]
-                for msg in messages:
-                    if hasattr(msg, "tool_calls") and msg.tool_calls:
-                        for call in msg.tool_calls:
-                            await log_emitter.emit(run_id, {
-                                "type": "agent_action",
-                                "message": f"Agent is calling tool: {call['name']}",
-                            })
+                if event_type == "messages":
+                    messages = event_data[0]
+                    for msg in messages:
+                        if hasattr(msg, "tool_calls") and msg.tool_calls:
+                            for call in msg.tool_calls:
+                                await log_emitter.emit(run_id, {
+                                    "type": "agent_action",
+                                    "message": f"Agent is calling tool: {call['name']}",
+                                })
 
-            elif event_type == "updates":
-                state_update = event_data
-                logger.info(
-                    "run=%s | state_update keys: %s",
-                    run_id,
-                    list(state_update.keys()),
-                )
+                elif event_type == "updates":
+                    state_update = event_data
+                    logger.info(
+                        "run=%s | state_update keys: %s",
+                        run_id,
+                        list(state_update.keys()),
+                    )
 
-                for node_name, node_output in state_update.items():
-                    await log_emitter.emit(run_id, {
-                        "type": "node_finish",
-                        "node": node_name,
-                        "message": f"Completed step: {node_name.replace('_', ' ').title()}",
-                    })
+                    for node_name, node_output in state_update.items():
+                        await log_emitter.emit(run_id, {
+                            "type": "node_finish",
+                            "node": node_name,
+                            "message": f"Completed step: {node_name.replace('_', ' ').title()}",
+                        })
 
-                    if not isinstance(node_output, dict):
-                        continue
+                        if not isinstance(node_output, dict):
+                            continue
 
-                    db_updates = _extract_db_updates(node_output)
-                    if db_updates:
-                        logger.debug(
-                            "run=%s | writing to DB (from %s): %s",
-                            run_id,
-                            node_name,
-                            {k: str(v)[:60] for k, v in db_updates.items()},
-                        )
-                        try:
-                            await update_pipeline_run(
-                                supabase=supabase, run_id=run_id, **db_updates
+                        db_updates = _extract_db_updates(node_output)
+                        if db_updates:
+                            logger.debug(
+                                "run=%s | writing to DB (from %s): %s",
+                                run_id,
+                                node_name,
+                                {k: str(v)[:60] for k, v in db_updates.items()},
                             )
-                        except Exception as exc:
-                            logger.warning("run=%s | DB update failed: %s", run_id, exc)
+                            try:
+                                await update_pipeline_run(
+                                    supabase=supabase, run_id=run_id, **db_updates
+                                )
+                            except Exception as exc:
+                                logger.warning("run=%s | DB update failed: %s", run_id, exc)
 
         logger.info("run=%s | astream loop finished", run_id)
         await log_emitter.emit(run_id, {
             "type": "info",
             "message": "Pipeline execution completed or paused for review.",
         })
+
+    except TimeoutError:
+        logger.error(
+            "run=%s | pipeline timed out after %ds",
+            run_id,
+            PIPELINE_TIMEOUT_SECONDS,
+        )
+        await log_emitter.emit(run_id, {
+            "type": "error",
+            "message": f"Pipeline timed out after {PIPELINE_TIMEOUT_SECONDS}s. Please try again.",
+        })
+        try:
+            await update_pipeline_run(
+                supabase=supabase,
+                run_id=run_id,
+                status="failed",
+            )
+        except Exception:
+            pass
 
     except asyncio.CancelledError:
         logger.info("run=%s | task cancelled", run_id)

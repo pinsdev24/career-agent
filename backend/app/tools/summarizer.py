@@ -14,8 +14,19 @@ from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
+from app.tools.retry import async_retry
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_summarizer(llm: ChatOpenAI, prompt: str) -> str:
+    """Retry-wrapped LLM call for summarization tasks."""
+    response = await llm.ainvoke(
+        [SystemMessage(content=prompt)],
+        config={"metadata": {"node": "summarizer", "model_tier": "fast"}},
+    )
+    return response.content if isinstance(response.content, str) else ""
 
 
 async def summarize_cv(cv_text: str, max_words: int = 200) -> str:
@@ -51,12 +62,11 @@ CV:
 Return ONLY the summary, no commentary."""
 
     try:
-        response = await llm.ainvoke([SystemMessage(content=prompt)])
-        summary = response.content if isinstance(response.content, str) else ""
+        summary = await _invoke_summarizer(llm, prompt)
         logger.info("Summarized CV: %d chars → %d chars", len(cv_text), len(summary))
-        return summary.strip()
+        return summary.strip() if summary else cv_text[:2000]
     except Exception as exc:
-        logger.warning("CV summarization failed (%s), using truncated original", exc)
+        logger.warning("CV summarization failed after retries (%s), using truncated original", exc)
         return cv_text[:2000]
 
 
@@ -107,12 +117,11 @@ JOB OFFER:
 Return ONLY the summary, no commentary."""
 
     try:
-        response = await llm.ainvoke([SystemMessage(content=prompt)])
-        summary = response.content if isinstance(response.content, str) else ""
+        summary = await _invoke_summarizer(llm, prompt)
         logger.info("Summarized offer: %d chars → %d chars", len(offer_text), len(summary))
-        return summary.strip()
+        return summary.strip() if summary else offer_text[:1500]
     except Exception as exc:
-        logger.warning("Offer summarization failed (%s), using truncated original", exc)
+        logger.warning("Offer summarization failed after retries (%s), using truncated original", exc)
         return offer_text[:1500]
 
 

@@ -8,9 +8,19 @@ from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
 from app.models.state import AgentState
+from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_writer_llm(llm: ChatOpenAI, messages: list, run_id: str) -> object:
+    """Retry-wrapped cover letter generation call."""
+    return await llm.ainvoke(
+        messages,
+        config={"metadata": {"node": "writer", "run_id": run_id, "model_tier": "premium"}},
+    )
 
 SYSTEM_PROMPT = (
     "You are an expert cover letter writer with 15 years of experience helping "
@@ -94,9 +104,19 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
     tone = state.get("tone_of_voice", "professional")
     tone_instruction = TONE_INSTRUCTIONS.get(tone, TONE_INSTRUCTIONS["professional"])
 
+    user_feedback = state.get("user_feedback")
+
     # Build revision context if this is a retry
     revision_context = ""
-    if revision_count > 0 and state.get("critic_feedback"):
+    if user_feedback:
+        logger.info("Writer: applying user_feedback for manual rewrite")
+        revision_context = (
+            f"**USER DIRECT FEEDBACK (PRIORITIZE THIS):**\n{user_feedback}\n\n"
+            f"Ensure you apply these exact instructions while rewriting the current draft."
+        )
+        if state.get("draft_letter"):
+            revision_context += f"\n\n**CURRENT DRAFT TO IMPROVE:**\n{state['draft_letter']}\n"
+    elif revision_count > 0 and state.get("critic_feedback"):
         feedback = state["critic_feedback"]
         revision_context = REVISION_CONTEXT_TEMPLATE.format(
             revision_count=revision_count,
@@ -141,8 +161,19 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
         )),
     ]
 
-    response = await llm.ainvoke(messages)
-    letter = response.content if isinstance(response.content, str) else ""
+    try:
+        response = await _invoke_writer_llm(llm, messages, run_id=state.get("run_id", ""))
+        letter = response.content if isinstance(response.content, str) else ""  # type: ignore[union-attr]
+    except Exception as exc:
+        logger.error(
+            "Writer: LLM call failed after retries (revision=%d, run=%s): %s",
+            revision_count, state.get("run_id"), exc, exc_info=True,
+        )
+        await log_emitter.emit(state.get("run_id"), {
+            "type": "error",
+            "message": "Cover letter generation failed. Please try again.",
+        })
+        raise
 
     logger.info(
         "Writer: %d-word letter generated (revision=%d) for run=%s",

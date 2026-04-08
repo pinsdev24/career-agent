@@ -33,6 +33,7 @@ class PipelineStatus(str, Enum):
     WAITING_LETTER_REVIEW = "waiting_letter_review"
     COMPLETED = "completed"
     FAILED = "failed"
+    WAITING_LOOP_DECISION = "waiting_loop_decision"  # HITL-3: apply to another offer?
 
 
 class ToneOfVoice(str, Enum):
@@ -151,6 +152,7 @@ class PipelineRunResponse(BaseModel):
     best_score: int = 0
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    error_details: dict[str, Any] | None = None  # Populated on pipeline failure
 
     @field_validator("critic_score", mode="before")
     @classmethod
@@ -186,3 +188,23 @@ class HITLLetterReview(BaseModel):
 
     edited_letter: str
     approved: bool = True
+    user_feedback: str | None = Field(default=None)
+
+
+# ---------------------------------------------------------------------------
+# Memory
+# ---------------------------------------------------------------------------
+
+
+class MemoryResponse(BaseModel):
+    """A single memory entry."""
+
+    memory_key: str
+    memory_data: dict[str, Any]
+    updated_at: datetime | None = None
+
+
+class MemoryUpdate(BaseModel):
+    """Request to update a specific memory entry."""
+
+    memory_data: dict[str, Any]

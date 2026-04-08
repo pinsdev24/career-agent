@@ -43,6 +43,8 @@ class AgentState(TypedDict, total=False):
 
     # --- Writer output ---
     draft_letter: str
+    user_feedback: str | None
+    is_manual_rewrite: bool | None
 
     # --- Critic output ---
     critic_score: int
@@ -62,6 +64,9 @@ class AgentState(TypedDict, total=False):
 
     # --- Final output (post HITL-2) ---
     final_letter: str
+
+    # --- Error tracking ---
+    error_details: dict | None  # Set by nodes on unrecoverable failure; cleared on resume
 
     # --- Pipeline status ---
     status: Literal[

@@ -75,7 +75,6 @@ export function LiveAgentLog({ runId }: { runId: string }) {
         if (isActive) {
           console.error("Stream connection failed:", err);
           setIsConnected(false);
-          // Try reconnecting after 5s or handle failure gracefully.
         }
       }
     };
@@ -89,38 +88,40 @@ export function LiveAgentLog({ runId }: { runId: string }) {
   }, [runId]);
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-zinc-950 overflow-hidden shadow-2xl h-[600px] text-zinc-300 dark:border-zinc-800">
+    <div className="flex flex-col bg-[#111111] overflow-hidden h-[650px] text-gray-400 selection:bg-white/20">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/50 px-4 py-2 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <Terminal className="h-4 w-4 text-muted-foreground" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Agent Terminal
+      <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-6 py-4 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <Terminal className="h-4 w-4 text-gray-500" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-500">
+            Autonomous Processing Core
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            {isConnected ? (
-              <>
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </>
-            ) : (
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-            )}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {isConnected ? "LIVE" : "DISCONNECTED"}
-          </span>
+        <div className="flex items-center gap-4">
+           <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+              <span className="relative flex h-1.5 w-1.5">
+                {isConnected ? (
+                  <>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                  </>
+                ) : (
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+                )}
+              </span>
+              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                {isConnected ? "Connection Stable" : "Sync Error"}
+              </span>
+           </div>
         </div>
       </div>
 
       {/* Logs Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 font-mono text-sm bg-black/50 backdrop-blur-sm">
+      <div className="flex-1 overflow-y-auto p-8 space-y-4 font-mono text-xs custom-scrollbar">
         {logs.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-muted-foreground gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Establishing secure hook to pipeline...</span>
+          <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">Establishing Agent Secure Link...</span>
           </div>
         ) : (
           logs.map((log, index) => {
@@ -129,27 +130,28 @@ export function LiveAgentLog({ runId }: { runId: string }) {
               <div 
                 key={index} 
                 className={cn(
-                  "flex items-start gap-3 opacity-90 transition-opacity",
-                  isLast && "opacity-100"
+                  "flex items-start gap-4 transition-all duration-500",
+                  isLast ? "opacity-100 translate-x-0" : "opacity-30 -translate-x-1"
                 )}
               >
-                {/* Icon based on Log Type */}
-                <div className="mt-0.5 shrink-0">
-                  {log.type === "info" && <Terminal className="h-4 w-4 text-blue-400" />}
-                  {log.type === "agent_action" && <Cpu className={cn("h-4 w-4 text-amber-400", isLast && "animate-pulse")} />}
-                  {log.type === "node_finish" && <CheckCircle2 className="h-4 w-4 text-emerald-400" />}
-                  {log.type === "error" && <AlertCircle className="h-4 w-4 text-rose-500" />}
+                <div className="mt-0.5 shrink-0 opacity-40">
+                  {log.type === "info" && <Terminal className="h-3.5 w-3.5" />}
+                  {log.type === "agent_action" && <Cpu className={cn("h-3.5 w-3.5 text-orange-400", isLast && "animate-pulse")} />}
+                  {log.type === "node_finish" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />}
+                  {log.type === "error" && <AlertCircle className="h-3.5 w-3.5 text-rose-500" />}
                 </div>
 
-                {/* Message Content */}
                 <div className="flex-1 space-y-1">
                   <div className={cn(
-                    "leading-relaxed",
-                    log.type === "info" && "text-blue-400",
-                    log.type === "agent_action" && "text-amber-400",
-                    log.type === "node_finish" && "text-emerald-400 font-medium",
-                    log.type === "error" && "text-rose-500 font-semibold"
+                    "leading-relaxed tracking-tight",
+                    log.type === "info" && "text-gray-400",
+                    log.type === "agent_action" && "text-orange-400/90",
+                    log.type === "node_finish" && "text-emerald-400/80 font-medium",
+                    log.type === "error" && "text-rose-400 font-semibold"
                   )}>
+                    <span className="text-[10px] opacity-20 mr-4 tabular-nums">
+                      {new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
                     {log.message}
                   </div>
                 </div>
@@ -157,7 +159,18 @@ export function LiveAgentLog({ runId }: { runId: string }) {
             )
           })
         )}
-        <div ref={bottomRef} />
+        <div ref={bottomRef} className="h-4" />
+      </div>
+
+      {/* Terminal Footer */}
+      <div className="px-6 py-3 bg-black/20 border-t border-white/5 flex items-center justify-between">
+         <div className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-widest text-gray-600">
+            <span>Buffer: 1024KB</span>
+            <span>Uptime: {logs.length > 0 ? "Active" : "Idle"}</span>
+         </div>
+         <div className="text-[9px] font-mono text-gray-700">
+            {runId}
+         </div>
       </div>
     </div>
   )

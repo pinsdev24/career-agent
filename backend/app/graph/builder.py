@@ -49,6 +49,10 @@ def _route_after_critic(state: AgentState) -> str:
     score = state.get("critic_score", 0)
     revisions = state.get("revision_count", 0)
 
+    if state.get("is_manual_rewrite"):
+        logger.info("Manual rewrite loop completed. Routing directly back to HITL-2 (run=%s)", state.get("run_id"))
+        return "hitl2"
+
     if score >= settings.critic_threshold:
         return "hitl2"
     if revisions >= settings.max_revisions:
@@ -59,6 +63,18 @@ def _route_after_critic(state: AgentState) -> str:
         )
         return "hitl2"
     return "writer"
+
+
+def _route_after_hitl2(state: AgentState) -> str:
+    """Route after HITL-2 review.
+
+    - Approved (status='completed') → memory_writer → END
+    - Rejected / rewrite requested (status='writing') → writer (another revision)
+    """
+    if state.get("status") == "writing":
+        logger.info("HITL-2: routing back to writer for rewrite (run=%s)", state.get("run_id"))
+        return "writer"
+    return "memory_writer"
 
 
 # ---------------------------------------------------------------------------
@@ -111,8 +127,12 @@ def build_graph() -> StateGraph:
         {"writer": "writer", "hitl2": "hitl2"},
     )
 
-    # --- HITL-2 → Memory Writer → END ---
-    graph.add_edge("hitl2", "memory_writer")
+    # --- HITL-2 → approved: memory_writer → END | rejected: writer ---
+    graph.add_conditional_edges(
+        "hitl2",
+        _route_after_hitl2,
+        {"memory_writer": "memory_writer", "writer": "writer"},
+    )
     graph.add_edge("memory_writer", END)
 
     return graph

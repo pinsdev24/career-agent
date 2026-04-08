@@ -165,11 +165,26 @@ async def hitl2_node(state: AgentState, config: RunnableConfig) -> AgentState:
         })
 
     # review is the dict returned by Command(resume=review_data) from the API
+    # Structure: {"edited_letter": str | None, "approved": bool, "user_feedback": str | None}
+    approved = review.get("approved", True)  # default True for evaluation bypass
     final_letter = review.get("edited_letter") or best_draft
+    user_feedback = review.get("user_feedback")
+
+    if not approved:
+        # User wants a rewrite — route back to writer
+        logger.info("HITL-2: rewrite requested with feedback (thread=%s)", thread_id)
+        return {
+            "status": "writing",
+            # Pass the edited_letter as the new draft so writer has user context
+            "draft_letter": final_letter,
+            "user_feedback": user_feedback,
+            "is_manual_rewrite": True,
+        }
 
     logger.info("HITL-2: letter approved (thread=%s)", thread_id)
 
     return {
         "final_letter": final_letter,
         "status": "completed",
+        "is_manual_rewrite": False,  # Reset
     }

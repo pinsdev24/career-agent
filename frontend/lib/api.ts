@@ -10,6 +10,7 @@ import type {
   HITLLetterReview,
   SearchPreferences,
   ToneOfVoice,
+  Memory,
 } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -139,6 +140,25 @@ export async function reviewLetter(
   return request<PipelineRun>(`/hitl/${runId}/review-letter`, {
     method: "POST",
     body: JSON.stringify(data),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Memory
+// ---------------------------------------------------------------------------
+
+export async function getMemories(): Promise<Memory[]> {
+  return request<Memory[]>("/memory");
+}
+
+export async function getMemory(key: string): Promise<Memory> {
+  return request<Memory>(`/memory/${key}`);
+}
+
+export async function updateMemory(key: string, data: Record<string, any>): Promise<Memory> {
+  return request<Memory>(`/memory/${key}`, {
+    method: "PUT",
+    body: JSON.stringify({ memory_data: data }),
   });
 }
 

@@ -10,9 +10,19 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.models.state import AgentState
 from app.tools.embedding_tools import embed_text
+from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_gap_analysis(structured_llm: object, messages: list, run_id: str) -> object:
+    """Retry-wrapped gap analysis LLM call."""
+    return await structured_llm.ainvoke(  # type: ignore[union-attr]
+        messages,
+        config={"metadata": {"node": "matcher", "run_id": run_id, "model_tier": "fast"}},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -76,20 +86,25 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     structured_llm = llm.with_structured_output(GapAnalysisResult)
 
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(
+            content=(
+                f"CANDIDATE CV:\n{cv_text[:4000]}\n\n"
+                f"JOB OFFER:\n{offer_text[:4000]}"
+            )
+        ),
+    ]
+
     try:
-        result: GapAnalysisResult = await structured_llm.ainvoke(
-            [
-                SystemMessage(content=SYSTEM_PROMPT),
-                SystemMessage(
-                    content=(
-                        f"CANDIDATE CV:\n{cv_text[:4000]}\n\n"
-                        f"JOB OFFER:\n{offer_text[:4000]}"
-                    )
-                ),
-            ]
+        result: GapAnalysisResult = await _invoke_gap_analysis(  # type: ignore[assignment]
+            structured_llm, messages, run_id=state.get("run_id", "")
         )
     except Exception as exc:
-        logger.warning("Matcher: structured output failed: %s", exc)
+        logger.warning(
+            "Matcher: gap analysis failed after retries for run=%s: %s",
+            state.get("run_id"), exc,
+        )
         result = GapAnalysisResult(
             match_score=int(embedding_score),
             summary="Gap analysis unavailable — using embedding similarity.",
