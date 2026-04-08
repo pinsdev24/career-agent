@@ -104,16 +104,23 @@ async def review_letter(
         user["id"], run_id, data.approved,
     )
 
-    # Synchronously update status so frontend unfreezes immediately
+    # When approved: pre-write COMPLETED so the frontend unfreezes immediately.
+    # When rejected (rewrite): write WRITING so the frontend shows the pipeline
+    # is running again. The graph will re-enter writer → critic → hitl2.
     final_letter = data.edited_letter or run.get("draft_letter", "")
+    next_status = (
+        PipelineStatus.COMPLETED.value if data.approved else PipelineStatus.WRITING.value
+    )
+
     await update_pipeline_run(
         supabase=supabase,
         run_id=run_id,
-        status=PipelineStatus.COMPLETED.value,
-        final_letter=final_letter,
+        status=next_status,
+        final_letter=final_letter if data.approved else None,
     )
-    run["status"] = PipelineStatus.COMPLETED.value
-    run["final_letter"] = final_letter
+    run["status"] = next_status
+    if data.approved:
+        run["final_letter"] = final_letter
 
     # Resume the interrupted graph with the edited letter and approval decision
     asyncio.create_task(
@@ -122,6 +129,7 @@ async def review_letter(
             resume_value={
                 "edited_letter": data.edited_letter,
                 "approved": data.approved,
+                "user_feedback": data.user_feedback,
             },
             supabase=supabase,
         )

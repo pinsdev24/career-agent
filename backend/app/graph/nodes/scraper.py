@@ -10,10 +10,26 @@ from pydantic import BaseModel, Field
 
 from app.config import get_settings
 from app.models.state import AgentState
+from app.tools.retry import async_retry
 from app.tools.tavily_tools import extract_url
 from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.5)
+async def _extract_offer_url(url: str) -> dict:
+    """Retry-wrapped Tavily URL extraction."""
+    return await extract_url(url)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_scraper_llm(structured_llm: object, messages: list, run_id: str) -> object:
+    """Retry-wrapped offer structuring LLM call."""
+    return await structured_llm.ainvoke(  # type: ignore[union-attr]
+        messages,
+        config={"metadata": {"node": "scraper", "run_id": run_id, "model_tier": "fast"}},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -56,8 +72,8 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
     logger.info("Scraper: extracting %s for run=%s", offer_url, state.get("run_id"))
     await log_emitter.emit(state.get("run_id"), {"type": "info", "message": "Scraper: Extracting content from URL..."})
 
-    # Extract raw content via Tavily
-    extracted = await extract_url(offer_url)
+    # Extract raw content via Tavily (retried)
+    extracted = await _extract_offer_url(offer_url)
     raw_content = extracted.get("raw_content", "")
     await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Scraper routing raw content to LLM for structured extraction..."})
 
@@ -70,15 +86,20 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     structured_llm = llm.with_structured_output(StructuredOffer)
 
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(content=f"JOB OFFER TEXT:\n{raw_content[:6000]}"),
+    ]
+
     try:
-        structured: StructuredOffer = await structured_llm.ainvoke(
-            [
-                SystemMessage(content=SYSTEM_PROMPT),
-                SystemMessage(content=f"JOB OFFER TEXT:\n{raw_content[:6000]}"),
-            ]
+        structured: StructuredOffer = await _invoke_scraper_llm(  # type: ignore[assignment]
+            structured_llm, messages, run_id=state.get("run_id", "")
         )
     except Exception as exc:
-        logger.warning("Scraper: structured output failed (%s), using defaults", exc)
+        logger.warning(
+            "Scraper: structuring failed after retries for run=%s (%s), using defaults",
+            state.get("run_id"), exc,
+        )
         structured = StructuredOffer(
             title="Unknown",
             company="Unknown",

@@ -10,9 +10,19 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.models.state import AgentState
 from app.tools.embedding_tools import embed_text
+from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
 
 logger = logging.getLogger(__name__)
+
+
+@async_retry(max_retries=2, backoff_base=1.0)
+async def _invoke_gap_analysis(structured_llm: object, messages: list, run_id: str) -> object:
+    """Retry-wrapped gap analysis LLM call."""
+    return await structured_llm.ainvoke(  # type: ignore[union-attr]
+        messages,
+        config={"metadata": {"node": "matcher", "run_id": run_id, "model_tier": "fast"}},
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -76,20 +86,25 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     structured_llm = llm.with_structured_output(GapAnalysisResult)
 
+    messages = [
+        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(
+            content=(
+                f"CANDIDATE CV:\n{cv_text[:4000]}\n\n"
+                f"JOB OFFER:\n{offer_text[:4000]}"
+            )
+        ),
+    ]
+
     try:
-        result: GapAnalysisResult = await structured_llm.ainvoke(
-            [
-                SystemMessage(content=SYSTEM_PROMPT),
-                SystemMessage(
-                    content=(
-                        f"CANDIDATE CV:\n{cv_text[:4000]}\n\n"
-                        f"JOB OFFER:\n{offer_text[:4000]}"
-                    )
-                ),
-            ]
+        result: GapAnalysisResult = await _invoke_gap_analysis(  # type: ignore[assignment]
+            structured_llm, messages, run_id=state.get("run_id", "")
         )
     except Exception as exc:
-        logger.warning("Matcher: structured output failed: %s", exc)
+        logger.warning(
+            "Matcher: gap analysis failed after retries for run=%s: %s",
+            state.get("run_id"), exc,
+        )
         result = GapAnalysisResult(
             match_score=int(embedding_score),
             summary="Gap analysis unavailable — using embedding similarity.",
@@ -109,11 +124,46 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Matcher: Final semantic match score calculated at {final_score}%."})
 
+    # --- Generate compact summaries for downstream nodes ---
+    # These replace raw CV/offer text in Writer and Critic prompts,
+    # reducing token costs significantly on multi-revision runs.
+    await log_emitter.emit(state.get("run_id"), {"type": "agent_action", "message": "Matcher: Generating context summaries for efficient processing..."})
+
+    from app.tools.summarizer import summarize_cv, summarize_offer, summarize_gap_report  # noqa: E402
+
+    cv_summary, offer_summary, gap_summary = await _generate_summaries(
+        cv_text, selected_offer, gap_report
+    )
+
     return {
         "gap_report": gap_report,
         "match_score": final_score,
+        "cv_summary": cv_summary,
+        "offer_summary": offer_summary,
+        "gap_summary": gap_summary,
         "status": "matching",
     }
+
+
+async def _generate_summaries(
+    cv_text: str, offer: dict, gap_report: dict
+) -> tuple[str, str, str]:
+    """Generate all three summaries concurrently for speed."""
+    import asyncio
+    from app.tools.summarizer import summarize_cv, summarize_offer, summarize_gap_report
+
+    try:
+        cv_sum, offer_sum, gap_sum = await asyncio.gather(
+            summarize_cv(cv_text),
+            summarize_offer(offer),
+            summarize_gap_report(gap_report),
+        )
+        return cv_sum, offer_sum, gap_sum
+    except Exception as exc:
+        logger.warning("Matcher: summary generation failed: %s", exc)
+        # Fallback: truncated originals
+        offer_text = offer.get("raw_text", "") or offer.get("snippet", "")
+        return cv_text[:2000], offer_text[:1500], gap_report.get("summary", "")
 
 
 # ---------------------------------------------------------------------------

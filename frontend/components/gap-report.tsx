@@ -8,70 +8,68 @@ import { CheckCircle2, XCircle, BarChart3 } from "lucide-react";
 export function GapReportCard({ report }: { report: GapReport }) {
   const colorClass =
     report.match_score >= 80
-      ? "text-emerald-400"
+      ? "text-emerald-500"
       : report.match_score >= 60
-        ? "text-amber-400"
-        : "text-red-400";
+        ? "text-orange-500"
+        : "text-red-500";
 
   return (
-    <Card className="border-border/60 bg-card/80">
-      <CardHeader className="pb-4 border-b border-border/40">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <BarChart3 className="h-4.5 w-4.5 text-primary" />
-            <CardTitle className="text-base">Gap Analysis</CardTitle>
-          </div>
-          <div className={`text-3xl font-bold tabular-nums ${colorClass}`}>
-            {report.match_score}%
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-5 space-y-5">
+    <div className="space-y-8">
+      <div className="flex items-end justify-between gap-4 pb-4 border-b border-[#E8E6E1]">
+         <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Alignment Score</span>
+            <div className={`text-5xl font-medium tracking-tighter tabular-nums ${colorClass}`}>
+              {report.match_score}%
+            </div>
+         </div>
+      </div>
+
+      <div className="space-y-6">
         <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Summary</h4>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#111111] mb-2">Executive Summary</h4>
+          <p className="text-gray-500 font-light text-sm leading-relaxed">
             {report.summary}
           </p>
         </div>
 
-        <div className="flex flex-col gap-5">
-          <div className="space-y-2.5">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-              Matching Skills
+        <div className="grid grid-cols-1 gap-8">
+          <div className="space-y-4">
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 flex items-center gap-2">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              Structural Matches
             </h4>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {report.matching_skills?.length > 0 ? (
                 report.matching_skills.map((skill) => (
-                  <Badge key={skill} variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs whitespace-normal text-left h-auto py-1">
+                  <span key={skill} className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-[11px] font-medium">
                     {skill}
-                  </Badge>
+                  </span>
                 ))
               ) : (
-                <span className="text-sm text-muted-foreground italic">None identified</span>
+                <span className="text-sm text-gray-400 font-light italic">No direct matches identified.</span>
               )}
             </div>
           </div>
 
-          <div className="space-y-2.5">
-            <h4 className="text-sm font-semibold flex items-center gap-2">
-              <XCircle className="h-4 w-4 text-red-400" />
-              Missing Skills
+          <div className="space-y-4">
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-red-600 flex items-center gap-2">
+              <XCircle className="h-3.5 w-3.5" />
+              Identified Deficiencies
             </h4>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {report.missing_skills?.length > 0 ? (
                 report.missing_skills.map((skill) => (
-                  <Badge key={skill} variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20 text-xs whitespace-normal text-left h-auto py-1">
+                  <span key={skill} className="px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-100 text-[11px] font-medium">
                     {skill}
-                  </Badge>
+                  </span>
                 ))
               ) : (
-                <span className="text-sm text-muted-foreground italic">None identified</span>
+                <span className="text-sm text-gray-400 font-light italic">No major disqualifiers found.</span>
               )}
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { startPipeline } from "@/lib/api";
 import type { EntryMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -57,133 +58,119 @@ export default function NewPipelinePage() {
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">New Pipeline</h1>
-        <p className="text-muted-foreground mt-1">
-          Start a new job application pipeline
+    <div className="space-y-12">
+      <div className="pb-6 border-b border-[#E8E6E1]">
+          <h1 className="text-6xl font-medium tracking-tighter text-[#111111]">
+            New <span className="text-gray-300 font-light italic">Mission</span>
+          </h1>
+        <p className="text-gray-500 font-light text-lg">
+          Start a new specialized job application mission.
         </p>
       </div>
 
       {/* Mode selector */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
         <button
           type="button"
           onClick={() => setMode("url")}
-          className={`group rounded-2xl border-2 p-6 text-left transition-all duration-200 ${
+          className={`group rounded-[1.5rem] border p-8 text-left transition-all duration-300 ${
             mode === "url"
-              ? "border-primary bg-primary/8 glow-sm shadow-sm"
-              : "border-border/50 hover:border-primary/40 hover:bg-accent/20"
+              ? "border-[#111111] bg-white shadow-sm ring-1 ring-[#111111]/5"
+              : "border-[#E8E6E1] bg-white hover:border-[#111111]/30 hover:bg-[#F4F3F0]/50"
           }`}
         >
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl mb-4 transition-colors ${
-            mode === "url" ? "bg-primary/20" : "bg-secondary"
-          }`}>
-            <Link2 className={`h-5 w-5 ${mode === "url" ? "text-primary" : "text-muted-foreground"}`} />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F4F3F0] border border-[#E8E6E1] mb-6 flex-shrink-0 group-hover:bg-[#111111] transition-colors">
+            <Link2 className={`h-6 w-6 ${mode === "url" ? "text-[#111111] group-hover:text-white" : "text-gray-400 group-hover:text-white"}`} />
           </div>
-          <h3 className="text-lg font-semibold">URL Mode</h3>
-          <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-            Paste a specific job posting URL. We&apos;ll extract the offer and
-            generate a targeted cover letter.
+          <h3 className="text-xl font-medium text-[#111111]">Direct URL</h3>
+          <p className="text-gray-500 font-light mt-2 leading-relaxed">
+            Provide a specific job posting link. Ariadne will extract requirements and engineer a bespoke cover letter.
           </p>
         </button>
 
         <button
           type="button"
           onClick={() => setMode("explore")}
-          className={`group rounded-2xl border-2 p-6 text-left transition-all duration-200 ${
+          className={`group rounded-[1.5rem] border p-8 text-left transition-all duration-300 ${
             mode === "explore"
-              ? "border-primary bg-primary/8 glow-sm shadow-sm"
-              : "border-border/50 hover:border-primary/40 hover:bg-accent/20"
+              ? "border-[#111111] bg-white shadow-sm ring-1 ring-[#111111]/5"
+              : "border-[#E8E6E1] bg-white hover:border-[#111111]/30 hover:bg-[#F4F3F0]/50"
           }`}
         >
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl mb-4 transition-colors ${
-            mode === "explore" ? "bg-primary/20" : "bg-secondary"
-          }`}>
-            <Search className={`h-5 w-5 ${mode === "explore" ? "text-primary" : "text-muted-foreground"}`} />
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F4F3F0] border border-[#E8E6E1] mb-6 flex-shrink-0 group-hover:bg-[#111111] transition-colors">
+            <Search className={`h-6 w-6 ${mode === "explore" ? "text-[#111111] group-hover:text-white" : "text-gray-400 group-hover:text-white"}`} />
           </div>
-          <h3 className="text-lg font-semibold">Explore Mode</h3>
-          <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-            We&apos;ll search for jobs matching your profile and preferences.
-            You&apos;ll choose from the results.
+          <h3 className="text-xl font-medium text-[#111111]">Explore Mode</h3>
+          <p className="text-gray-500 font-light mt-2 leading-relaxed">
+            Let our agents scout for opportunities matching your profile structure. You choose the best fit to pursue.
           </p>
         </button>
       </div>
 
       {/* URL input */}
       {mode === "url" && (
-        <Card className="border-border/60 bg-card/80">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
-                <Globe className="h-4.5 w-4.5 text-primary" />
+        <div className="rounded-[1.5rem] border border-[#E8E6E1] bg-white p-8 max-w-4xl">
+           <div className="flex items-start gap-4 mb-6">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F4F3F0] border border-[#E8E6E1]">
+                 <Globe className="h-5 w-5 text-[#111111]" />
               </div>
-              <div>
-                <CardTitle className="text-lg">Job Posting URL</CardTitle>
-                <CardDescription>
-                  Paste the full URL of the job posting you want to apply to
-                </CardDescription>
+              <div className="mt-1">
+                 <h2 className="text-xl font-medium text-[#111111]">Job Posting URL</h2>
+                 <p className="text-gray-500 font-light mt-1 text-sm">Paste the exact absolute URL of the job application page.</p>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="url">URL</Label>
+           </div>
+           
+           <div className="space-y-3 pl-1">
+              <Label htmlFor="url" className="text-[10px] font-bold uppercase tracking-widest text-gray-400">URL Target</Label>
               <Input
-                id="url"
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://company.com/careers/job-posting"
-                className="font-mono text-sm rounded-xl h-11 bg-background/50"
+                 id="url"
+                 type="url"
+                 value={url}
+                 onChange={(e) => setUrl(e.target.value)}
+                 placeholder="https://company.com/careers/job-posting"
+                 className="h-14 rounded-xl font-mono text-sm border-[#E8E6E1] focus-visible:ring-[#111111] bg-[#FDFDFC] shadow-sm px-5"
               />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {mode === "explore" && (
-        <Card className="border-border/60 bg-card/80">
-          <CardContent className="py-6">
-            <div className="flex items-start gap-3 text-sm text-muted-foreground">
-              <Lightbulb className="h-5 w-5 mt-0.5 text-amber-400 shrink-0" />
-              <p>
-                We&apos;ll use your profile preferences (job title, location,
-                contract type) to find matching offers. Make sure your{" "}
-                <a
-                  href="/profile"
-                  className="text-primary font-medium underline underline-offset-4 decoration-primary/40 hover:decoration-primary"
-                >
-                  profile
-                </a>{" "}
-                is up to date.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {error && (
-        <div className="flex items-center gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
-          <span className="shrink-0">⚠</span>
-          {error}
+           </div>
         </div>
       )}
 
-      <Button
-        size="lg"
-        onClick={handleStart}
-        disabled={loading}
-        className="w-full sm:w-auto rounded-xl gap-2 font-semibold px-8"
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Rocket className="h-4 w-4" />
-        )}
-        {loading ? "Starting..." : "Start Pipeline"}
-        {!loading && <ArrowRight className="h-4 w-4 ml-1" />}
-      </Button>
+      {mode === "explore" && (
+        <div className="rounded-[1.5rem] border border-[#E8E6E1] bg-[#F4F3F0]/50 p-8 max-w-4xl">
+           <div className="flex items-start gap-4">
+              <Lightbulb className="h-6 w-6 mt-1 text-orange-500 shrink-0" />
+              <div>
+                 <h3 className="text-lg font-medium text-[#111111]">Intelligent Scouting</h3>
+                 <p className="text-gray-500 font-light mt-2 leading-relaxed">
+                   The system will leverage your profile DNA (title, stack, contract logic) to actively source matching offers. Ensure your <Link href="/profile" className="text-[#111111] font-medium underline underline-offset-4 decoration-gray-300 hover:decoration-[#111111] transition-colors">profile data</Link> is perfectly calibrated before deploying the pipeline.
+                 </p>
+              </div>
+           </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-3 rounded-[1rem] border border-red-200 bg-red-50 p-4 text-sm text-red-600 max-w-4xl">
+          <span className="shrink-0 text-lg">⚠️</span>
+          <span className="font-medium">{error}</span>
+        </div>
+      )}
+
+      <div className="pt-4">
+         <Button
+           size="lg"
+           onClick={handleStart}
+           disabled={loading}
+           className="rounded-full bg-[#111111] text-white hover:bg-black h-14 px-10 text-sm tracking-wider uppercase font-bold flex items-center gap-3 shadow-md transition-all hover:scale-[1.02]"
+         >
+           {loading ? (
+             <Loader2 className="h-5 w-5 animate-spin" />
+           ) : (
+             <Rocket className="h-5 w-5" />
+           )}
+           {loading ? "INITIALIZING..." : "START PIPELINE"}
+           {!loading && <ArrowRight className="h-5 w-5 ml-1" />}
+         </Button>
+      </div>
     </div>
   );
 }

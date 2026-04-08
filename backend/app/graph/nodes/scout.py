@@ -90,8 +90,6 @@ async def scout_node(state: AgentState, config: RunnableConfig) -> AgentState:
     cv_text = state.get("cv_text", "")
     
     include_domains = [
-        "linkedin.com",
-        "glassdoor.com",
         "boards.greenhouse.io",
         "jobs.lever.co",
         "jobs.ashbyhq.com",
@@ -125,7 +123,14 @@ async def scout_node(state: AgentState, config: RunnableConfig) -> AgentState:
         offer_embeddings = [[] for _ in contents]
 
     offers: list[dict] = []
+    seen_urls: set[str] = set()  # Dedup: Tavily may return the same URL across search slices
     for result, content, offer_emb in zip(filtered_results, contents, offer_embeddings):
+        url = result.get("url", "")
+        if url in seen_urls:
+            logger.debug("Scout: skipping duplicate URL %s", url)
+            continue
+        seen_urls.add(url)
+
         if cv_embedding and offer_emb:
             score = _cosine_similarity_pct(cv_embedding, offer_emb)
         else:
@@ -135,8 +140,8 @@ async def scout_node(state: AgentState, config: RunnableConfig) -> AgentState:
         offers.append({
             "id": str(uuid.uuid4()),
             "title": result.get("title", "Unknown"),
-            "company": _extract_company(result.get("url", "")),
-            "url": result.get("url", ""),
+            "company": _extract_company(url),
+            "url": url,
             "snippet": content[:300],
             "contact_email": None,
             "pre_score": round(score, 1),
