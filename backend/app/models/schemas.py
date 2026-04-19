@@ -98,12 +98,23 @@ class PipelineStartRequest(BaseModel):
     offer_url: HttpUrl | None = None
 
 
+class CompanyInfoSchema(BaseModel):
+    """Structured company information for frontend display."""
+
+    name: str
+    website: str | None = None
+    industry: str | None = None
+    size: str | None = None
+    description: str | None = None
+
+
 class JobOfferSummary(BaseModel):
     """Condensed job offer for display in HITL-1."""
 
     id: str
     title: str
     company: str
+    company_info: CompanyInfoSchema | None = None
     location: str | None = None
     url: str
     contact_email: str | None = None

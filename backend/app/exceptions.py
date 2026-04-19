@@ -41,6 +41,13 @@ class TavilyError(CareerAgentError):
         super().__init__(message, status_code=502)
 
 
+class OfferUnavailableError(CareerAgentError):
+    """Raised when a job offer page exists but the position is no longer available."""
+
+    def __init__(self, message: str = "Job offer is no longer available") -> None:
+        super().__init__(message, status_code=410)
+
+
 class NotFoundError(CareerAgentError):
     """Raised when a requested resource is not found."""
 

@@ -110,6 +110,21 @@ async def update_pipeline_run(
         raise NotFoundError(f"Pipeline run {run_id} not found")
     return result.data[0]
 
+async def delete_pipeline_run(
+    supabase: AsyncClient,
+    run_id: str,
+    user_id: str,
+) -> bool:
+    """Delete a pipeline run and all associated checkpoints."""
+    result = (
+        await supabase.table("pipeline_runs")
+        .delete()
+        .eq("id", run_id)
+        .eq("user_id", user_id)
+        .execute()
+    )
+    return len(result.data) > 0
+
 
 async def get_user_runs(supabase: AsyncClient, user_id: str) -> list[dict]:
     """Get all pipeline runs for a user, ordered by creation date."""

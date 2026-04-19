@@ -148,19 +148,22 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
     }
 
     # Update best_draft only if this revision is better (or it's the first one)
-    if current_score >= best_score_so_far or best_score_so_far == 0:
+    # OR if this is a manual rewrite (we MUST show the user their requested changes)
+    is_manual_rewrite = state.get("is_manual_rewrite")
+    if current_score >= best_score_so_far or best_score_so_far == 0 or is_manual_rewrite:
         result["best_draft"] = letter
         result["best_score"] = current_score
         result["best_feedback"] = evaluation.model_dump()
+        
+        reason = "manual rewrite" if is_manual_rewrite else f"score={current_score} (was {best_score_so_far})"
         logger.info(
-            "Critic: new best draft! score=%d (was %d) for run=%s",
-            current_score,
-            best_score_so_far,
+            "Critic: new best draft! %s for run=%s",
+            reason,
             state.get("run_id"),
         )
         await log_emitter.emit(state.get("run_id"), {
             "type": "info",
-            "message": f"Critic: ⭐ New best draft! Score improved to {current_score}/100.",
+            "message": f"Critic: ⭐ New best draft! ({reason})",
         })
     else:
         await log_emitter.emit(state.get("run_id"), {
