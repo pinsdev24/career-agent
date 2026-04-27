@@ -24,6 +24,9 @@ COPY --from=ghcr.io/astral-sh/uv:0.6.14 /uv /usr/local/bin/uv
 
 WORKDIR /build
 
+# Tell uv to create the virtualenv at /app/.venv so paths match the runtime stage
+ENV UV_PROJECT_ENVIRONMENT=/app/.venv
+
 # Copy dependency manifests first → Docker layer cache is reused when only
 # source code changes (not dependencies).
 COPY pyproject.toml uv.lock ./
@@ -54,7 +57,7 @@ RUN groupadd --gid 1001 appgroup && \
 WORKDIR /app
 
 # Copy the pre-built virtualenv from builder
-COPY --from=builder /build/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
 
 # Copy application source
 COPY app/ ./app/
