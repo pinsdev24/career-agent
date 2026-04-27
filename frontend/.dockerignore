@@ -1,0 +1,30 @@
+# ── Dependencies (re-installed inside the image) ──────────────────────────────
+node_modules/
+
+# ── Next.js build cache & output (rebuilt inside the image) ───────────────────
+.next/
+out/
+
+# ── Secrets ────────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── TypeScript incremental cache ───────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── OS / IDE noise ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ── Git ────────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Docs / CI (not needed at runtime) ─────────────────────────────────────────
+README.md
+AGENTS.md
+CLAUDE.md

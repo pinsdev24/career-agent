@@ -1,0 +1,23 @@
+# =============================================================================
+# Railway deployment configuration — CareerAgent Frontend
+# Docs: https://docs.railway.com/reference/config-as-code
+# =============================================================================
+
+[build]
+builder        = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+# ⚠️  NEXT_PUBLIC_* variables must be set as Build Variables in Railway so they
+# are passed as Docker --build-arg values and embedded into the JS bundle.
+# Add them under: Service → Variables → mark each NEXT_PUBLIC_* as a Build Variable.
+
+[deploy]
+startCommand = "node server.js"
+
+# Restart on failure
+restartPolicyType       = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+# Health check — Railway only routes traffic once this responds successfully
+healthcheckPath    = "/"
+healthcheckTimeout = 300
