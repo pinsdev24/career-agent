@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { ArrowUpRight, Menu, Search, Briefcase, FileText, CheckCircle2, ChevronRight, Zap, Target, PenTool, Sparkles, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
 
 // Reusable animation variants
-const fadeUp = {
+// `as const` narrows the ease array to a fixed-length tuple so framer-motion's
+// Easing type is satisfied (number[] is too wide).
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
