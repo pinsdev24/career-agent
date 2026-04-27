@@ -114,8 +114,10 @@ def build_application_summary(state: AgentState) -> dict:
     """Build a compact application summary for the user's history."""
     offer = state.get("selected_offer", {})
     return {
+        "run_id": state.get("run_id", ""),
         "company": offer.get("company", "Unknown"),
         "role": offer.get("title", "Unknown"),
+        "url": offer.get("url", ""),
         "match_score": state.get("match_score", 0),
         "best_score": state.get("best_score", 0),
         "tone_used": state.get("tone_of_voice", "professional"),

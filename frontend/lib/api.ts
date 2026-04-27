@@ -119,6 +119,18 @@ export async function cancelPipeline(runId: string): Promise<{ status: string; c
   });
 }
 
+export async function markApplied(runId: string): Promise<{ status: string; updated: boolean }> {
+  return request<{ status: string; updated: boolean }>(`/pipeline/${runId}/applied`, {
+    method: "POST",
+  });
+}
+
+export async function deletePipeline(runId: string): Promise<{ status: string; deleted: boolean }> {
+  return request<{ status: string; deleted: boolean }>(`/pipeline/${runId}`, {
+    method: "DELETE",
+  });
+}
+
 // ---------------------------------------------------------------------------
 // HITL
 // ---------------------------------------------------------------------------

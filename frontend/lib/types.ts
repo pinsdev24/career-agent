@@ -50,10 +50,19 @@ export interface Profile {
 // Pipeline
 // ---------------------------------------------------------------------------
 
+export interface CompanyInfo {
+  name: string;
+  website?: string | null;
+  industry?: string | null;
+  size?: string | null;
+  description?: string | null;
+}
+
 export interface JobOffer {
   id: string;
   title: string;
   company: string;
+  company_info?: CompanyInfo | null;
   location?: string | null;
   url: string;
   contact_email?: string | null;

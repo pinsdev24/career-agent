@@ -217,22 +217,25 @@ export default function ProfilePage() {
             }}
           />
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F4F3F0] border border-[#E8E6E1] mb-6">
+          <div className="relative z-10 flex flex-col gap-16">
+            {/* Upload Area */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F4F3F0] border border-[#E8E6E1] mb-2">
                   <FileText className="h-6 w-6 text-[#111111]" />
                 </div>
-                <h3 className="text-3xl font-medium text-[#111111] tracking-tight">Professional Vitae</h3>
-                <p className="text-gray-400 font-light text-base leading-relaxed">
-                  Upload your CV in PDF format. Our extractors will parse your professional narrative to feed the agent graph.
-                </p>
+                <div>
+                  <h3 className="text-3xl font-medium text-[#111111] tracking-tight">Professional Vitae</h3>
+                  <p className="text-gray-400 font-light text-base leading-relaxed mt-2">
+                    Upload your CV in PDF format. Our extractors will parse your professional narrative to feed the agent graph.
+                  </p>
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-6 lg:justify-end">
                 <label className="cursor-pointer group/upload">
                   <input type="file" accept=".pdf" onChange={handleUpload} className="hidden" disabled={uploading} />
-                  <div className="flex items-center gap-6 rounded-full border-2 border-dashed border-[#E8E6E1] px-10 h-20 transition-all duration-300 hover:border-[#111111] group-hover:bg-[#FDFDFC]">
+                  <div className="flex items-center gap-6 rounded-full border-2 border-dashed border-[#E8E6E1] px-10 h-20 transition-all duration-300 hover:border-[#111111] group-hover/upload:bg-[#FDFDFC]">
                     {uploading ? (
                       <Loader2 className="h-6 w-6 animate-spin text-[#111111]" />
                     ) : (
@@ -256,23 +259,106 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* Extracted Data Display */}
             {profile?.cv_structured && Object.keys(profile.cv_structured).length > 0 && (
-              <div className="bg-[#F4F3F0]/50 rounded-[2rem] border border-[#E8E6E1] p-10 space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
-                <div className="space-y-1">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Extracted Identity</span>
-                  <p className="text-2xl font-medium text-[#111111] tracking-tighter">
-                    {typeof profile.cv_structured.full_name === "string" ? profile.cv_structured.full_name : "Anonymous Candidate"}
-                  </p>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-12 border-t border-[#E8E6E1] pt-12">
+                <div className="flex items-center gap-4">
+                  <div className="h-8 w-8 rounded-full bg-[#111111] text-white flex items-center justify-center">
+                    <Brain className="h-4 w-4" />
+                  </div>
+                  <h4 className="text-xl font-medium tracking-tight text-[#111111]">Extracted Ontology</h4>
                 </div>
 
-                <div className="space-y-4">
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Identified Competencies</span>
-                  <div className="flex flex-wrap gap-2">
-                    {Array.isArray(profile.cv_structured.skills) && profile.cv_structured.skills.map((skill: string) => (
-                      <span key={skill} className="px-4 py-1.5 rounded-full bg-white border border-[#E8E6E1] text-[11px] font-bold text-[#111111] uppercase tracking-wider shadow-sm">
-                        {skill}
-                      </span>
-                    ))}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Left Column: Identity & Skills */}
+                  <div className="space-y-8">
+                    <div className="bg-[#F4F3F0]/50 rounded-[2rem] border border-[#E8E6E1] p-8 space-y-6">
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Identity</span>
+                        <p className="text-2xl font-medium text-[#111111] tracking-tighter">
+                          {typeof profile.cv_structured.full_name === "string" ? profile.cv_structured.full_name : "Anonymous Candidate"}
+                        </p>
+                        {typeof profile.cv_structured.email === "string" && (
+                          <p className="text-sm text-gray-500 font-light">{profile.cv_structured.email}</p>
+                        )}
+                        {typeof profile.cv_structured.location === "string" && (
+                          <p className="text-sm text-gray-500 font-light">{profile.cv_structured.location}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="bg-[#FDFDFC] rounded-[2rem] border border-[#E8E6E1] p-8 space-y-4">
+                      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Competencies</span>
+                      <div className="flex flex-wrap gap-2">
+                        {Array.isArray(profile.cv_structured.skills) && profile.cv_structured.skills.map((skill: string) => (
+                          <span key={skill} className="px-3 py-1 rounded-full bg-[#F4F3F0] border border-[#E8E6E1] text-[10px] font-bold text-[#111111] uppercase tracking-wider">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {Array.isArray(profile.cv_structured.languages) && profile.cv_structured.languages.length > 0 && (
+                      <div className="bg-[#FDFDFC] rounded-[2rem] border border-[#E8E6E1] p-8 space-y-4">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">Languages</span>
+                        <div className="space-y-3">
+                          {profile.cv_structured.languages.map((lang: any, i: number) => (
+                            <div key={i} className="flex justify-between items-center border-b border-[#E8E6E1] last:border-0 pb-2 last:pb-0">
+                              <span className="text-sm font-medium text-[#111111]">{lang.language}</span>
+                              <span className="text-xs text-gray-400 uppercase tracking-widest">{lang.level || "Native"}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Column: Experience & Education */}
+                  <div className="lg:col-span-2 space-y-8">
+                    {Array.isArray(profile.cv_structured.experience) && profile.cv_structured.experience.length > 0 && (
+                      <div className="bg-[#FDFDFC] rounded-[2rem] border border-[#E8E6E1] p-8 space-y-6">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-2">
+                          <Briefcase className="h-3 w-3" /> Professional Experience
+                        </span>
+                        <div className="space-y-8">
+                          {profile.cv_structured.experience.map((exp: any, i: number) => (
+                            <div key={i} className="relative pl-6 before:absolute before:left-0 before:top-2 before:bottom-[-2rem] last:before:bottom-0 before:w-px before:bg-[#E8E6E1]">
+                              <div className="absolute left-[-4px] top-2 w-2 h-2 rounded-full bg-[#111111] ring-4 ring-white" />
+                              <div className="space-y-1">
+                                <h5 className="text-lg font-medium text-[#111111] leading-tight">{exp.title}</h5>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="font-medium text-gray-600">{exp.company}</span>
+                                  <span className="text-gray-300">•</span>
+                                  <span className="text-gray-400 font-mono text-xs">{exp.duration}</span>
+                                </div>
+                                {exp.description && (
+                                  <p className="text-sm text-gray-500 font-light mt-3 leading-relaxed line-clamp-3 hover:line-clamp-none transition-all">
+                                    {exp.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {Array.isArray(profile.cv_structured.education) && profile.cv_structured.education.length > 0 && (
+                      <div className="bg-[#FDFDFC] rounded-[2rem] border border-[#E8E6E1] p-8 space-y-6">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400 flex items-center gap-2">
+                          <BookOpen className="h-3 w-3" /> Academic Background
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {profile.cv_structured.education.map((edu: any, i: number) => (
+                            <div key={i} className="p-4 rounded-2xl bg-[#F4F3F0]/50 border border-[#E8E6E1]">
+                              <h5 className="text-sm font-medium text-[#111111] mb-1">{edu.degree}</h5>
+                              <p className="text-xs text-gray-500">{edu.institution}</p>
+                              {edu.year && <p className="text-[10px] font-mono text-gray-400 mt-2">{edu.year}</p>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -419,82 +505,113 @@ export default function ProfilePage() {
                 <h3 className="text-2xl font-medium text-[#111111]">Agent Memory</h3>
                 <p className="text-[10px] uppercase tracking-[0.3em] font-black text-gray-400">Persistent Cognitive Parameters</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[9px] font-mono font-bold text-gray-400 uppercase tracking-tighter">Live Sync Active</span>
+                <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Live Sync Active</span>
               </div>
             </div>
 
             {loadingMemories ? (
-              <div className="py-20 flex justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-200" />
+              <div className="py-20 flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-200" />
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Syncing Neurons...</span>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-                {/* Visual Settings */}
-                <div className="lg:col-span-5 space-y-10">
-                  <div className="space-y-6">
-                    {/* Style Notes */}
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Contextual Notes</label>
-                      <p className="text-lg font-light text-[#111111] leading-relaxed">
-                        {memories.find(m => m.memory_key === 'preferences')?.memory_data?.style_notes || "No heuristics recorded."}
+            ) : (() => {
+              const prefMemory = memories.find(m => m.memory_key === 'preferences');
+              const data = prefMemory?.memory_data || {};
+              const hasData = Object.keys(data).length > 0;
+
+              if (!hasData) {
+                return (
+                  <div className="py-16 flex flex-col items-center justify-center text-center space-y-6">
+                    <div className="h-16 w-16 rounded-full bg-[#F4F3F0] flex items-center justify-center mb-2">
+                      <Brain className="h-8 w-8 text-gray-300" />
+                    </div>
+                    <div className="space-y-2 max-w-md">
+                      <h4 className="text-lg font-medium text-[#111111]">No Memories Recorded</h4>
+                      <p className="text-sm text-gray-400 font-light leading-relaxed">
+                        Ariadne learns from your feedback during pipeline runs. As you interact with the agent, it will build a persistent cognitive profile here to personalize future assets.
                       </p>
                     </div>
+                  </div>
+                );
+              }
 
-                    <div className="grid grid-cols-2 gap-8 border-t border-[#E8E6E1] pt-8">
-                      <div className="space-y-2">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Master Tone</label>
-                        <p className="font-mono text-sm uppercase text-[#111111]">
-                          {memories.find(m => m.memory_key === 'preferences')?.memory_data?.preferred_tone || "Undetermined"}
-                        </p>
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                  {/* Visual Settings */}
+                  <div className="lg:col-span-5 space-y-10">
+                    <div className="space-y-6">
+                      {/* Style Notes */}
+                      <div className="space-y-3">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                          <MessageSquare className="h-3 w-3" /> Contextual Notes
+                        </label>
+                        <div className="p-6 rounded-2xl bg-[#F4F3F0]/50 border border-[#E8E6E1]">
+                          <p className="text-sm font-light text-[#111111] leading-relaxed">
+                            {data.style_notes || <span className="text-gray-400 italic">No explicit style instructions recorded yet.</span>}
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Seniority Target</label>
-                        <p className="font-mono text-sm uppercase text-[#111111]">
-                          {memories.find(m => m.memory_key === 'preferences')?.memory_data?.target_seniority || "Standard"}
-                        </p>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Length Constraint</label>
-                        <p className="font-mono text-sm uppercase text-[#111111]">
-                          {memories.find(m => m.memory_key === 'preferences')?.memory_data?.letter_length_preference || "Optimal"}
-                        </p>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="p-5 rounded-2xl bg-white border border-[#E8E6E1] space-y-2">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Master Tone</label>
+                          <p className="font-mono text-xs font-medium uppercase text-[#111111]">
+                            {data.preferred_tone || "Adaptive"}
+                          </p>
+                        </div>
+                        <div className="p-5 rounded-2xl bg-white border border-[#E8E6E1] space-y-2">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Length Constraint</label>
+                          <p className="font-mono text-xs font-medium uppercase text-[#111111]">
+                            {data.letter_length_preference || "Optimal"}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Categorical Manifest */}
-                <div className="lg:col-span-7 space-y-10 lg:border-l lg:border-[#E8E6E1] lg:pl-16">
-                  <div className="space-y-8">
+                  {/* Categorical Manifest */}
+                  <div className="lg:col-span-7 space-y-8 lg:border-l lg:border-[#E8E6E1] lg:pl-16">
                     {/* Industries */}
                     <div className="space-y-4">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Strategic Verticals</label>
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                        <Briefcase className="h-3 w-3" /> Strategic Verticals
+                      </label>
                       <div className="flex flex-wrap gap-2">
-                        {(memories.find(m => m.memory_key === 'preferences')?.memory_data?.preferred_industries as string[] || []).map((ind, i) => (
-                          <span key={i} className="px-5 py-2 rounded-lg bg-white border border-[#E8E6E1] text-[11px] font-medium text-[#111111]">
-                            {ind}
-                          </span>
-                        ))}
+                        {(data.preferred_industries as string[] || []).length > 0 ? (
+                          (data.preferred_industries as string[]).map((ind, i) => (
+                            <span key={i} className="px-4 py-1.5 rounded-full bg-white border border-[#E8E6E1] text-[11px] font-medium text-[#111111] shadow-sm">
+                              {ind}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-sm text-gray-400 font-light italic">Agent is exploring autonomously</span>
+                        )}
                       </div>
                     </div>
 
                     {/* Roles */}
                     <div className="space-y-4">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Functional Ontologies</label>
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                        <Sparkles className="h-3 w-3" /> Functional Ontologies
+                      </label>
                       <div className="flex flex-wrap gap-2">
-                        {(memories.find(m => m.memory_key === 'preferences')?.memory_data?.preferred_role_types as string[] || []).map((role, i) => (
-                          <span key={i} className="px-5 py-2 rounded-lg bg-[#E8E6E1]/30 text-[11px] font-medium text-[#111111]">
-                            {role}
-                          </span>
-                        ))}
+                        {(data.preferred_role_types as string[] || []).length > 0 ? (
+                          (data.preferred_role_types as string[]).map((role, i) => (
+                            <span key={i} className="px-4 py-1.5 rounded-full bg-[#111111] text-[11px] font-medium text-white shadow-sm">
+                              {role}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-sm text-gray-400 font-light italic">No explicit roles pinned</span>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           <div className="bg-[#F4F3F0] border-t border-[#E8E6E1] px-12 py-6 flex justify-between items-center">
@@ -511,26 +628,26 @@ export default function ProfilePage() {
             </span>
             <AlertDialog>
               <AlertDialogTrigger
-                className="h-8 px-4 rounded-full text-[10px] font-black uppercase tracking-widest text-[#111111]/30 hover:text-red-600 hover:bg-red-50/50 transition-all"
+                className="h-8 px-6 rounded-full border border-red-200 bg-white text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-white hover:bg-red-500 transition-all flex items-center gap-2"
               >
-                Purge Heuristics
+                <Trash2 className="h-3 w-3" /> Purge Heuristics
               </AlertDialogTrigger>
-              <AlertDialogContent className="max-w-md rounded-3xl border-[#E8E6E1] bg-white p-8">
+              <AlertDialogContent className="max-w-md rounded-[2rem] border-[#E8E6E1] bg-white p-8">
                 <AlertDialogHeader className="space-y-3">
-                  <AlertDialogTitle className="text-xl font-semibold text-[#111111]">Purge Memory</AlertDialogTitle>
-                  <AlertDialogDescription className="text-sm text-gray-500 leading-relaxed">
-                    This action will delete these preferences. Ariadne will lose this contextual data for future sessions.
+                  <AlertDialogTitle className="text-xl font-medium text-[#111111]">Purge Agent Memory?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm text-gray-500 font-light leading-relaxed">
+                    This action will delete all learned preferences and stylistic notes. Ariadne will lose this contextual data for future sessions and will need to relearn your preferences.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter className="pt-6">
-                  <AlertDialogCancel className="h-10 px-6 rounded-full border-[#E8E6E1] text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-[#111111]">
+                <AlertDialogFooter className="pt-8 gap-3">
+                  <AlertDialogCancel className="h-12 px-8 rounded-full border border-[#E8E6E1] text-xs font-bold uppercase tracking-widest text-[#111111] hover:bg-[#F4F3F0]">
                     Cancel
                   </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => handleDeleteMemory('preferences')}
-                    className="h-10 px-6 rounded-full bg-red-600 text-white hover:bg-red-700 text-[11px] font-bold uppercase tracking-widest"
+                    className="h-12 px-8 rounded-full bg-red-500 text-white hover:bg-red-600 text-xs font-bold uppercase tracking-widest border-none"
                   >
-                    Confirm
+                    Confirm Purge
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

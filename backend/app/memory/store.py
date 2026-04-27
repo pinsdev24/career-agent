@@ -72,15 +72,15 @@ async def upsert_user_memory(
 async def get_all_user_memories(
     supabase: AsyncClient,
     user_id: str,
-) -> dict[str, dict]:
-    """Retrieve all memory entries for a user, keyed by memory_key."""
+) -> list[dict]:
+    """Retrieve all memory entries for a user."""
     result = (
         await supabase.table("user_memories")
-        .select("memory_key, memory_data")
+        .select("memory_key, memory_data, updated_at")
         .eq("user_id", user_id)
         .execute()
     )
-    return {row["memory_key"]: row["memory_data"] for row in (result.data or [])}
+    return result.data or []
 
 
 # ---------------------------------------------------------------------------
@@ -151,3 +151,26 @@ async def record_application(
         user_id,
         application_summary.get("company", "unknown"),
     )
+
+async def mark_application_as_applied(
+    supabase: AsyncClient,
+    user_id: str,
+    run_id: str,
+) -> bool:
+    """Mark an application as 'applied' in the user's history."""
+    history = await get_user_memory(supabase, user_id, "application_history")
+    if not history or "applications" not in history:
+        return False
+        
+    updated = False
+    for app in history["applications"]:
+        if app.get("run_id") == run_id:
+            app["applied"] = True
+            updated = True
+            break
+            
+    if updated:
+        await upsert_user_memory(supabase, user_id, "application_history", history)
+        logger.info("Memory: marked run_id=%s as applied for user=%s", run_id, user_id)
+        
+    return updated

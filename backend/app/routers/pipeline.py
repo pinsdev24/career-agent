@@ -135,3 +135,36 @@ async def stream_pipeline_logs(
         log_emitter.stream(run_id),
         media_type="text/event-stream"
     )
+
+@router.post("/{run_id}/applied")
+async def mark_pipeline_applied(
+    run_id: str,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+) -> dict[str, str | bool]:
+    """Mark the job application as applied by the user."""
+    from app.memory.store import mark_application_as_applied
+    
+    # Ensure they own the run
+    run = await get_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
+    if not run:
+        raise NotFoundError(f"Pipeline run {run_id} not found")
+
+    updated = await mark_application_as_applied(supabase=supabase, user_id=user["id"], run_id=run_id)
+    return {"status": "success", "updated": updated}
+
+@router.delete("/{run_id}")
+async def delete_run(
+    run_id: str,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+) -> dict[str, str | bool]:
+    """Delete a pipeline run."""
+    from app.tools.supabase_ops import delete_pipeline_run
+
+    run = await get_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
+    if not run:
+        raise NotFoundError(f"Pipeline run {run_id} not found")
+
+    deleted = await delete_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
+    return {"status": "success", "deleted": deleted}

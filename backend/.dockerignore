@@ -1,0 +1,35 @@
+# ── Virtual environment & package caches ──────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# ── Secrets (injected at runtime via Railway env vars) ─────────────────────────
+.env
+
+# ── LangGraph local dev artifacts ─────────────────────────────────────────────
+.langgraph_api/
+
+# ── Test suite (not needed at runtime) ────────────────────────────────────────
+tests/
+
+# ── Supabase local CLI artefacts ──────────────────────────────────────────────
+supabase/.branches/
+supabase/.temp/
+
+# ── OS / IDE noise ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
