@@ -42,19 +42,13 @@ import {
   PenTool,
   Scale,
   Rocket,
-  PartyPopper,
   Mail,
   FileText,
   Trash2,
+  ArrowLeft,
+  MoreHorizontal,
 } from "lucide-react";
-
-const STATUS_ICONS: Record<string, React.ElementType> = {
-  started: Rocket,
-  scouting: Search,
-  matching: Puzzle,
-  writing: PenTool,
-  critiquing: Scale,
-};
+import Link from "next/link";
 
 export default function PipelineRunPage({
   params,
@@ -211,134 +205,130 @@ export default function PipelineRunPage({
   if (loading && !run) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-5 w-5 animate-spin text-[#999]" />
       </div>
     );
   }
 
   if (!run) {
     return (
-      <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-6 text-center text-destructive">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-[13px] text-red-600">
         {error || "Pipeline run not found."}
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 pb-16">
-      {/* Header & Status Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#E8E6E1]">
-        <div>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Tactical Control</span>
-            <span className="text-[10px] font-mono text-[#111111] bg-[#F4F3F0] px-2 py-0.5 rounded border border-[#E8E6E1]">
-              {run.id.substring(0, 8)}...
-            </span>
+    <div className="space-y-6 pb-12">
+      {/* Breadcrumb + Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="flex items-center justify-center h-8 w-8 rounded-lg border border-[#EBEBEB] hover:bg-[#F5F5F5] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 text-[#999]" />
+          </Link>
+          <div>
+            <h1 className="text-[15px] font-semibold text-[#1a1a1a] tracking-tight">
+              {run.selected_offer?.title || "Active Pipeline"}
+            </h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              {run.selected_offer?.company && (
+                <span className="text-[12px] text-[#999]">{run.selected_offer.company}</span>
+              )}
+              <span className="text-[11px] font-mono text-[#ccc] bg-[#F5F5F5] px-1.5 py-0.5 rounded">
+                {run.id.substring(0, 8)}
+              </span>
+            </div>
           </div>
-          <h1 className="text-4xl font-medium tracking-tight text-[#111111] mb-2">
-            {run.selected_offer?.title || "Active Processing"}
-          </h1>
-          <p className="text-gray-500 font-light text-lg">
-            {run.selected_offer?.company || "Source validation in progress..."}
-          </p>
         </div>
 
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Current Phase</span>
-            <AlertDialog>
-              <AlertDialogTrigger 
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
-                  "h-7 px-3 rounded-full text-xs text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors gap-1.5"
-                )}
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                ) : (
-                  <Trash2 className="h-3 w-3" />
-                )}
-                Delete
-              </AlertDialogTrigger>
-              <AlertDialogContent className="rounded-[2rem]">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete this pipeline run, including all associated gap reports, drafts, and validation data. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="rounded-full bg-red-500 hover:bg-red-600 text-white"
-                    onClick={handleDelete}
-                  >
-                    Delete Run
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+        <div className="flex items-center gap-2">
+          {/* Status */}
           <div className={cn(
-            "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border",
-            run.status === 'completed' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-              run.status === 'failed' ? "bg-red-50 text-red-600 border-red-100" :
-                "bg-[#111111] text-white border-[#111111]"
+            "px-3 py-1.5 rounded-lg text-[11px] font-medium",
+            run.status === 'completed' ? "bg-emerald-50 text-emerald-700" :
+              run.status === 'failed' ? "bg-red-50 text-red-600" :
+                "bg-[#F5F5F5] text-[#666]"
           )}>
-            {run.status === 'completed' ? 'Success' :
-              run.status === 'failed' ? 'Terminated' :
-                'Active Operation'}
+            {PIPELINE_STATUS_LABELS[run.status]}
           </div>
+
+          {/* Actions */}
+          <AlertDialog>
+            <AlertDialogTrigger
+              className="flex items-center justify-center h-8 w-8 rounded-lg border border-[#EBEBEB] hover:bg-red-50 hover:border-red-200 hover:text-red-500 transition-colors text-[#999]"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Trash2 className="h-3.5 w-3.5" />
+              )}
+            </AlertDialogTrigger>
+            <AlertDialogContent className="rounded-xl max-w-md">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-[15px]">Delete this run?</AlertDialogTitle>
+                <AlertDialogDescription className="text-[13px]">
+                  This will permanently delete all data associated with this pipeline run. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="rounded-lg h-9 text-[13px]">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="rounded-lg bg-red-500 hover:bg-red-600 text-white h-9 text-[13px]"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
-      {/* Progress Bar - Custom Lattice Style */}
-      <div className="relative">
-        <PipelineProgress currentStatus={run.status} />
-      </div>
+      {/* Progress */}
+      <PipelineProgress currentStatus={run.status} />
 
       {error && (
-        <div className="flex items-center gap-3 rounded-[1rem] border border-red-200 bg-red-50 p-5 text-sm text-red-600 max-w-4xl mx-auto">
-          <span className="shrink-0 text-lg">⚠️</span>
+        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
+          <span className="shrink-0">⚠️</span>
           <span className="font-medium">{error}</span>
         </div>
       )}
 
       {/* HITL-1: Offer Selection */}
       {run.status === "waiting_offer_selection" && (
-        <div className="space-y-8 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl font-medium text-[#111111] mb-4 tracking-tight">
-              {run.discovered_offers?.length === 0 ? "No Opportunities Found" : "Select Targeted Opportunity"}
-            </h2>
-            <p className="text-gray-500 font-light text-lg">
-              {run.discovered_offers?.length === 0 
-                ? "Our agents exhausted multiple search strategies but couldn't find any novel matching roles. Please refine your preferences and launch a new mission."
-                : "Our agents have identified these matching offers. Select the most relevant one to continue the engineering process."}
-            </p>
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-semibold text-[#1a1a1a]">
+                {run.discovered_offers?.length === 0 ? "No Offers Found" : "Select an Offer"}
+              </h2>
+              <p className="text-[13px] text-[#999] mt-0.5">
+                {run.discovered_offers?.length === 0
+                  ? "No matching roles were found. Try adjusting your profile preferences."
+                  : "Choose the most relevant opportunity to continue."}
+              </p>
+            </div>
           </div>
 
           {run.discovered_offers?.length === 0 ? (
-            <div className="flex justify-center pt-8">
+            <div className="flex justify-start pt-2">
               <Button
                 variant="outline"
-                size="lg"
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="rounded-full h-14 px-12 text-sm tracking-widest uppercase font-bold flex items-center gap-3 border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600 transition-all"
+                className="rounded-lg h-9 text-[13px] text-red-500 border-red-200 hover:bg-red-50 gap-2"
               >
-                {isDeleting ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Trash2 className="h-5 w-5" />
-                )}
-                Discard Mission
+                {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                Delete Mission
               </Button>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-2">
                 {run.discovered_offers?.map((offer) => (
                   <OfferCard
                     key={offer.id}
@@ -349,21 +339,18 @@ export default function PipelineRunPage({
                 ))}
               </div>
 
-              <div className="flex justify-center pt-8">
-                <Button
-                  size="lg"
-                  onClick={handleSelectOffer}
-                  disabled={!selectedOfferId || actionLoading}
-                  className="rounded-full bg-[#111111] text-white hover:bg-black h-14 px-12 text-sm tracking-widest uppercase font-bold flex items-center gap-3 shadow-xl transition-all hover:scale-105 disabled:opacity-30 disabled:scale-100"
-                >
-                  {actionLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <ArrowRight className="h-5 w-5" />
-                  )}
-                  {actionLoading ? "PROCESSING..." : "CONFIRM SELECTION"}
-                </Button>
-              </div>
+              <Button
+                onClick={handleSelectOffer}
+                disabled={!selectedOfferId || actionLoading}
+                className="rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] h-9 px-5 text-[13px] font-medium gap-2 shadow-sm disabled:opacity-30"
+              >
+                {actionLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowRight className="h-4 w-4" />
+                )}
+                {actionLoading ? "Processing..." : "Confirm Selection"}
+              </Button>
             </>
           )}
         </div>
@@ -371,16 +358,16 @@ export default function PipelineRunPage({
 
       {/* HITL-2: Letter Review */}
       {run.status === "waiting_letter_review" && (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div>
-              <h2 className="text-3xl font-medium text-[#111111] mb-2 tracking-tight">Review Generated Draft</h2>
-              <p className="text-gray-500 font-light text-lg">The Critic Agent has validated the tone. You can now finalize or request refinements.</p>
-            </div>
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div>
+            <h2 className="text-[15px] font-semibold text-[#1a1a1a]">Review Draft</h2>
+            <p className="text-[13px] text-[#999] mt-0.5">
+              The AI critic has reviewed your letter. Finalize or request changes.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 bg-white rounded-[2rem] border border-[#E8E6E1] p-1 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            <div className="lg:col-span-8 bg-white rounded-xl border border-[#EBEBEB] overflow-hidden">
               <LetterEditor
                 initialLetter={run.draft_letter || ""}
                 onSubmit={handleReviewLetter}
@@ -388,18 +375,17 @@ export default function PipelineRunPage({
               />
             </div>
 
-            <div className="lg:col-span-4 space-y-6">
-              <div className="bg-[#F4F3F0]/50 rounded-[1.5rem] border border-[#E8E6E1] p-6">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 pl-1">Agent Feedback Loop</h3>
+            <div className="lg:col-span-4">
+              <div className="bg-white rounded-xl border border-[#EBEBEB] p-4">
                 <Tabs defaultValue="gap" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-white/50 p-1 rounded-xl border border-[#E8E6E1]">
-                    <TabsTrigger value="gap" className="rounded-lg data-[state=active]:bg-[#111111] data-[state=active]:text-white">Gap Analysis</TabsTrigger>
-                    <TabsTrigger value="critic" className="rounded-lg data-[state=active]:bg-[#111111] data-[state=active]:text-white">AI Critic</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 bg-[#F5F5F5] p-0.5 rounded-lg h-8">
+                    <TabsTrigger value="gap" className="rounded-md text-[12px] h-7 data-[state=active]:bg-white data-[state=active]:shadow-sm">Gap</TabsTrigger>
+                    <TabsTrigger value="critic" className="rounded-md text-[12px] h-7 data-[state=active]:bg-white data-[state=active]:shadow-sm">Critic</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="gap" className="mt-6">
+                  <TabsContent value="gap" className="mt-4">
                     {run.gap_report && <GapReportCard report={run.gap_report} />}
                   </TabsContent>
-                  <TabsContent value="critic" className="mt-6">
+                  <TabsContent value="critic" className="mt-4">
                     {run.critic_score && <CriticScoresCard score={run.critic_score} />}
                   </TabsContent>
                 </Tabs>
@@ -409,45 +395,43 @@ export default function PipelineRunPage({
         </div>
       )}
 
-      {/* Completed State */}
+      {/* Completed */}
       {run.status === "completed" && (
-        <div className="space-y-12 animate-in zoom-in-95 fade-in duration-1000">
+        <div className="space-y-4 animate-in fade-in duration-500">
           {!hasSeenCompletion && (
-            <div className="flex items-center gap-4 px-8 py-4 bg-emerald-50 border border-emerald-100 rounded-[1.5rem] animate-in fade-in duration-500">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="text-emerald-700 font-medium text-sm">Your engineered cover letter is ready to be sent.</p>
+            <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-lg">
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <p className="text-emerald-700 text-[13px] font-medium">Your cover letter is ready to send.</p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8 space-y-8">
-              <div className="bg-white rounded-[2rem] border border-[#E8E6E1] shadow-sm overflow-hidden">
-                <div className="px-8 py-6 border-b border-[#E8E6E1] bg-[#FDFDFC] flex justify-between items-center sm:flex-row flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-[#111111]" />
-                    <span className="font-medium text-[#111111]">Final Asset</span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <div className="lg:col-span-8 space-y-4">
+              <div className="bg-white rounded-xl border border-[#EBEBEB] overflow-hidden">
+                <div className="px-4 py-3 border-b border-[#F5F5F5] bg-[#FAFAFA] flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#999]" />
+                    <span className="text-[13px] font-medium text-[#1a1a1a]">Final Letter</span>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <Button
                       variant={isApplied ? "default" : "outline"}
                       size="sm"
                       className={cn(
-                        "rounded-full gap-2 h-9 px-4 transition-all",
+                        "rounded-lg gap-1.5 h-8 px-3 text-[12px] transition-all",
                         isApplied
                           ? "bg-emerald-500 hover:bg-emerald-600 text-white border-transparent"
-                          : "border-[#E8E6E1] hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"
+                          : "border-[#EBEBEB] hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200"
                       )}
                       onClick={handleMarkApplied}
                       disabled={isApplied || isApplying}
                     >
                       {isApplying ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        <Loader2 className="h-3 w-3 animate-spin" />
                       ) : isApplied ? (
-                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <CheckCircle2 className="h-3 w-3" />
                       ) : (
-                        <Rocket className="h-3.5 w-3.5" />
+                        <Rocket className="h-3 w-3" />
                       )}
                       {isApplied ? "Applied!" : "I Applied"}
                     </Button>
@@ -455,23 +439,23 @@ export default function PipelineRunPage({
                       <DropdownMenuTrigger
                         className={cn(
                           buttonVariants({ variant: "outline", size: "sm" }),
-                          "rounded-full border-[#E8E6E1] gap-2 h-9 px-4 hover:bg-[#F4F3F0]"
+                          "rounded-lg border-[#EBEBEB] gap-1.5 h-8 px-3 text-[12px] hover:bg-[#F5F5F5]"
                         )}
                       >
-                        <Mail className="h-3.5 w-3.5" />
+                        <Mail className="h-3 w-3" />
                         Send
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
-                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="rounded-lg cursor-pointer py-2">
-                          <Image src="/google-gmail.svg" alt="Gmail" width={16} height={16} className="mr-2" />
+                      <DropdownMenuContent align="end" className="w-44 rounded-lg p-1">
+                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="rounded-md cursor-pointer text-[13px] py-1.5">
+                          <Image src="/google-gmail.svg" alt="Gmail" width={14} height={14} className="mr-2" />
                           Gmail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="rounded-lg cursor-pointer py-2">
-                          <Image src="/ms-outlook.svg" alt="Outlook" width={16} height={16} className="mr-2" />
+                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="rounded-md cursor-pointer text-[13px] py-1.5">
+                          <Image src="/ms-outlook.svg" alt="Outlook" width={14} height={14} className="mr-2" />
                           Outlook
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="rounded-lg cursor-pointer py-2">
-                          <Mail className="h-3.5 w-3.5 mr-2 text-gray-400" />
+                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="rounded-md cursor-pointer text-[13px] py-1.5">
+                          <Mail className="h-3.5 w-3.5 mr-2 text-[#999]" />
                           Default App
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -479,43 +463,42 @@ export default function PipelineRunPage({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-full border-[#E8E6E1] gap-2 h-9 px-4 hover:bg-[#F4F3F0]"
+                      className="rounded-lg border-[#EBEBEB] gap-1.5 h-8 px-3 text-[12px] hover:bg-[#F5F5F5]"
                       onClick={handleCopy}
                     >
                       {copied ? (
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                        <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                       ) : (
-                        <Copy className="h-3.5 w-3.5" />
+                        <Copy className="h-3 w-3" />
                       )}
                       {copied ? "Copied" : "Copy"}
                     </Button>
                   </div>
                 </div>
-                <div className="p-10 whitespace-pre-wrap font-serif text-lg leading-relaxed text-[#111111] selection:bg-orange-100">
+                <div className="p-6 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1a1a1a] font-[system-ui] selection:bg-blue-100">
                   {run.final_letter}
                 </div>
               </div>
 
               {run.selected_offer && (
-                <div className="space-y-4">
-                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 pl-4">Target Role Specifications</h3>
+                <div className="space-y-2">
+                  <h3 className="text-[11px] font-semibold text-[#999] uppercase tracking-wider px-1">Target Role</h3>
                   <OfferCard offer={run.selected_offer} />
                 </div>
               )}
             </div>
 
-            <div className="lg:col-span-4 space-y-6">
-              <div className="bg-white rounded-[1.5rem] border border-[#E8E6E1] shadow-sm p-6 overflow-hidden">
-                <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-6">Validation Reports</h3>
+            <div className="lg:col-span-4">
+              <div className="bg-white rounded-xl border border-[#EBEBEB] p-4">
                 <Tabs defaultValue="critic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-[#F4F3F0] p-1 rounded-xl">
-                    <TabsTrigger value="critic" className="rounded-lg data-[state=active]:bg-[#111111] data-[state=active]:text-white">AI Critic</TabsTrigger>
-                    <TabsTrigger value="gap" className="rounded-lg data-[state=active]:bg-[#111111] data-[state=active]:text-white">Gap Analysis</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 bg-[#F5F5F5] p-0.5 rounded-lg h-8">
+                    <TabsTrigger value="critic" className="rounded-md text-[12px] h-7 data-[state=active]:bg-white data-[state=active]:shadow-sm">Critic</TabsTrigger>
+                    <TabsTrigger value="gap" className="rounded-md text-[12px] h-7 data-[state=active]:bg-white data-[state=active]:shadow-sm">Gap</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="critic" className="mt-6">
+                  <TabsContent value="critic" className="mt-4">
                     {run.critic_score && <CriticScoresCard score={run.critic_score} />}
                   </TabsContent>
-                  <TabsContent value="gap" className="mt-6">
+                  <TabsContent value="gap" className="mt-4">
                     {run.gap_report && <GapReportCard report={run.gap_report} />}
                   </TabsContent>
                 </Tabs>
@@ -525,23 +508,23 @@ export default function PipelineRunPage({
         </div>
       )}
 
-      {/* Failed State */}
+      {/* Failed */}
       {run.status === "failed" && (
-        <div className="space-y-8 animate-in zoom-in-95 fade-in duration-500 max-w-4xl mx-auto">
-          <div className="bg-red-50 rounded-[2rem] border border-red-100 p-10 flex items-center gap-6">
-            <div className="w-16 h-16 rounded-2xl bg-white border border-red-200 flex items-center justify-center shrink-0">
-              <span className="text-3xl">⚠️</span>
+        <div className="space-y-4 animate-in fade-in duration-500 max-w-3xl">
+          <div className="bg-red-50 rounded-xl border border-red-100 p-5 flex items-start gap-4">
+            <div className="w-9 h-9 rounded-lg bg-white border border-red-200 flex items-center justify-center shrink-0">
+              <span className="text-base">⚠️</span>
             </div>
             <div>
-              <h2 className="text-2xl font-medium text-red-700 mb-1">Mission Halt Detected</h2>
-              <p className="text-red-600/70 font-light">The autonomous engineering process encountered a critical error.</p>
+              <h2 className="text-[14px] font-semibold text-red-700 mb-0.5">Pipeline Failed</h2>
+              <p className="text-[13px] text-red-600/70">An error occurred during processing.</p>
             </div>
           </div>
 
           {run.error_details && (
-            <div className="rounded-[1.5rem] border border-[#E8E6E1] bg-white p-8">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4">Diagnostics Log</h3>
-              <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-[#111111] overflow-x-auto p-6 bg-[#F4F3F0] rounded-xl border border-[#E8E6E1]">
+            <div className="rounded-xl border border-[#EBEBEB] bg-white p-4">
+              <h3 className="text-[11px] font-semibold text-[#999] uppercase tracking-wider mb-3">Error Details</h3>
+              <pre className="whitespace-pre-wrap font-mono text-[12px] leading-relaxed text-[#1a1a1a] overflow-x-auto p-4 bg-[#FAFAFA] rounded-lg border border-[#EBEBEB]">
                 {JSON.stringify(run.error_details, null, 2)}
               </pre>
             </div>
@@ -549,42 +532,34 @@ export default function PipelineRunPage({
         </div>
       )}
 
-      {/* Progressing (Loading/Processing) States */}
-      {["started", "scouting", "matching", "writing", "critiquing"].includes(
-        run.status
-      ) && (
-          <div className="flex flex-col items-center justify-center space-y-12 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-            <div className="w-full bg-[#111111] rounded-[2.5rem] p-4 shadow-2xl ring-1 ring-white/10 overflow-hidden relative">
-              <div className="absolute top-0 right-0 p-8 opacity-5">
-                <Loader2 className="w-64 h-64 animate-spin text-white" />
-              </div>
-              <div className="relative z-10">
-                <LiveAgentLog runId={runId} />
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full h-11 px-8 text-gray-400 border-[#E8E6E1] hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all font-medium"
-                disabled={actionLoading}
-                onClick={async () => {
-                  setActionLoading(true);
-                  try {
-                    await cancelPipeline(runId);
-                  } catch (err: unknown) {
-                    setError(err instanceof Error ? err.message : "Failed to cancel pipeline");
-                  } finally {
-                    setActionLoading(false);
-                  }
-                }}
-              >
-                {actionLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : "Abort Operation"}
-              </Button>
-            </div>
+      {/* Processing States */}
+      {["started", "scouting", "matching", "writing", "critiquing"].includes(run.status) && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="bg-[#1a1a1a] rounded-xl overflow-hidden shadow-lg">
+            <LiveAgentLog runId={runId} />
           </div>
-        )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg h-8 px-4 text-[12px] text-[#999] border-[#EBEBEB] hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all"
+            disabled={actionLoading}
+            onClick={async () => {
+              setActionLoading(true);
+              try {
+                await cancelPipeline(runId);
+              } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : "Failed to cancel pipeline");
+              } finally {
+                setActionLoading(false);
+              }
+            }}
+          >
+            {actionLoading ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : null}
+            Abort
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

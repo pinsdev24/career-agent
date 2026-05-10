@@ -16,19 +16,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  LayoutDashboard,
+  LayoutGrid,
   UserCircle,
-  Rocket,
+  FolderPlus,
   LogOut,
   PanelLeftClose,
   PanelLeft,
-  MoreVertical,
+  ChevronsUpDown,
+  User,
+  Settings,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
 const navItems = [
-  { href: "/dashboard", label: "Missions", icon: LayoutDashboard },
-  { href: "/pipeline/new", label: "New Mission", icon: Rocket },
+  { href: "/dashboard", label: "Missions", icon: LayoutGrid },
+  { href: "/pipeline/new", label: "New Mission", icon: FolderPlus },
+  { href: "/profile", label: "Profile", icon: User },
 ];
 
 export function Sidebar() {
@@ -73,37 +76,33 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`relative flex h-full flex-col border-r border-[#E8E6E1] bg-[#FDFDFC] transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
+      className={`relative flex h-full flex-col border-r border-[#EBEBEB] bg-white transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isCollapsed ? "w-[68px]" : "w-[240px]"
         }`}
     >
-      {/* Header with Logo & Toggle */}
+      {/* Header */}
       <div
-        className={`relative flex h-16 shrink-0 items-center border-b border-[#E8E6E1] px-4 ${isCollapsed ? "justify-center" : "justify-between"
+        className={`flex h-14 shrink-0 items-center border-b border-[#EBEBEB] px-4 ${isCollapsed ? "justify-center" : "justify-between"
           }`}
       >
-        <Logo iconOnly={isCollapsed} className={isCollapsed ? "scale-[0.7]" : "scale-90"} />
-        
-        {/* Toggle Button */}
-        <Button
-          variant="ghost"
-          size="icon"
+        <Logo iconOnly={isCollapsed} className={isCollapsed ? "scale-[0.85]" : "scale-[0.85]"} />
+
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`h-8 w-8 rounded-lg hover:bg-[#F4F3F0] text-gray-400 ${
-            isCollapsed 
-              ? "absolute -right-4 top-4 z-20 rounded-full border border-[#E8E6E1] bg-white shadow-sm" 
-              : "relative"
-          }`}
+          className={`flex items-center justify-center h-7 w-7 rounded-md text-[#999] hover:text-[#1a1a1a] hover:bg-[#F5F5F5] transition-colors ${isCollapsed
+            ? "absolute -right-3.5 top-3.5 z-20 rounded-full border border-[#EBEBEB] bg-white shadow-sm"
+            : ""
+            }`}
         >
           {isCollapsed ? (
-            <PanelLeft className="h-4 w-4" />
+            <PanelLeft className="h-3.5 w-3.5" />
           ) : (
-            <PanelLeftClose className="h-4 w-4" />
+            <PanelLeftClose className="h-3.5 w-3.5" />
           )}
-        </Button>
+        </button>
       </div>
 
-      {/* Nav links */}
-      <nav className="flex-1 space-y-2 px-3 py-4">
+      {/* Navigation */}
+      <nav className="flex-1 px-2.5 py-3 space-y-0.5">
         {navItems.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -117,13 +116,15 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               title={isCollapsed ? item.label : undefined}
-              className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${isActive
-                  ? "bg-[#111111] text-white shadow-md shadow-black/5"
-                  : "text-gray-500 hover:bg-[#F4F3F0] hover:text-[#111111]"
-                } ${isCollapsed ? "justify-center" : "justify-start"}`}
+              className={`group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-all duration-150 ${isActive
+                ? "bg-[#F5F5F5] text-[#1a1a1a]"
+                : "text-[#666] hover:bg-[#F5F5F5] hover:text-[#1a1a1a]"
+                } ${isCollapsed ? "justify-center px-0" : ""}`}
             >
               <Icon
-                className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? "text-white" : ""} ${isCollapsed ? "h-4.5 w-4.5" : "h-5 w-5"}`}
+                className={`shrink-0 h-[18px] w-[18px] transition-colors ${isActive ? "text-[#1a1a1a]" : "text-[#999] group-hover:text-[#666]"
+                  }`}
+                strokeWidth={isActive ? 2 : 1.75}
               />
               {!isCollapsed && <span>{item.label}</span>}
             </Link>
@@ -131,41 +132,41 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Profile / Logout */}
-      <div className="border-t border-[#E8E6E1] p-3">
+      {/* User section */}
+      <div className="border-t border-[#EBEBEB] p-2.5">
         <DropdownMenu>
           <DropdownMenuTrigger
-            className={`flex w-full items-center justify-start gap-3 rounded-xl px-2 py-3 text-sm font-medium transition-colors text-gray-700 hover:bg-[#F4F3F0] outline-hidden focus-visible:ring-1 focus-visible:ring-[#111111] disabled:pointer-events-none disabled:opacity-50 ${isCollapsed ? "justify-center" : ""
+            className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-colors hover:bg-[#F5F5F5] outline-hidden focus-visible:ring-1 focus-visible:ring-[#1a1a1a] ${isCollapsed ? "justify-center px-0" : ""
               }`}
           >
-            <Avatar className="h-8 w-8 rounded-lg shrink-0 border border-[#E8E6E1]">
+            <Avatar className="h-7 w-7 rounded-full shrink-0 border border-[#EBEBEB]">
               <AvatarImage src={avatarUrl} alt={userName} />
-              <AvatarFallback className="bg-gray-100 text-[#111111] rounded-lg text-xs font-semibold">
+              <AvatarFallback className="bg-[#F5F5F5] text-[#1a1a1a] rounded-full text-[10px] font-semibold">
                 {getInitials(userName)}
               </AvatarFallback>
             </Avatar>
 
             {!isCollapsed && (
-              <div className="flex flex-1 flex-col items-start overflow-hidden leading-tight">
-                <span className="truncate font-medium text-[#111111]">{userName}</span>
-                <span className="truncate text-xs text-gray-500 w-full text-left">
+              <div className="flex flex-1 flex-col items-start overflow-hidden leading-none">
+                <span className="truncate text-[13px] font-medium text-[#1a1a1a]">{userName}</span>
+                <span className="truncate text-[11px] text-[#999] w-full text-left mt-0.5">
                   {userEmail}
                 </span>
               </div>
             )}
 
-            {!isCollapsed && <MoreVertical className="h-4 w-4 shrink-0 text-gray-400" />}
+            {!isCollapsed && <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-[#ccc]" />}
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
             side="right"
-            className="w-56"
-            sideOffset={14}
+            className="w-52 rounded-xl p-1"
+            sideOffset={12}
           >
             <DropdownMenuGroup>
-              <DropdownMenuLabel className="flex flex-col gap-1 p-2">
-                <span className="font-semibold">{userName}</span>
-                <span className="text-xs text-muted-foreground font-normal">
+              <DropdownMenuLabel className="flex flex-col gap-0.5 px-2 py-1.5">
+                <span className="text-[13px] font-semibold">{userName}</span>
+                <span className="text-[11px] text-muted-foreground font-normal">
                   {userEmail}
                 </span>
               </DropdownMenuLabel>
@@ -173,17 +174,17 @@ export function Sidebar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => router.push("/profile")}
-              className="cursor-pointer py-2"
+              className="cursor-pointer py-1.5 rounded-lg text-[13px]"
             >
-              <UserCircle className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+              <Settings className="mr-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               <span>Profile Settings</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}
-              className="text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer"
+              className="text-red-500 focus:text-red-500 focus:bg-red-500/10 cursor-pointer rounded-lg text-[13px]"
             >
-              <LogOut className="mr-2 h-4 w-4 shrink-0" />
+              <LogOut className="mr-2 h-3.5 w-3.5 shrink-0" />
               <span>Sign Out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -7,64 +7,68 @@ import { PIPELINE_STATUS_LABELS } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
-  Rocket,
   Plus,
   Loader2,
   ArrowUpRight,
   Target,
-  FileText
+  FileText,
+  Rocket,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 
-function statusColorLattice(status: string) {
-  switch (status) {
-    case "completed":
-      return "text-[9px] uppercase font-black tracking-[0.1em] px-2.5 py-0.5 rounded-sm bg-emerald-500 text-white";
-    case "failed":
-      return "text-[9px] uppercase font-black tracking-[0.1em] px-2.5 py-0.5 rounded-sm bg-red-500 text-white";
-    case "waiting_offer_selection":
-    case "waiting_letter_review":
-      return "text-[9px] uppercase font-black tracking-[0.1em] px-2.5 py-0.5 rounded-sm bg-orange-500 text-white animate-pulse";
-    default:
-      return "text-[9px] uppercase font-black tracking-[0.1em] px-2.5 py-0.5 rounded-sm bg-[#111111] text-white";
-  }
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, { bg: string; text: string; dot: string; pulse?: boolean }> = {
+    completed: { bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
+    failed: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+    waiting_offer_selection: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500", pulse: true },
+    waiting_letter_review: { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500", pulse: true },
+  };
+  const fallback = { bg: "bg-[#F0F0F0]", text: "text-[#555]", dot: "bg-[#555]", pulse: true };
+  const c = config[status] || fallback;
+
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${c.bg} ${c.text}`}>
+      <span className="relative flex h-1.5 w-1.5">
+        {c.pulse && <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${c.dot} opacity-60`} />}
+        <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${c.dot}`} />
+      </span>
+      {PIPELINE_STATUS_LABELS[status as keyof typeof PIPELINE_STATUS_LABELS] || status}
+    </span>
+  );
 }
 
 function groupRunsByDate(runs: PipelineRun[]) {
   const groups: { [key: string]: PipelineRun[] } = {
-    "Today": [],
-    "Yesterday": [],
-    "Last Week": [],
-    "Archive": [],
+    Today: [],
+    Yesterday: [],
+    "This Week": [],
+    Earlier: [],
   };
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-
   const lastWeek = new Date(today);
   lastWeek.setDate(lastWeek.getDate() - 7);
 
-  const sortedRuns = [...runs].sort((a, b) => {
-    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-  });
+  const sortedRuns = [...runs].sort(
+    (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+  );
 
   sortedRuns.forEach((run) => {
     if (!run.created_at) {
-      groups["Archive"].push(run);
+      groups["Earlier"].push(run);
       return;
     }
     const runDate = new Date(run.created_at);
-    if (runDate >= today) {
-      groups["Today"].push(run);
-    } else if (runDate >= yesterday) {
-      groups["Yesterday"].push(run);
-    } else if (runDate >= lastWeek) {
-      groups["Last Week"].push(run);
-    } else {
-      groups["Archive"].push(run);
-    }
+    if (runDate >= today) groups["Today"].push(run);
+    else if (runDate >= yesterday) groups["Yesterday"].push(run);
+    else if (runDate >= lastWeek) groups["This Week"].push(run);
+    else groups["Earlier"].push(run);
   });
 
   return Object.entries(groups).filter(([_, groupRuns]) => groupRuns.length > 0);
@@ -108,129 +112,131 @@ export default function DashboardPage() {
   const groupedRuns = groupRunsByDate(runs);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-16 py-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-12 border-b border-[#E8E6E1]">
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-1 border-t-2 border-[#111111]" />
-             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400">Tactical Control</span>
-          </div>
-          <h1 className="text-6xl font-medium tracking-tighter text-[#111111]">
-            Mission <span className="text-gray-300 font-light italic">Manifest</span>
-          </h1>
-          <p className="text-gray-400 text-lg max-w-xl font-light">
-            Real-time telemetry and management of your autonomous career procurement cycles.
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-[#1a1a1a] tracking-tight">Missions</h1>
+          <p className="text-[13px] text-[#999] mt-0.5">
+            Track and manage your application pipelines.
           </p>
         </div>
         <Link href="/pipeline/new">
-          <Button className="rounded-full bg-[#111111] text-white hover:bg-black h-16 px-10 text-[11px] font-bold uppercase tracking-[0.2em] flex items-center gap-3 shadow-2xl shadow-black/20 transition-all hover:-translate-y-1 active:scale-95 group">
-            Initialise Sequence
-            <Plus className="h-4 w-4 group-hover:rotate-90 transition-transform duration-500" />
+          <Button className="rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] h-9 px-4 text-[13px] font-medium flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]">
+            <Plus className="h-4 w-4" />
+            New Mission
           </Button>
         </Link>
       </div>
 
+      {/* Content */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-48 space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-[#111111]" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Synchronizing Data...</span>
+        <div className="flex flex-col items-center justify-center py-24 space-y-3">
+          <Loader2 className="h-5 w-5 animate-spin text-[#999]" />
+          <span className="text-[13px] text-[#999]">Loading missions...</span>
         </div>
       ) : runs.length === 0 ? (
-        <div className="bg-[#FDFDFC] rounded-[3rem] border border-[#E8E6E1] p-12 md:p-32 text-center relative overflow-hidden group">
-            <div 
-              className="absolute inset-0 pointer-events-none z-0 opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-1000"
-              style={{
-                backgroundImage: `
-                  linear-gradient(to right, #000 1px, transparent 1px),
-                  linear-gradient(to bottom, #000 1px, transparent 1px)
-                `,
-                backgroundSize: "2rem 2rem"
-              }}
-            />
-            <div className="relative z-10 max-w-lg mx-auto">
-              <div className="w-20 h-20 rounded-full bg-[#F4F3F0] border border-[#E8E6E1] flex items-center justify-center mx-auto mb-10 shadow-inner group-hover:scale-110 transition-transform duration-1000">
-                 <Rocket className="h-8 w-8 text-[#111111]" />
-              </div>
-              <h2 className="text-4xl font-medium text-[#111111] mb-6 tracking-tight">Zero active cycles.</h2>
-              <p className="text-gray-400 font-light text-lg mb-12 leading-relaxed italic">
-                Ariadne is currently idle. Deploy a specialized agent to begin your next career transition.
-              </p>
-              <Link href="/pipeline/new">
-                 <Button className="rounded-full bg-[#111111] text-white hover:bg-black h-14 px-12 text-[11px] font-bold uppercase tracking-widest flex items-center gap-3 mx-auto shadow-xl">
-                   New Deployment <ArrowUpRight className="w-4 h-4" />
-                 </Button>
-              </Link>
+        <div className="rounded-xl border border-[#EBEBEB] bg-white p-16 text-center">
+          <div className="max-w-sm mx-auto">
+            <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] flex items-center justify-center mx-auto mb-4">
+              <Rocket className="h-5 w-5 text-[#999]" />
             </div>
+            <h2 className="text-[15px] font-semibold text-[#1a1a1a] mb-2">No missions yet</h2>
+            <p className="text-[13px] text-[#999] mb-6 leading-relaxed">
+              Start a new mission to deploy Ariadne's agents on your next job application.
+            </p>
+            <Link href="/pipeline/new">
+              <Button className="rounded-lg bg-[#1a1a1a] text-white hover:bg-[#333] h-9 px-5 text-[13px] font-medium gap-2">
+                <Plus className="h-4 w-4" />
+                New Mission
+              </Button>
+            </Link>
+          </div>
         </div>
       ) : (
-        <div className="space-y-24">
+        <div className="space-y-6">
           {groupedRuns.map(([groupName, groupRuns]) => (
-            <div key={groupName} className="space-y-8">
-               <div className="flex items-center gap-6">
-                 <div className="h-px bg-[#E8E6E1] flex-1" />
-                 <h2 className="text-[10px] font-bold text-gray-300 uppercase tracking-[0.5em] whitespace-nowrap">
-                   {groupName}
-                 </h2>
-                 <div className="h-px bg-[#E8E6E1] flex-1" />
-               </div>
+            <div key={groupName} className="space-y-1.5">
+              <h2 className="text-[11px] font-semibold text-[#999] uppercase tracking-wider px-1 mb-2">
+                {groupName}
+              </h2>
 
-               <div className="grid grid-cols-1 gap-6">
-                 {groupRuns.map((run) => (
-                    <Link key={run.id} href={`/pipeline/${run.id}`} className="group block">
-                       <div className="bg-white rounded-[2rem] p-8 border border-[#E8E6E1] group-hover:border-[#111111] transition-all duration-700 flex flex-col md:flex-row md:items-center justify-between gap-8 relative overflow-hidden">
-                          {/* Accent bar on hover */}
-                          <div className="absolute left-0 top-0 bottom-0 w-0 group-hover:w-2 bg-[#111111] transition-all duration-500" />
-                          
-                          <div className="flex items-center gap-8 relative z-10">
-                             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.5rem] bg-[#F4F3F0] border border-[#E8E6E1] group-hover:bg-[#111111] group-hover:border-[#111111] transition-all duration-500">
-                                {run.entry_mode === "explore" ? (
-                                  <Target className="h-6 w-6 text-[#111111] group-hover:text-white transition-colors" />
-                                ) : (
-                                  <FileText className="h-6 w-6 text-[#111111] group-hover:text-white transition-colors" />
-                                )}
-                             </div>
-                             <div className="space-y-1">
-                                <h3 className="text-2xl font-medium text-[#111111] tracking-tight group-hover:translate-x-1 transition-transform duration-500">
-                                  {run.selected_offer?.title || run.offer_url || "Strategic Exploration"}
-                                </h3>
-                                <div className="flex items-center gap-3 text-xs text-gray-400 font-light">
-                                   <span className="uppercase tracking-widest">{run.created_at ? new Date(run.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ""}</span>
-                                   {run.selected_offer?.company && (
-                                     <>
-                                       <span className="w-1 h-1 rounded-full bg-gray-200" />
-                                       <span className="text-[#111111] font-medium">{run.selected_offer.company}</span>
-                                     </>
-                                   )}
-                                </div>
-                             </div>
-                          </div>
+              <div className="rounded-xl border border-[#EBEBEB] bg-white overflow-hidden divide-y divide-[#F5F5F5]">
+                {groupRuns.map((run) => (
+                  <Link key={run.id} href={`/pipeline/${run.id}`} className="group block">
+                    <div className="flex items-center gap-4 px-4 py-3.5 hover:bg-[#FAFAFA] transition-colors duration-150">
+                      {/* Icon */}
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${run.status === "completed"
+                          ? "bg-emerald-50 text-emerald-600"
+                          : run.status === "failed"
+                            ? "bg-red-50 text-red-500"
+                            : "bg-[#F5F5F5] text-[#666]"
+                        }`}>
+                        {run.status === "completed" ? (
+                          <CheckCircle2 className="h-4 w-4" />
+                        ) : run.status === "failed" ? (
+                          <XCircle className="h-4 w-4" />
+                        ) : run.entry_mode === "explore" ? (
+                          <Target className="h-4 w-4" />
+                        ) : (
+                          <FileText className="h-4 w-4" />
+                        )}
+                      </div>
 
-                          <div className="flex items-center gap-12 relative z-10">
-                             {run.gap_report && (
-                               <div className="flex flex-col items-end">
-                                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 mb-2">Alignment</span>
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-medium tracking-tighter text-[#111111] tabular-nums">{run.gap_report.match_score}</span>
-                                    <span className="text-[10px] text-gray-300 font-bold">%</span>
-                                  </div>
-                               </div>
-                             )}
-                             
-                             <div className="flex flex-col items-end min-w-[120px]">
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 mb-2">Phase</span>
-                                <span className={statusColorLattice(run.status)}>
-                                  {PIPELINE_STATUS_LABELS[run.status]}
-                                </span>
-                             </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-[13px] font-medium text-[#1a1a1a] truncate group-hover:text-[#000] transition-colors">
+                            {run.selected_offer?.title || run.offer_url || "Explore Mission"}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {run.selected_offer?.company && (
+                            <span className="text-[12px] text-[#999] truncate">
+                              {run.selected_offer.company}
+                            </span>
+                          )}
+                          {run.created_at && (
+                            <>
+                              {run.selected_offer?.company && <span className="text-[#ddd]">·</span>}
+                              <span className="text-[12px] text-[#bbb] flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {new Date(run.created_at).toLocaleDateString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
 
-                             <div className="w-12 h-12 rounded-full border border-[#E8E6E1] flex items-center justify-center group-hover:bg-[#111111] group-hover:border-[#111111] transition-all duration-500 text-gray-300 group-hover:text-white group-hover:rotate-45">
-                                <ArrowUpRight className="h-5 w-5" />
-                             </div>
-                          </div>
-                       </div>
-                    </Link>
-                 ))}
-               </div>
+                      {/* Score */}
+                      {run.gap_report && (
+                        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+                          <span className="text-[12px] text-[#999]">Match</span>
+                          <span className={`text-[13px] font-semibold tabular-nums ${run.gap_report.match_score >= 80
+                              ? "text-emerald-600"
+                              : run.gap_report.match_score >= 60
+                                ? "text-amber-600"
+                                : "text-red-500"
+                            }`}>
+                            {run.gap_report.match_score}%
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Status */}
+                      <div className="shrink-0">
+                        <StatusBadge status={run.status} />
+                      </div>
+
+                      {/* Arrow */}
+                      <ArrowUpRight className="h-4 w-4 text-[#ddd] group-hover:text-[#999] shrink-0 transition-colors" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           ))}
         </div>

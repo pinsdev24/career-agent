@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { PenLine, RotateCcw, Check, Loader2, MessageSquare } from "lucide-react";
+import { RotateCcw, Check, Loader2, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface LetterEditorProps {
@@ -26,35 +26,32 @@ export function LetterEditor({ initialLetter, onSubmit, loading }: LetterEditorP
   };
 
   return (
-    <div className="flex flex-col space-y-6">
-      <div className="flex items-center justify-between px-8 pt-8">
-        <div className="space-y-1">
-           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Draft version 0.1</span>
-           <h3 className="text-xl font-medium text-[#111111]">Refine Asset</h3>
-        </div>
-        <div className="text-[10px] font-mono text-gray-400 bg-[#F4F3F0] px-2 py-1 rounded border border-[#E8E6E1]">
-          {content.length} CHARS
-        </div>
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#F5F5F5] bg-[#FAFAFA]">
+        <span className="text-[13px] font-medium text-[#1a1a1a]">Draft Editor</span>
+        <span className="text-[11px] font-mono text-[#999] bg-[#F5F5F5] px-2 py-0.5 rounded">
+          {content.length} chars
+        </span>
       </div>
 
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        className="flex-1 min-h-[500px] font-serif text-lg leading-relaxed px-10 py-4 resize-none rounded-[1.5rem] bg-[#FDFDFC] border-transparent focus:border-transparent focus-visible:ring-0 selection:bg-orange-100 placeholder:text-gray-200"
-        placeholder="Drafting in progress..."
+        className="flex-1 min-h-[400px] text-[14px] leading-relaxed px-6 py-4 resize-none rounded-none bg-white border-0 focus:border-0 focus-visible:ring-0 selection:bg-blue-100 placeholder:text-[#ddd]"
+        placeholder="Drafting..."
         disabled={loading}
       />
 
-      <div className="px-8 pb-8 space-y-6">
+      <div className="p-4 space-y-3 border-t border-[#F5F5F5]">
         {showFeedback && (
-          <div className="animate-in slide-in-from-top-2 fade-in duration-500">
+          <div className="animate-in slide-in-from-top-2 fade-in duration-300">
             <div className="relative">
-              <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#ccc]" />
               <Input
-                placeholder="Strategic instruction (e.g. emphasize leadership roles)..."
+                placeholder="e.g. emphasize leadership experience..."
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                className="h-12 pl-12 bg-white rounded-xl border-[#E8E6E1] focus-visible:ring-[#111111] shadow-sm"
+                className="h-9 pl-9 text-[13px] bg-white rounded-lg border-[#EBEBEB] focus-visible:ring-[#1a1a1a]"
                 disabled={loading}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleRewrite();
@@ -65,37 +62,36 @@ export function LetterEditor({ initialLetter, onSubmit, loading }: LetterEditorP
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-6 justify-between items-center bg-[#F4F3F0]/50 p-6 rounded-[1.5rem] border border-[#E8E6E1]">
-          <div className="text-[11px] uppercase tracking-widest text-gray-400 font-bold max-w-xs leading-relaxed">
-            Satisfied? Proceed to finalization. Otherwise, issue a strategic rewrite.
-          </div>
-          
-          <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[11px] text-[#999] hidden sm:block">
+            Edit the letter above, then approve or request a rewrite.
+          </span>
+          <div className="flex items-center gap-2 ml-auto">
             <Button
               variant="outline"
               onClick={handleRewrite}
               disabled={loading}
-              className="rounded-full border-[#E8E6E1] bg-white h-12 px-8 text-[11px] font-bold uppercase tracking-widest text-[#111111] hover:bg-[#F4F3F0] transition-all flex-1 md:flex-none"
+              className="rounded-lg border-[#EBEBEB] h-9 px-4 text-[12px] font-medium text-[#666] hover:bg-[#F5F5F5] gap-1.5"
             >
               {loading && showFeedback ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <RotateCcw className="h-4 w-4 mr-2" />
+                <RotateCcw className="h-3.5 w-3.5" />
               )}
-              {showFeedback ? "Confirm Strategy" : "Rewrite"}
+              {showFeedback ? "Send" : "Rewrite"}
             </Button>
-            
+
             <Button
               onClick={() => onSubmit(content, true)}
               disabled={loading}
-              className="rounded-full bg-[#111111] text-white h-12 px-8 text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all flex-1 md:flex-none shadow-lg shadow-black/5"
+              className="rounded-lg bg-[#1a1a1a] text-white h-9 px-5 text-[12px] font-medium hover:bg-[#333] gap-1.5 shadow-sm"
             >
               {loading && !showFeedback ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <Check className="h-4 w-4 mr-2" />
+                <Check className="h-3.5 w-3.5" />
               )}
-              {loading && !showFeedback ? "VALIDATING..." : "APPROVE ASSET"}
+              Approve
             </Button>
           </div>
         </div>

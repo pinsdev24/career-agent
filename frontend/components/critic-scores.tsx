@@ -1,9 +1,7 @@
 "use client";
 
 import type { CriticScore } from "@/lib/types";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Star, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 
 export function CriticScoresCard({ score }: { score: CriticScore }) {
   const dimensions = [
@@ -16,49 +14,48 @@ export function CriticScoresCard({ score }: { score: CriticScore }) {
 
   const colorClass =
     score.overall >= 80
-      ? "text-emerald-500"
+      ? "text-emerald-600"
       : score.overall >= 60
-        ? "text-orange-500"
+        ? "text-amber-600"
         : "text-red-500";
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-end justify-between gap-4 pb-4 border-b border-[#E8E6E1]">
-         <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Critic Yield</span>
-            <div className={`text-5xl font-medium tracking-tighter tabular-nums ${colorClass}`}>
-              {score.overall}<span className="text-xl font-light text-gray-300 ml-1">/100</span>
-            </div>
-         </div>
+    <div className="space-y-4">
+      {/* Overall score */}
+      <div className="flex items-baseline gap-2 pb-3 border-b border-[#F5F5F5]">
+        <span className={`text-3xl font-semibold tabular-nums tracking-tight ${colorClass}`}>
+          {score.overall}
+        </span>
+        <span className="text-[11px] text-[#999] font-medium">/100</span>
       </div>
 
-      <div className="space-y-6">
-        <div className="space-y-4">
-          {dimensions.map((dim) => (
-            <div key={dim.label} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#111111]">{dim.label}</span>
-                <span className="font-medium tabular-nums text-xs text-gray-400">{dim.value}%</span>
-              </div>
-              <div className="h-1 w-full bg-[#F4F3F0] rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-[#111111] transition-all duration-1000 ease-out" 
-                  style={{ width: `${dim.value}%` }}
-                />
-              </div>
+      {/* Dimensions */}
+      <div className="space-y-2.5">
+        {dimensions.map((dim) => (
+          <div key={dim.label} className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-medium text-[#1a1a1a]">{dim.label}</span>
+              <span className="text-[11px] tabular-nums text-[#999]">{dim.value}%</span>
             </div>
-          ))}
-        </div>
+            <div className="h-1.5 w-full bg-[#F5F5F5] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#1a1a1a] rounded-full transition-all duration-700 ease-out"
+                style={{ width: `${dim.value}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="rounded-[1.2rem] bg-[#F4F3F0]/50 p-6 border border-[#E8E6E1]">
-          <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#111111] mb-3 flex items-center gap-2">
-            <Lightbulb className="h-3.5 w-3.5 text-orange-500" />
-            Strategic Feedback
-          </h4>
-          <p className="text-gray-500 font-light text-sm leading-relaxed">
-            {score.feedback}
-          </p>
-        </div>
+      {/* Feedback */}
+      <div className="rounded-lg bg-[#FAFAFA] p-3 border border-[#F5F5F5]">
+        <h4 className="text-[11px] font-semibold text-[#1a1a1a] mb-1.5 flex items-center gap-1.5">
+          <Lightbulb className="h-3 w-3 text-amber-500" />
+          Feedback
+        </h4>
+        <p className="text-[12px] text-[#666] leading-relaxed">
+          {score.feedback}
+        </p>
       </div>
     </div>
   );
