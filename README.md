@@ -10,9 +10,10 @@ Powered by **LangGraph** on the backend and an immersive **Next.js** / **Shadcn 
 
 * **Intelligent Job Sync**: Agents seamlessly analyze your submitted Resume against the target Job Description to identify matched skills, missing criteria, and critical "Gap Analysis" reports.
 * **Autonomous Cover Letter Drafting**: Utilizing OpenAI's `gpt-5-mini` combined with agent-driven search schemas (via Tavily), the agent will draft a robust and precise cover letter on your behalf.
+* **Multilingual AI & i18n Support**: Full internationalization (English & French) on the frontend via `next-intl`. The LangGraph backend dynamically adapts its prompts and drafts based on user language preferences.
 * **AI Critic Feedback**: Generates detailed critique scores across structure, relevance, and tone, pointing out optimization strategies for your profile.
 * **Human-in-the-loop (HITL)**: You are always in control. Review the generated letter, submit revision instructions, and visually track the agent pipeline as it processes your changes in real-time.
-* **Modern Dashboard**: Built with a sleek, fully responsive dashboard including dark mode interfaces, smooth transitions, and state-of-the-art Shadcn UI primitives.
+* **Premium UI & Dark Mode**: Built with a sleek, fully responsive dashboard including polished dark mode interfaces, smooth transitions, and state-of-the-art Shadcn UI primitives.
 * **Session Security**: Fully integrated OAuth and Session management handled through Supabase.
 
 ---
@@ -21,6 +22,7 @@ Powered by **LangGraph** on the backend and an immersive **Next.js** / **Shadcn 
 
 ### Frontend Structure
 * **Core Framework:** [Next.js](https://nextjs.org/) (App Router)
+* **Internationalization:** [next-intl](https://next-intl-docs.vercel.app/)
 * **Styling Engine:** [Tailwind CSS](https://tailwindcss.com/)
 * **Component Library:** [Shadcn UI](https://ui.shadcn.com/) & [Lucide Icons](https://lucide.dev/)
 * **Client Validation:** [Zod](https://zod.dev/) & React Hook Form
@@ -102,13 +104,15 @@ npm run dev
 /
 ├── backend/                  # FastAPI & Langgraph agent definitions
 │   ├── app/
-│   │   ├── graph/            # Edge functions, state builders, and Hitl Logic
+│   │   ├── graph/            # Edge functions, state builders, Hitl Logic, Language Processing
 │   │   ├── routers/          # API endpoint routes for pipelines/CV uploads 
 │   │   └── tools/            # Sub-tools triggered by agent edges
 │   └── requirements.txt
 └── frontend/                 # Client React interface
     ├── app/                  # Route Groups, Dashboard, Authentication
     ├── components/           # UI Primitives, Layouts, Dashboard Widgets
+    ├── i18n/                 # Localization configuration
+    ├── messages/             # Translation dictionaries (en, fr)
     ├── lib/                  # Utilities and Supabase SSR Clients
     └── tailwind.config.ts    # Design System & Theme config
 ```
@@ -116,7 +120,8 @@ npm run dev
 ## 📝 Roadmap & Known Issues
 - [x] Cover Letter Pipeline setup.
 - [x] Human-in-the-Loop workflow integrated.
-- [x] UI/UX layout optimizations on dashboard.
+- [x] UI/UX layout optimizations on dashboard (Premium Dark Mode).
+- [x] Multi-language support (i18n on Frontend, Agent-level translation).
 - [ ] Migrate `MemorySaver` to highly-concurrent `AsyncPostgresSaver` utilizing Supabase for distributed persistence.
 - [ ] Incorporate native resume extraction models parsing deeper document types (PDFs/Docx).
 

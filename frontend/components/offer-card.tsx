@@ -1,11 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { JobOffer } from "@/lib/types";
 import {
   MapPin,
   ExternalLink,
-  TrendingUp,
-  Globe,
   Building2,
   Users,
   CheckCircle2,
@@ -18,24 +17,19 @@ interface OfferCardProps {
 }
 
 export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
+  const t = useTranslations("Common");
   const matchColor =
     offer.pre_score > 80
       ? "text-emerald-600 bg-emerald-50"
       : offer.pre_score > 60
         ? "text-amber-600 bg-amber-50"
-        : "text-[#999] bg-[#F5F5F5]";
+        : "text-[#999] dark:text-[#888] bg-[#F5F5F5] dark:bg-[#222]";
 
   const ci = offer.company_info;
 
   return (
     <div
-      className={`group transition-all duration-200 rounded-xl border bg-white ${
-        onClick ? "cursor-pointer" : ""
-      } ${
-        selected
-          ? "border-[#1a1a1a] ring-1 ring-[#1a1a1a]/5"
-          : "border-[#EBEBEB] hover:border-[#ccc]"
-      }`}
+      className={`group transition-all duration-200 rounded-xl border bg-white dark:bg-[#111] ${ onClick ? "cursor-pointer" : "" } ${ selected ? "border-[#1a1a1a] ring-1 ring-[#1a1a1a]/5" : "border-[#EBEBEB] dark:border-[#333] hover:border-[#ccc]" }`}
       onClick={onClick}
     >
       <div className="p-4">
@@ -43,22 +37,22 @@ export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
           <div className="space-y-2 flex-1 min-w-0">
             <div className="flex items-start gap-3">
               {selected && (
-                <div className="w-5 h-5 rounded-full bg-[#1a1a1a] text-white flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-[#1a1a1a] dark:bg-[#111] text-white flex items-center justify-center shrink-0 mt-0.5">
                   <CheckCircle2 className="h-3 w-3" />
                 </div>
               )}
               <div className="min-w-0">
-                <h3 className="text-[14px] font-medium text-[#1a1a1a] leading-snug">
+                <h3 className="text-[14px] font-medium text-[#1a1a1a] dark:text-white leading-snug">
                   {offer.title}
                 </h3>
-                <p className="text-[13px] text-[#999] mt-0.5">
+                <p className="text-[13px] text-[#999] dark:text-[#888] mt-0.5">
                   {ci?.name || offer.company}
                 </p>
               </div>
             </div>
 
             {/* Meta row */}
-            <div className="flex flex-wrap items-center gap-3 text-[12px] text-[#999]">
+            <div className="flex flex-wrap items-center gap-3 text-[12px] text-[#999] dark:text-[#888]">
               {offer.location && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-3 w-3 shrink-0" />
@@ -81,16 +75,16 @@ export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
                 href={offer.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#1a1a1a] font-medium inline-flex items-center gap-1 hover:underline underline-offset-2"
+                className="text-[#1a1a1a] dark:text-white font-medium inline-flex items-center gap-1 hover:underline underline-offset-2"
                 onClick={(e) => e.stopPropagation()}
               >
-                View <ExternalLink className="h-3 w-3" />
+                {t("view")} <ExternalLink className="h-3 w-3" />
               </a>
             </div>
 
             {/* Snippet */}
             {offer.snippet && (
-              <p className="text-[12px] text-[#999] line-clamp-2 leading-relaxed">
+              <p className="text-[12px] text-[#999] dark:text-[#888] line-clamp-2 leading-relaxed">
                 {offer.snippet}
               </p>
             )}
@@ -108,7 +102,7 @@ export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
         <div className="px-4 pb-3">
           <a
             href={`mailto:${offer.contact_email}`}
-            className="text-[11px] font-mono text-[#999] hover:text-[#1a1a1a] transition-colors"
+            className="text-[11px] font-mono text-[#999] hover:text-[#1a1a1a] dark:text-white transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
             {offer.contact_email}

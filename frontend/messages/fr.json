@@ -1,0 +1,331 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Entrez vos identifiants pour accéder à votre tableau de bord.",
+      "button": "Se connecter",
+      "toggle_text": "Vous n'avez pas de compte ?",
+      "toggle_btn": "S'inscrire"
+    },
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Entrez vos détails ci-dessous pour commencer.",
+      "button": "Créer un compte",
+      "toggle_text": "Vous avez déjà un compte ?",
+      "toggle_btn": "Se connecter",
+      "success": "Vérifiez vos e-mails pour le lien de confirmation !"
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "email_placeholder": "vous@exemple.com"
+    },
+    "errors": {
+      "failed": "Échec de l'authentification"
+    },
+    "sidebar": {
+      "title": "Échappez au labyrinthe de la recherche d'emploi.",
+      "subtitle": "Rejoignez Ariadne pour automatiser vos candidatures, générer des lettres de motivation sur mesure et maximiser votre potentiel de carrière.",
+      "hired": "Recruté"
+    }
+  },
+  "Sidebar": {
+    "missions": "Missions",
+    "new_mission": "Nouvelle Mission",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "sign_out": "Déconnexion",
+    "profile_settings": "Paramètres du Profil",
+    "sign_out_confirm_title": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "sign_out_confirm_desc": "Vous devrez vous reconnecter pour accéder à votre tableau de bord.",
+    "cancel": "Annuler",
+    "confirm": "Oui, me déconnecter"
+  },
+  "Landing": {
+    "nav": {
+      "product": "Produit",
+      "features": "Fonctionnalités",
+      "testimonials": "Témoignages",
+      "dashboard": "Tableau de Bord"
+    },
+    "hero": {
+      "title_start": "Là où votre carrière",
+      "title_end": "se construit.",
+      "subtitle": "Échappez au labyrinthe de la recherche d'emploi. Nous mettons votre valeur professionnelle en avant en combinant des stratégies éprouvées avec l'IA.",
+      "cta_primary": "Trouver votre prochain rôle",
+      "cta_secondary": "Comment ça marche"
+    },
+    "visuals": {
+      "opportunities": "Opportunités d'emploi",
+      "apply_now": "Postuler maintenant",
+      "efficiency_title": "Transformez efficacement votre expérience de candidature.",
+      "efficiency_desc": "Ariadne est l'assistant de carrière personnel qui automatise vos lettres de motivation et la correspondance des compétences.",
+      "dream_company": "Entreprise de rêve",
+      "maximize_title": "Maximisez votre potentiel.",
+      "maximize_desc": "Tirez parti de nos modèles de correspondance intelligents pour trouver le rôle parfait n'importe où.",
+      "full_time": "Temps plein",
+      "freelance": "Freelance & Contrats"
+    },
+    "features": {
+      "badge": "L'Intelligence",
+      "title": "Un système multi-agents au service de votre succès.",
+      "subtitle": "Ariadne n'utilise pas seulement des modèles. Nos agents IA spécialisés analysent et rédigent vos candidatures de manière unique.",
+      "items": {
+        "gap": {
+          "title": "Analyse d'écart intelligente",
+          "desc": "Nous analysons la correspondance sémantique entre votre CV et le poste, vous donnant un score précis et identifiant les compétences manquantes."
+        },
+        "tone": {
+          "title": "Hyper-Personnalisation",
+          "desc": "Notre agent rédacteur crée des lettres de motivation percutantes. Il apprend votre ton de voix personnel pour vous ressembler exactement."
+        },
+        "zap": {
+          "title": "Contrôle Humain",
+          "desc": "Vous gardez le contrôle total. Ariadne rédige les brouillons, mais vous approuvez, éditez et révisez avant la finalisation."
+        }
+      }
+    },
+    "architecture": {
+      "badge": "Architecture du Système",
+      "title": "Un pipeline conçu pour la précision.",
+      "subtitle": "Ariadne abandonne les interfaces IA génériques pour une architecture multi-agents spécialisée. Chaque candidature est analysée avec une précision chirurgicale.",
+      "steps": {
+        "one": {
+          "title": "Correspondance Sémantique Profonde",
+          "desc": "Ariadne ne cherche pas de mots-clés. L'agent Matcher analyse la correspondance conceptuelle profonde entre votre profil et l'offre."
+        },
+        "two": {
+          "title": "Mémoire du Ton de Voix",
+          "desc": "Il apprend comment vous vous exprimez. Chaque révision de lettre enrichit la mémoire stylistique de votre assistant."
+        },
+        "three": {
+          "title": "Audit par l'Agent Critique",
+          "desc": "Rien ne sort du pipeline sans vérification. Un agent critique autonome audite chaque lettre sur 5 dimensions strictes."
+        }
+      }
+    },
+    "scout": {
+      "badge": "Mode Exploration",
+      "title": "Laissez Ariadne trouver les opportunités.",
+      "subtitle": "Vous n'avez pas de lien d'offre spécifique ? Déposez votre CV. Notre agent Scout parcourt le web pour vous présenter les meilleures options.",
+      "items": [
+        "Extraction web automatisée via Tavily",
+        "Plongements vectoriels contextuels",
+        "Expiration automatique après 7 jours"
+      ],
+      "cta": "Essayer le mode Exploration"
+    },
+    "testimonials": {
+      "badge": "Histoires de Candidats",
+      "title": "Des carrières lancées par Ariadne.",
+      "subtitle": "Rejoignez des milliers de professionnels qui ont déjà échappé au labyrinthe de la recherche d'emploi.",
+      "items": [
+        {
+          "quote": "Ariadne a transformé ma recherche. J'ai déposé mon CV et il m'a trouvé 5 rôles que j'ai adorés. Les lettres étaient parfaites.",
+          "author": "Sarah J.",
+          "role": "Product Manager"
+        },
+        {
+          "quote": "La mémoire du ton de voix est incroyable. Après deux candidatures, l'agent a commencé à écrire exactement comme moi.",
+          "author": "Michael T.",
+          "role": "Ingénieur Frontend"
+        },
+        {
+          "quote": "Je passais 2 heures à adapter mes lettres. Maintenant, cela me prend 5 minutes pour réviser et approuver.",
+          "author": "Elena R.",
+          "role": "Data Scientist"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Arrêtez de postuler dans le noir.",
+      "subtitle": "Rejoignez l'élite des professionnels utilisant l'architecture multi-agents d'Ariadne pour naviguer avec précision.",
+      "button": "Entrer dans le Labyrinthe",
+      "footer": "Aucune carte de crédit requise. Gratuit à explorer."
+    },
+    "footer": {
+      "copyright": "© {year} Ariadne. Élevant les chercheurs d'emploi mondialement."
+    }
+  },
+  "Dashboard": {
+    "title": "Missions",
+    "subtitle": "Suivez et gérez vos pipelines de candidature.",
+    "new_mission": "Nouvelle Mission",
+    "loading": "Chargement des missions...",
+    "empty": {
+      "title": "Pas encore de missions",
+      "description": "Lancez une nouvelle mission pour déployer les agents d'Ariadne sur votre prochaine candidature."
+    },
+    "groups": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "this_week": "Cette semaine",
+      "earlier": "Plus tôt"
+    },
+    "status": {
+      "completed": "Terminé",
+      "failed": "Échoué",
+      "waiting_offer_selection": "Choisir Offre",
+      "waiting_letter_review": "Réviser Lettre",
+      "writing": "Rédaction",
+      "analyzing": "Analyse",
+      "scouting": "Recherche"
+    },
+    "match": "Match",
+    "explore_mission": "Mission Exploration"
+  },
+  "Profile": {
+    "title": "Profil",
+    "subtitle": "Gérez votre CV et vos informations personnelles.",
+    "cv_section": "CV / Résumé",
+    "cv_description": "Téléchargez votre CV au format PDF pour analyse par l'agent.",
+    "uploading": "Traitement du CV...",
+    "upload_btn": "Télécharger un nouveau CV",
+    "replace_btn": "Remplacer le CV",
+    "basic_info": "Informations de base",
+    "basic_info_desc": "Informations extraites de votre CV.",
+    "memories": "Mémoires de l'Agent",
+    "memories_desc": "Détails clés appris par l'agent au fil de vos sessions.",
+    "cv_active": "CV Actif",
+    "extracted_data": "Données Extraites",
+    "identity": "Identité",
+    "skills": "Compétences",
+    "experience": "Expérience",
+    "education": "Éducation",
+    "languages": "Langues",
+    "view_all": "Tout voir",
+    "view_details": "Voir détails",
+    "full_experience": "Expérience complète",
+    "all_skills": "Toutes les compétences",
+    "agent_memory": "Mémoire de l'Agent",
+    "memory_active": "Actif",
+    "loading_memories": "Chargement des mémoires...",
+    "no_memories": "Pas encore de mémoires",
+    "no_memories_desc": "Ariadne apprend de vos retours. Au fur et à mesure que vous révisez des lettres, elle construit un profil ici.",
+    "style_notes": "Notes de Style",
+    "tone": "Ton",
+    "length": "Longueur",
+    "industries": "Secteurs",
+    "roles": "Rôles",
+    "last_sync": "Dernière sync",
+    "no_data": "Aucune donnée",
+    "clear": "Effacer",
+    "clear_memory_title": "Effacer la mémoire ?",
+    "clear_memory_desc": "Cela supprimera toutes les préférences apprises. L'agent devra réapprendre de vos futures interactions.",
+    "cancel": "Annuler",
+    "clear_btn": "Effacer la mémoire"
+  },
+  "NewMission": {
+    "title": "Nouvelle Mission",
+    "subtitle": "Lancez un nouveau pipeline de candidature.",
+    "modes": {
+      "url": {
+        "label": "URL Directe",
+        "desc": "Collez un lien d'offre d'emploi"
+      },
+      "explore": {
+        "label": "Explorer",
+        "desc": "Laisser les agents trouver des offres"
+      }
+    },
+    "url_label": "URL de l'offre d'emploi",
+    "url_placeholder": "https://entreprise.com/carrieres/offre",
+    "explore_info": "Le système utilisera vos données de profil pour trouver des offres correspondantes. Assurez-vous que votre profil est à jour.",
+    "starting": "Démarrage...",
+    "start_btn": "Lancer le Pipeline",
+    "error_url": "Veuillez entrer une URL d'offre."
+  },
+  "MissionDetail": {
+    "active_pipeline": "Pipeline Actif",
+    "delete_title": "Supprimer cette mission ?",
+    "delete_desc": "Cela supprimera définitivement toutes les données. Cette action est irréversible.",
+    "delete_btn": "Supprimer",
+    "cancel": "Annuler",
+    "no_offers": "Aucune offre trouvée",
+    "select_offer": "Sélectionnez une offre",
+    "no_offers_desc": "Aucune offre correspondante trouvée. Essayez d'ajuster vos préférences.",
+    "select_offer_desc": "Choisissez l'opportunité la plus pertinente pour continuer.",
+    "confirm_selection": "Confirmer la sélection",
+    "review_draft": "Réviser le brouillon",
+    "review_desc": "L'agent critique a révisé votre lettre. Finalisez ou demandez des changements.",
+    "processing": "Traitement...",
+    "ready_to_send": "Votre lettre de motivation est prête.",
+    "final_letter": "Lettre Finale",
+    "applied": "Postulé !",
+    "i_applied": "J'ai postulé",
+    "send": "Envoyer",
+    "copied": "Copié",
+    "copy": "Copier",
+    "target_role": "Poste Cible",
+    "failed_title": "Échec du Pipeline",
+    "failed_desc": "Une erreur est survenue lors du traitement.",
+    "error_details": "Détails de l'erreur",
+    "abort": "Abandonner",
+    "tabs": {
+      "gap": "Écarts",
+      "critic": "Critique"
+    }
+  },
+  "LetterEditor": {
+    "title": "Éditeur de Brouillon",
+    "chars": "{count} caractères",
+    "placeholder": "Rédaction...",
+    "feedback_placeholder": "ex: souligner l'expérience en leadership...",
+    "helper": "Modifiez la lettre ci-dessus, puis approuvez ou demandez une réécriture.",
+    "rewrite": "Réécrire",
+    "send": "Envoyer",
+    "approve": "Approuver"
+  },
+  "Settings": {
+    "title": "Paramètres",
+    "subtitle": "Gérez vos préférences et le comportement de l'agent.",
+    "agent_prefs": "Préférences de l'Agent",
+    "agent_prefs_desc": "Contrôlez comment l'IA écrit et ce qu'elle recherche.",
+    "tones": {
+      "professional": {
+        "label": "Professionnel",
+        "desc": "Soigné & corporatif"
+      },
+      "conversational": {
+        "label": "Conversationnel",
+        "desc": "Amical & naturel"
+      },
+      "enthusiastic": {
+        "label": "Enthousiaste",
+        "desc": "Énergique & passionné"
+      },
+      "formal": {
+        "label": "Formel",
+        "desc": "Traditionnel & respectueux"
+      },
+      "concise": {
+        "label": "Concis",
+        "desc": "Bref & direct"
+      }
+    },
+    "tone": "Ton de voix",
+    "tone_desc": "Comment l'agent doit-il rédiger vos lettres de motivation ?",
+    "llm_lang": "Langue de sortie de l'IA",
+    "llm_lang_desc": "Tout le contenu généré par l'IA (lettres, analyses) sera dans cette langue.",
+    "search_filters": "Filtres de recherche",
+    "search_filters_desc": "Filtres par défaut utilisés pour la recherche d'offres.",
+    "location": "Localisation",
+    "contract_type": "Type de contrat",
+    "remote_preference": "Préférence télétravail",
+    "job_title": "Titre du poste cible",
+    "app_prefs": "Préférences de l'App",
+    "app_prefs_desc": "Personnalisez l'interface utilisateur.",
+    "ui_lang": "Langue de l'interface",
+    "ui_lang_desc": "La langue d'affichage du tableau de bord.",
+    "theme": "Thème",
+    "theme_desc": "Choisissez entre le mode clair et sombre.",
+    "save": "Enregistrer les préférences",
+    "saving": "Enregistrement..."
+  },
+  "Common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès",
+    "view": "Voir"
+  }
+}

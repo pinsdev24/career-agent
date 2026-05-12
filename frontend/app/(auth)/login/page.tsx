@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Mail, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { Logo } from "@/components/logo";
 import Image from "next/image";
 
 export default function LoginPage() {
+  const t = useTranslations("Auth");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -35,7 +37,7 @@ export default function LoginPage() {
           options: { emailRedirectTo: `${window.location.origin}/callback` },
         });
         if (error) throw error;
-        setMessage("Check your email for a confirmation link!");
+        setMessage(t("signup.success"));
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -46,7 +48,7 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Authentication failed");
+      setError(err instanceof Error ? err.message : t("errors.failed"));
     } finally {
       setLoading(false);
     }
@@ -96,8 +98,8 @@ export default function LoginPage() {
               />
               {/* Floating aesthetic tag */}
               <div className="absolute inset-x-0 bottom-4 flex justify-center">
-                <div className="bg-white/90 backdrop-blur-sm text-[#111111] text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Hired
+                <div className="bg-white dark:bg-[#111]/90 backdrop-blur-sm text-[#111111] text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {t("sidebar.hired")}
                 </div>
               </div>
             </div>
@@ -116,10 +118,10 @@ export default function LoginPage() {
         
         <div className="relative z-10 max-w-lg mb-12">
           <h2 className="text-4xl font-medium tracking-tight mb-4 leading-tight">
-            Escape the job search labyrinth.
+            {t("sidebar.title")}
           </h2>
           <p className="text-gray-500 font-light text-lg">
-            Join Ariadne to automate your applications, generate tailored cover letters, and maximize your career potential.
+            {t("sidebar.subtitle")}
           </p>
         </div>
       </div>
@@ -134,19 +136,17 @@ export default function LoginPage() {
         <div className="w-full max-w-md mx-auto space-y-8">
           <div className="space-y-2">
             <h1 className="text-3xl font-medium tracking-tight">
-              {isSignUp ? "Create an account" : "Welcome back"}
+              {isSignUp ? t("signup.title") : t("login.title")}
             </h1>
             <p className="text-gray-500 text-sm font-light">
-              {isSignUp 
-                ? "Enter your details below to get started." 
-                : "Enter your credentials to access your dashboard."}
+              {isSignUp ? t("signup.subtitle") : t("login.subtitle")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email
+                {t("fields.email")}
               </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -156,15 +156,15 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="you@example.com"
-                  className="pl-10 h-12 rounded-xl bg-white border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
+                  placeholder={t("fields.email_placeholder")}
+                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
+                {t("fields.password")}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -176,7 +176,7 @@ export default function LoginPage() {
                   required
                   minLength={6}
                   placeholder="••••••••"
-                  className="pl-10 h-12 rounded-xl bg-white border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
+                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
                 />
               </div>
             </div>
@@ -204,7 +204,7 @@ export default function LoginPage() {
                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  {isSignUp ? "Create Account" : "Sign In"}
+                  {isSignUp ? t("signup.button") : t("login.button")}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -213,7 +213,7 @@ export default function LoginPage() {
 
           {/* Toggle Login/Signup */}
           <div className="text-center text-sm text-gray-500 pt-2">
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            {isSignUp ? t("signup.toggle_text") : t("login.toggle_text")}{" "}
             <button
               type="button"
               onClick={() => {
@@ -223,7 +223,7 @@ export default function LoginPage() {
               }}
               className="font-medium text-[#111111] hover:underline underline-offset-4 transition-all"
             >
-              {isSignUp ? "Sign in" : "Sign up"}
+              {isSignUp ? t("signup.toggle_btn") : t("login.toggle_btn")}
             </button>
           </div>
         </div>
