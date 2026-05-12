@@ -46,6 +46,14 @@ class ToneOfVoice(str, Enum):
     CONCISE = "concise"
 
 
+class LanguagePreference(str, Enum):
+    """Supported LLM output languages (ISO 639-1)."""
+
+    EN = "en"
+    FR = "fr"
+    NL = "nl"
+
+
 # ---------------------------------------------------------------------------
 # Profile
 # ---------------------------------------------------------------------------
@@ -74,15 +82,17 @@ class ProfileResponse(BaseModel):
     cv_raw_text: str | None = None
     cv_structured: dict[str, Any] | None = None
     tone_of_voice: ToneOfVoice = ToneOfVoice.PROFESSIONAL
+    language_preference: LanguagePreference = LanguagePreference.EN
     search_preferences: SearchPreferences | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
 
 class ProfilePreferencesUpdate(BaseModel):
-    """Update search preferences and tone of voice."""
+    """Update search preferences, tone of voice, and language."""
 
     tone_of_voice: ToneOfVoice | None = None
+    language_preference: LanguagePreference | None = None
     search_preferences: SearchPreferences | None = None
 
 

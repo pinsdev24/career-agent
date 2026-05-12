@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from app.config import get_settings
+from app.graph.language import get_language_instruction
 from app.models.state import AgentState
 from app.tools.embedding_tools import embed_text
 from app.tools.retry import async_retry
@@ -86,8 +87,10 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )
     structured_llm = llm.with_structured_output(GapAnalysisResult)
 
+    language_instruction = get_language_instruction(state.get("language_preference", "en"))
+
     messages = [
-        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(content=f"{SYSTEM_PROMPT}\n\n{language_instruction}"),
         SystemMessage(
             content=(
                 f"CANDIDATE CV:\n{cv_text[:4000]}\n\n"
@@ -132,7 +135,8 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
     from app.tools.summarizer import summarize_cv, summarize_offer, summarize_gap_report  # noqa: E402
 
     cv_summary, offer_summary, gap_summary = await _generate_summaries(
-        cv_text, selected_offer, gap_report
+        cv_text, selected_offer, gap_report,
+        language_code=state.get("language_preference", "en"),
     )
 
     return {
@@ -146,7 +150,7 @@ async def matcher_node(state: AgentState, config: RunnableConfig) -> AgentState:
 
 
 async def _generate_summaries(
-    cv_text: str, offer: dict, gap_report: dict
+    cv_text: str, offer: dict, gap_report: dict, language_code: str = "en",
 ) -> tuple[str, str, str]:
     """Generate all three summaries concurrently for speed."""
     import asyncio
@@ -154,8 +158,8 @@ async def _generate_summaries(
 
     try:
         cv_sum, offer_sum, gap_sum = await asyncio.gather(
-            summarize_cv(cv_text),
-            summarize_offer(offer),
+            summarize_cv(cv_text, language_code=language_code),
+            summarize_offer(offer, language_code=language_code),
             summarize_gap_report(gap_report),
         )
         return cv_sum, offer_sum, gap_sum

@@ -290,6 +290,7 @@ async def run_pipeline(
             "cv_structured": profile.get("cv_structured", {}),
             "search_preferences": profile.get("search_preferences", {}),
             "tone_of_voice": profile.get("tone_of_voice", "professional"),
+            "language_preference": profile.get("language_preference", "en"),
             "status": "started",
             # Initialize Best-of-N tracking
             "draft_history": [],
