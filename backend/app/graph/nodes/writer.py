@@ -7,6 +7,7 @@ from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
+from app.graph.language import get_language_instruction
 from app.models.state import AgentState
 from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
@@ -61,6 +62,7 @@ Rules:
 - {tone_instruction}
 - Target length: 280-380 words
 - Return ONLY the letter body (no "Subject:" or metadata)
+- {language_instruction}
 """
 
 TONE_INSTRUCTIONS = {
@@ -144,6 +146,9 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
     )[:2000]
     gap_narrative = state.get("gap_summary", gap.get("summary", "Strong candidate match."))
 
+    language = state.get("language_preference", "en")
+    language_instruction = get_language_instruction(language)
+
     messages = [
         SystemMessage(content=SYSTEM_PROMPT),
         HumanMessage(content=WRITER_PROMPT.format(
@@ -158,6 +163,7 @@ async def writer_node(state: AgentState, config: RunnableConfig) -> AgentState:
             gap_summary=gap_narrative,
             revision_context=revision_context,
             memory_context=memory_context,
+            language_instruction=language_instruction,
         )),
     ]
 

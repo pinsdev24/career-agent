@@ -24,6 +24,8 @@ export type ToneOfVoice =
   | "formal"
   | "concise";
 
+export type LanguagePreference = "en" | "fr" | "nl";
+
 // ---------------------------------------------------------------------------
 // Profile
 // ---------------------------------------------------------------------------
@@ -41,6 +43,7 @@ export interface Profile {
   cv_raw_text?: string | null;
   cv_structured?: Record<string, unknown> | null;
   tone_of_voice: ToneOfVoice;
+  language_preference: LanguagePreference;
   search_preferences?: SearchPreferences | null;
   created_at?: string | null;
   updated_at?: string | null;

@@ -6,6 +6,7 @@ At the core of CareerAgent is a sophisticated multi-agent system orchestrated by
 
 The `GraphState` object represents the memory of a single pipeline run. It gets updated sequentially as the graph progresses from node to node. It holds:
 - The user's CV and target job offer.
+- The user's language preference (injected into all subsequent prompts).
 - Intermediate artifacts (Gap Analysis, Draft Letters).
 - Routing instructions (e.g., whether to wait for user input).
 - Memory summaries.
@@ -56,6 +57,10 @@ Evaluates the entry mode of the user's request.
 ### 6. The Memory Writer
 - **Role**: Runs concurrently at the end of the pipeline as a side-effect.
 - **Process**: Extracts learnings from the user's HITL-2 edits (e.g., "The user deleted a lot of adjectives, we should lower the verbosity"). Updates the `preferences` and `application_history` tables in Supabase for future runs.
+
+## Language Processing & i18n
+
+The pipeline is inherently language-aware. Utilizing the `app/graph/language.py` module, the backend extracts the user's language preference (e.g., `en`, `fr`) from their profile state and dynamically injects precise system directives into all language models across the pipeline. This ensures that the Matcher, Writer, and Critic nodes process data and generate outputs seamlessly in the user's selected language.
 
 ## Human-in-the-Loop (HITL)
 

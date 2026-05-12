@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 from app.config import get_settings
+from app.graph.language import get_language_instruction
 from app.models.state import AgentState
 from app.tools.retry import async_retry
 from app.graph.pubsub import log_emitter
@@ -94,8 +95,10 @@ async def critic_node(state: AgentState, config: RunnableConfig) -> AgentState:
         "message": "Critic analyzing letter relevance, tone, persuasiveness...",
     })
 
+    language_instruction = get_language_instruction(state.get("language_preference", "en"))
+
     messages = [
-        SystemMessage(content=SYSTEM_PROMPT),
+        SystemMessage(content=f"{SYSTEM_PROMPT}\n\n{language_instruction}"),
         SystemMessage(
             content=f"JOB OFFER:\n{offer_context}\n\nCOVER LETTER:\n{letter}"
         ),

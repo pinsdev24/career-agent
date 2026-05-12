@@ -1,0 +1,331 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Enter your credentials to access your dashboard.",
+      "button": "Sign In",
+      "toggle_text": "Don't have an account?",
+      "toggle_btn": "Sign up"
+    },
+    "signup": {
+      "title": "Create an account",
+      "subtitle": "Enter your details below to get started.",
+      "button": "Create Account",
+      "toggle_text": "Already have an account?",
+      "toggle_btn": "Sign in",
+      "success": "Check your email for a confirmation link!"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "email_placeholder": "you@example.com"
+    },
+    "errors": {
+      "failed": "Authentication failed"
+    },
+    "sidebar": {
+      "title": "Escape the job search labyrinth.",
+      "subtitle": "Join Ariadne to automate your applications, generate tailored cover letters, and maximize your career potential.",
+      "hired": "Hired"
+    }
+  },
+  "Sidebar": {
+    "missions": "Missions",
+    "new_mission": "New Mission",
+    "profile": "Profile",
+    "settings": "Settings",
+    "sign_out": "Sign Out",
+    "profile_settings": "Profile Settings",
+    "sign_out_confirm_title": "Are you sure you want to sign out?",
+    "sign_out_confirm_desc": "You will need to log in again to access your dashboard.",
+    "cancel": "Cancel",
+    "confirm": "Yes, sign out"
+  },
+  "Landing": {
+    "nav": {
+      "product": "Product",
+      "features": "Features",
+      "testimonials": "Success Stories",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "title_start": "Where Your Career",
+      "title_end": "Path is Built.",
+      "subtitle": "Escape the job search labyrinth. We bring your professional value to the forefront by combining proven application strategies with intelligent AI analysis.",
+      "cta_primary": "Find your next role",
+      "cta_secondary": "How it works"
+    },
+    "visuals": {
+      "opportunities": "Job Opportunities",
+      "apply_now": "Apply now",
+      "efficiency_title": "Efficiently transform your application experience.",
+      "efficiency_desc": "Ariadne is the personal Career Assistant that automates your cover letters and skill matching, so you stay focused on acing the interviews.",
+      "dream_company": "Dream Company",
+      "maximize_title": "Maximize Your Potential.",
+      "maximize_desc": "Leverage our intelligent matching models to find the perfect role wherever you want - starting in just minutes.",
+      "full_time": "Full-time Roles",
+      "freelance": "Freelance & Contracts"
+    },
+    "features": {
+      "badge": "The Intelligence",
+      "title": "A multi-agent system working just for your success.",
+      "subtitle": "Ariadne doesn't just use templates. Our specialized AI agents analyze, match, write, and review your applications uniquely for every offer.",
+      "items": {
+        "gap": {
+          "title": "Smart Gap Analysis",
+          "desc": "We analyze the semantic match between your CV and the job description, giving you a precise percentage score and identifying exact missing skills to highlight."
+        },
+        "tone": {
+          "title": "Hyper-Personalization",
+          "desc": "Our writer agent crafts compelling cover letters using a 3-act structure. It learns your personal Tone of Voice from your feedback to sound exactly like you."
+        },
+        "zap": {
+          "title": "Human-in-the-Loop",
+          "desc": "You retain total control. Ariadne writes the drafts, but you approve, edit, and review before any application is finalized."
+        }
+      }
+    },
+    "architecture": {
+      "badge": "System Architecture",
+      "title": "A pipeline built for precision.",
+      "subtitle": "Ariadne abandons generic AI wrappers for a specialized multi-agent architecture. Every application is parsed, scored, and rewritten with surgical accuracy.",
+      "steps": {
+        "one": {
+          "title": "Deep Semantic Matching",
+          "desc": "Ariadne doesn't search for keywords. The Matcher Agent converts your resume and target job descriptions into high-dimensional vector embeddings to analyze the underlying conceptual fit."
+        },
+        "two": {
+          "title": "Tone of Voice Memory",
+          "desc": "It learns how you sound. Every time you review and tweak a cover letter, the Human-in-the-Loop system commits your stylistic choices to memory."
+        },
+        "three": {
+          "title": "The Critic Agent Audit",
+          "desc": "Nothing leaves the pipeline unverified. An autonomous Critic Agent audits every drafted letter across 5 strict dimensions."
+        }
+      }
+    },
+    "scout": {
+      "badge": "Mode Exploration",
+      "title": "Let Ariadne find the opportunities.",
+      "subtitle": "Don't have a specific offer link? Just drop your CV. Our Scout Agent browses the web, matches relevant roles, and presents you the top options.",
+      "items": [
+        "Automated Web Scraping via Tavily",
+        "Contextual Vector Embeddings",
+        "Expires after 7 days automatically"
+      ],
+      "cta": "Try Explore Mode"
+    },
+    "testimonials": {
+      "badge": "Candidate Stories",
+      "title": "Careers launched by Ariadne.",
+      "subtitle": "Join thousands of professionals who have already escaped the job search labyrinth.",
+      "items": [
+        {
+          "quote": "Ariadne transformed my job hunt. I dropped my CV, and it matched me with 5 roles I loved. The cover letters were pristine.",
+          "author": "Sarah J.",
+          "role": "Product Manager"
+        },
+        {
+          "quote": "The Tone of Voice Memory is wild. After two applications, the agent started writing exactly like I do, but sharper.",
+          "author": "Michael T.",
+          "role": "Frontend Engineer"
+        },
+        {
+          "quote": "I used to spend 2 hours tailoring my CV and letters per job. Now it takes me 5 minutes to review and approve.",
+          "author": "Elena R.",
+          "role": "Data Scientist"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Stop applying in the dark.",
+      "subtitle": "Join the elite professionals using Ariadne's multi-agent architecture to navigate the job market with absolute precision.",
+      "button": "Enter the Labyrinth",
+      "footer": "No credit card required. Free to explore."
+    },
+    "footer": {
+      "copyright": "© {year} Ariadne. Elevating job seekers globally."
+    }
+  },
+  "Dashboard": {
+    "title": "Missions",
+    "subtitle": "Track and manage your application pipelines.",
+    "new_mission": "New Mission",
+    "loading": "Loading missions...",
+    "empty": {
+      "title": "No missions yet",
+      "description": "Start a new mission to deploy Ariadne's agents on your next job application."
+    },
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "this_week": "This Week",
+      "earlier": "Earlier"
+    },
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "waiting_offer_selection": "Pick Offer",
+      "waiting_letter_review": "Review Letter",
+      "writing": "Writing",
+      "analyzing": "Analyzing",
+      "scouting": "Scouting"
+    },
+    "match": "Match",
+    "explore_mission": "Explore Mission"
+  },
+  "Profile": {
+    "title": "Profile",
+    "subtitle": "Manage your CV and personal details.",
+    "cv_section": "CV / Resume",
+    "cv_description": "Upload your CV in PDF format for agent analysis.",
+    "uploading": "Processing CV...",
+    "upload_btn": "Upload new CV",
+    "replace_btn": "Replace CV",
+    "basic_info": "Basic Information",
+    "basic_info_desc": "Information extracted from your CV.",
+    "memories": "Agent Memories",
+    "memories_desc": "Key details the agent has learned about you across all sessions.",
+    "cv_active": "CV Active",
+    "extracted_data": "Extracted Data",
+    "identity": "Identity",
+    "skills": "Skills",
+    "experience": "Experience",
+    "education": "Education",
+    "languages": "Languages",
+    "view_all": "View All",
+    "view_details": "View details",
+    "full_experience": "Full Experience",
+    "all_skills": "All Skills",
+    "agent_memory": "Agent Memory",
+    "memory_active": "Active",
+    "loading_memories": "Loading memories...",
+    "no_memories": "No Memories Yet",
+    "no_memories_desc": "Ariadne learns from your feedback. As you review cover letters, it builds a persistent profile here.",
+    "style_notes": "Style Notes",
+    "tone": "Tone",
+    "length": "Length",
+    "industries": "Industries",
+    "roles": "Roles",
+    "last_sync": "Last sync",
+    "no_data": "No data",
+    "clear": "Clear",
+    "clear_memory_title": "Clear Agent Memory?",
+    "clear_memory_desc": "This will delete all learned preferences. The agent will need to relearn from your future interactions.",
+    "cancel": "Cancel",
+    "clear_btn": "Clear Memory"
+  },
+  "NewMission": {
+    "title": "New Mission",
+    "subtitle": "Start a new job application pipeline.",
+    "modes": {
+      "url": {
+        "label": "Direct URL",
+        "desc": "Paste a job posting link"
+      },
+      "explore": {
+        "label": "Explore",
+        "desc": "Let agents find offers"
+      }
+    },
+    "url_label": "Job Posting URL",
+    "url_placeholder": "https://company.com/careers/job-posting",
+    "explore_info": "The system will use your profile data to actively find matching offers. Make sure your profile is up to date before starting.",
+    "starting": "Starting...",
+    "start_btn": "Start Pipeline",
+    "error_url": "Please enter a job URL."
+  },
+  "MissionDetail": {
+    "active_pipeline": "Active Pipeline",
+    "delete_title": "Delete this run?",
+    "delete_desc": "This will permanently delete all data associated with this pipeline run. This action cannot be undone.",
+    "delete_btn": "Delete",
+    "cancel": "Cancel",
+    "no_offers": "No Offers Found",
+    "select_offer": "Select an Offer",
+    "no_offers_desc": "No matching roles were found. Try adjusting your profile preferences.",
+    "select_offer_desc": "Choose the most relevant opportunity to continue.",
+    "confirm_selection": "Confirm Selection",
+    "review_draft": "Review Draft",
+    "review_desc": "The AI critic has reviewed your letter. Finalize or request changes.",
+    "processing": "Processing...",
+    "ready_to_send": "Your cover letter is ready to send.",
+    "final_letter": "Final Letter",
+    "applied": "Applied!",
+    "i_applied": "I Applied",
+    "send": "Send",
+    "copied": "Copied",
+    "copy": "Copy",
+    "target_role": "Target Role",
+    "failed_title": "Pipeline Failed",
+    "failed_desc": "An error occurred during processing.",
+    "error_details": "Error Details",
+    "abort": "Abort",
+    "tabs": {
+      "gap": "Gap",
+      "critic": "Critic"
+    }
+  },
+  "LetterEditor": {
+    "title": "Draft Editor",
+    "chars": "{count} chars",
+    "placeholder": "Drafting...",
+    "feedback_placeholder": "e.g. emphasize leadership experience...",
+    "helper": "Edit the letter above, then approve or request a rewrite.",
+    "rewrite": "Rewrite",
+    "send": "Send",
+    "approve": "Approve"
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Manage your app preferences and agent behavior.",
+    "agent_prefs": "Agent Preferences",
+    "agent_prefs_desc": "Control how the AI writes and what it looks for.",
+    "tones": {
+      "professional": {
+        "label": "Professional",
+        "desc": "Polished & corporate"
+      },
+      "conversational": {
+        "label": "Conversational",
+        "desc": "Friendly & natural"
+      },
+      "enthusiastic": {
+        "label": "Enthusiastic",
+        "desc": "Energetic & passionate"
+      },
+      "formal": {
+        "label": "Formal",
+        "desc": "Traditional & respectful"
+      },
+      "concise": {
+        "label": "Concise",
+        "desc": "Brief & to-the-point"
+      }
+    },
+    "tone": "Tone of Voice",
+    "tone_desc": "How should the agent write your cover letters?",
+    "llm_lang": "LLM Output Language",
+    "llm_lang_desc": "All AI-generated content (cover letters, analysis, feedback) will be in this language.",
+    "search_filters": "Search Filters",
+    "search_filters_desc": "Default filters used when the agent scouts for jobs on your behalf.",
+    "location": "Location",
+    "contract_type": "Contract Type",
+    "remote_preference": "Remote Preference",
+    "job_title": "Target Job Title",
+    "app_prefs": "App Preferences",
+    "app_prefs_desc": "Customize the user interface.",
+    "ui_lang": "App UI Language",
+    "ui_lang_desc": "The language of the dashboard interface.",
+    "theme": "Theme",
+    "theme_desc": "Choose between light and dark mode.",
+    "save": "Save Preferences",
+    "saving": "Saving..."
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "view": "View"
+  }
+}

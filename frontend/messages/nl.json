@@ -1,0 +1,331 @@
+{
+  "Auth": {
+    "login": {
+      "title": "Welkom terug",
+      "subtitle": "Voer uw gegevens in om toegang te krijgen tot uw dashboard.",
+      "button": "Inloggen",
+      "toggle_text": "Heeft u nog geen account?",
+      "toggle_btn": "Aanmelden"
+    },
+    "signup": {
+      "title": "Account aanmaken",
+      "subtitle": "Voer hieronder uw gegevens in om aan de slag te gaan.",
+      "button": "Account aanmaken",
+      "toggle_text": "Heeft u al een account?",
+      "toggle_btn": "Inloggen",
+      "success": "Check uw e-mail voor een bevestigingslink!"
+    },
+    "fields": {
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "email_placeholder": "u@voorbeeld.com"
+    },
+    "errors": {
+      "failed": "Authenticatie mislukt"
+    },
+    "sidebar": {
+      "title": "Ontsnap aan het doolhof van de zoektocht naar een baan.",
+      "subtitle": "Sluit u aan bij Ariadne om uw sollicitaties te automatiseren, op maat gemaakte sollicitatiebrieven te genereren en uw carrièrepotentieel te maximaliseren.",
+      "hired": "Aangenomen"
+    }
+  },
+  "Sidebar": {
+    "missions": "Missies",
+    "new_mission": "Nieuwe Missie",
+    "profile": "Profiel",
+    "settings": "Instellingen",
+    "sign_out": "Uitloggen",
+    "profile_settings": "Profielinstellingen",
+    "sign_out_confirm_title": "Weet u zeker dat u wilt uitloggen?",
+    "sign_out_confirm_desc": "U moet opnieuw inloggen om toegang te krijgen tot uw dashboard.",
+    "cancel": "Annuleren",
+    "confirm": "Ja, uitloggen"
+  },
+  "Landing": {
+    "nav": {
+      "product": "Product",
+      "features": "Functies",
+      "testimonials": "Succesverhalen",
+      "dashboard": "Dashboard"
+    },
+    "hero": {
+      "title_start": "Waar je carrière",
+      "title_end": "wordt gebouwd.",
+      "subtitle": "Ontsnap aan het doolhof van de zoektocht naar een baan. Wij brengen uw professionele waarde naar voren door bewezen strategieën te combineren met AI.",
+      "cta_primary": "Vind je volgende rol",
+      "cta_secondary": "Hoe het werkt"
+    },
+    "visuals": {
+      "opportunities": "Vacatures",
+      "apply_now": "Nu solliciteren",
+      "efficiency_title": "Transformeer uw sollicitatie-ervaring op een efficiënte manier.",
+      "efficiency_desc": "Ariadne is de persoonlijke carrière-assistent die uw sollicitatiebrieven en het matchen van vaardigheden automatiseert.",
+      "dream_company": "Droombedrijf",
+      "maximize_title": "Maximaliseer uw potentieel.",
+      "maximize_desc": "Maak gebruik van onze intelligente matchingmodellen om overal de perfecte rol te vinden.",
+      "full_time": "Fulltime Rollen",
+      "freelance": "Freelance & Contracten"
+    },
+    "features": {
+      "badge": "De Intelligentie",
+      "title": "Een multi-agent systeem dat werkt voor uw succes.",
+      "subtitle": "Ariadne gebruikt niet alleen sjablonen. Onze gespecialiseerde AI-agents analyseren en schrijven uw sollicitaties op unieke wijze.",
+      "items": {
+        "gap": {
+          "title": "Slimme kloofanalyse",
+          "desc": "We analyseren de semantische match tussen uw CV en de jobomschrijving, geven u een nauwkeurige score en identificeren ontbrekende vaardigheden."
+        },
+        "tone": {
+          "title": "Hyper-personalisatie",
+          "desc": "Onze schrijfagent stelt overtuigende sollicitatiebrieven op. Hij leert uw persoonlijke tone of voice kennen om precies zoals u te klinken."
+        },
+        "zap": {
+          "title": "Mens-in-de-loop",
+          "desc": "U behoudt de totale controle. Ariadne schrijft de concepten, maar u keurt ze goed, bewerkt ze en beoordeelt ze vóór finalisering."
+        }
+      }
+    },
+    "architecture": {
+      "badge": "Systeemarchitectuur",
+      "title": "Een pijplijn gebouwd voor precisie.",
+      "subtitle": "Ariadne laat generieke AI-wrappers achterwege voor een gespecialiseerde multi-agent architectuur. Elke sollicitatie wordt met precisie geanalyseerd.",
+      "steps": {
+        "one": {
+          "title": "Diepe Semantische Matching",
+          "desc": "Ariadne zoekt niet naar trefwoorden. De Matcher Agent analyseert de diepe conceptuele match tussen uw profiel en de vacature."
+        },
+        "two": {
+          "title": "Geheugen van Tone of Voice",
+          "desc": "Het leert hoe u klinkt. Elke beoordeling van een brief verrijkt het stilistische geheugen van uw assistent."
+        },
+        "three": {
+          "title": "Audit door de Critic Agent",
+          "desc": "Niets verlaat de pijplijn zonder verificatie. Een autonome Critic Agent controleert elke brief op 5 strikte dimensies."
+        }
+      }
+    },
+    "scout": {
+      "badge": "Exploratiemodus",
+      "title": "Laat Ariadne de kansen vinden.",
+      "subtitle": "Heb je geen specifieke vacaturelink? Upload je CV. Onze Scout Agent doorzoekt het web om je de beste opties te presenteren.",
+      "items": [
+        "Geautomatiseerde web scraping via Tavily",
+        "Contextuele vector-embeddings",
+        "Verloopt automatisch na 7 dagen"
+      ],
+      "cta": "Probeer Exploratiemodus"
+    },
+    "testimonials": {
+      "badge": "Verhalen van Kandidaten",
+      "title": "Carrières gelanceerd door Ariadne.",
+      "subtitle": "Sluit u aan bij duizenden professionals die al zijn ontsnapt aan het doolhof van de zoektocht naar een baan.",
+      "items": [
+        {
+          "quote": "Ariadne heeft mijn zoektocht getransformeerd. Ik heb mijn CV geupload en het vond 5 rollen die ik geweldig vond. De brieven waren perfect.",
+          "author": "Sarah J.",
+          "role": "Product Manager"
+        },
+        {
+          "quote": "Het geheugen van de tone of voice is geweldig. Na twee sollicitaties begon de agent precies zoals ik te schrijven.",
+          "author": "Michael T.",
+          "role": "Frontend Engineer"
+        },
+        {
+          "quote": "Vroeger besteedde ik 2 uur aan het aanpassen van brieven. Nu kost het me 5 minuten om ze te beoordelen en goed te keuren.",
+          "author": "Elena R.",
+          "role": "Data Scientist"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Stop met solliciteren in het donker.",
+      "subtitle": "Sluit u aan bij de elite van professionals die de multi-agent architectuur van Ariadne gebruiken om met precisie te navigeren.",
+      "button": "Betreed het Labyrint",
+      "footer": "Geen creditcard vereist. Gratis te verkennen."
+    },
+    "footer": {
+      "copyright": "© {year} Ariadne. Verheft werkzoekenden wereldwijd."
+    }
+  },
+  "Dashboard": {
+    "title": "Missies",
+    "subtitle": "Volg en beheer uw sollicitatie-pijplijnen.",
+    "new_mission": "Nieuwe Missie",
+    "loading": "Missies laden...",
+    "empty": {
+      "title": "Nog geen missies",
+      "description": "Start een nieuwe missie om de agents van Ariadne in te zetten voor uw volgende sollicitatie."
+    },
+    "groups": {
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "this_week": "Deze week",
+      "earlier": "Eerder"
+    },
+    "status": {
+      "completed": "Voltooid",
+      "failed": "Mislukt",
+      "waiting_offer_selection": "Kies Aanbod",
+      "waiting_letter_review": "Review Brief",
+      "writing": "Schrijven",
+      "analyzing": "Analyseren",
+      "scouting": "Scouten"
+    },
+    "match": "Match",
+    "explore_mission": "Exploratiemissie"
+  },
+  "Profile": {
+    "title": "Profiel",
+    "subtitle": "Beheer uw CV en persoonlijke gegevens.",
+    "cv_section": "CV / Resume",
+    "cv_description": "Upload uw CV in PDF-formaat voor analyse door de agent.",
+    "uploading": "CV verwerken...",
+    "upload_btn": "Nieuw CV uploaden",
+    "replace_btn": "CV vervangen",
+    "basic_info": "Basisinformatie",
+    "basic_info_desc": "Informatie geëxtraheerd uit uw CV.",
+    "memories": "Agent Geheugen",
+    "memories_desc": "Belangrijkste details die de agent over u heeft geleerd tijdens alle sessies.",
+    "cv_active": "CV Actief",
+    "extracted_data": "Geëxtraheerde gegevens",
+    "identity": "Identiteit",
+    "skills": "Vaardigheden",
+    "experience": "Ervaring",
+    "education": "Opleiding",
+    "languages": "Talen",
+    "view_all": "Alles bekijken",
+    "view_details": "Details bekijken",
+    "full_experience": "Volledige ervaring",
+    "all_skills": "Alle vaardigheden",
+    "agent_memory": "Agent Geheugen",
+    "memory_active": "Actief",
+    "loading_memories": "Geheugen laden...",
+    "no_memories": "Nog geen geheugen",
+    "no_memories_desc": "Ariadne leert van uw feedback. Terwijl u brieven beoordeelt, bouwt het hier een profiel op.",
+    "style_notes": "Stijlaantekeningen",
+    "tone": "Toon",
+    "length": "Lengte",
+    "industries": "Sectoren",
+    "roles": "Rollen",
+    "last_sync": "Laatste sync",
+    "no_data": "Geen gegevens",
+    "clear": "Wissen",
+    "clear_memory_title": "Agent geheugen wissen?",
+    "clear_memory_desc": "Dit verwijdert alle geleerde voorkeuren. De agent moet opnieuw leren van uw toekomstige interacties.",
+    "cancel": "Annuleren",
+    "clear_btn": "Geheugen wissen"
+  },
+  "NewMission": {
+    "title": "Nieuwe Missie",
+    "subtitle": "Start een nieuwe sollicitatiepijplijn.",
+    "modes": {
+      "url": {
+        "label": "Directe URL",
+        "desc": "Plak een vacaturelink"
+      },
+      "explore": {
+        "label": "Verkennen",
+        "desc": "Laat agents vacatures vinden"
+      }
+    },
+    "url_label": "Vacature URL",
+    "url_placeholder": "https://bedrijf.com/carriere/vacature",
+    "explore_info": "Het systeem gebruikt uw profielgegevens om actief bijpassende aanbiedingen te vinden. Zorg ervoor dat uw profiel up-to-date is.",
+    "starting": "Starten...",
+    "start_btn": "Start Pijplijn",
+    "error_url": "Voer een vacature-URL in."
+  },
+  "MissionDetail": {
+    "active_pipeline": "Actieve Pijplijn",
+    "delete_title": "Deze run verwijderen?",
+    "delete_desc": "Dit verwijdert permanent alle gegevens. Deze actie kan niet ongedaan worden gemaakt.",
+    "delete_btn": "Verwijderen",
+    "cancel": "Annuleren",
+    "no_offers": "Geen aanbiedingen gevonden",
+    "select_offer": "Selecteer een aanbod",
+    "no_offers_desc": "Geen bijpassende rollen gevonden. Probeer uw profielvoorkeuren aan te passen.",
+    "select_offer_desc": "Kies de meest relevante kans om door te gaan.",
+    "confirm_selection": "Bevestig selectie",
+    "review_draft": "Concept beoordelen",
+    "review_desc": "De AI-criticus heeft uw brief beoordeeld. Finaliseer of vraag om wijzigingen.",
+    "processing": "Verwerken...",
+    "ready_to_send": "Uw sollicitatiebrief is klaar om te verzenden.",
+    "final_letter": "Definitieve brief",
+    "applied": "Toegepast!",
+    "i_applied": "Ik heb gesolliciteerd",
+    "send": "Verzenden",
+    "copied": "Gekopieerd",
+    "copy": "Kopiëren",
+    "target_role": "Doelrol",
+    "failed_title": "Pijplijn mislukt",
+    "failed_desc": "Er is een fout opgetreden tijdens de verwerking.",
+    "error_details": "Foutdetails",
+    "abort": "Afbreken",
+    "tabs": {
+      "gap": "Kloof",
+      "critic": "Criticus"
+    }
+  },
+  "LetterEditor": {
+    "title": "Concept Editor",
+    "chars": "{count} tekens",
+    "placeholder": "Schrijven...",
+    "feedback_placeholder": "bijv. nadruk leggen op leiderschapservaring...",
+    "helper": "Bewerk de brief hierboven, keur hem dan goed of vraag om een herschrijving.",
+    "rewrite": "Herschrijven",
+    "send": "Verzenden",
+    "approve": "Goedkeuren"
+  },
+  "Settings": {
+    "title": "Instellingen",
+    "subtitle": "Beheer uw app-voorkeuren en agentgedrag.",
+    "agent_prefs": "Agent Voorkeuren",
+    "agent_prefs_desc": "Bepaal hoe de AI schrijft en waarnaar hij zoekt.",
+    "tones": {
+      "professional": {
+        "label": "Professioneel",
+        "desc": "Gepolijst & zakelijk"
+      },
+      "conversational": {
+        "label": "Converserend",
+        "desc": "Vriendelijk & natuurlijk"
+      },
+      "enthusiastic": {
+        "label": "Enthousiast",
+        "desc": "Energiek & gepassioneerd"
+      },
+      "formal": {
+        "label": "Formeel",
+        "desc": "Traditioneel & respectvol"
+      },
+      "concise": {
+        "label": "Beknopt",
+        "desc": "Kort & bondig"
+      }
+    },
+    "tone": "Tone of Voice",
+    "tone_desc": "Hoe moet de agent uw sollicitatiebrieven schrijven?",
+    "llm_lang": "AI Output Taal",
+    "llm_lang_desc": "Alle door AI gegenereerde inhoud (brieven, analyses) zal in deze taal zijn.",
+    "search_filters": "Zoekfilters",
+    "search_filters_desc": "Standaardfilters die worden gebruikt wanneer de agent voor u zoekt.",
+    "location": "Locatie",
+    "contract_type": "Contracttype",
+    "remote_preference": "Remote Voorkeur",
+    "job_title": "Doel Functietitel",
+    "app_prefs": "App Voorkeuren",
+    "app_prefs_desc": "Pas de gebruikersinterface aan.",
+    "ui_lang": "App UI Taal",
+    "ui_lang_desc": "De taal van de dashboardinterface.",
+    "theme": "Thema",
+    "theme_desc": "Kies tussen lichte en donkere modus.",
+    "save": "Voorkeuren opslaan",
+    "saving": "Opslaan..."
+  },
+  "Common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Succes",
+    "view": "Bekijk"
+  }
+}

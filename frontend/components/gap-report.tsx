@@ -14,15 +14,15 @@ export function GapReportCard({ report }: { report: GapReport }) {
   return (
     <div className="space-y-4">
       {/* Score */}
-      <div className="flex items-baseline gap-2 pb-3 border-b border-[#F5F5F5]">
+      <div className="flex items-baseline gap-2 pb-3 border-b border-[#F5F5F5] dark:border-[#222]">
         <span className={`text-3xl font-semibold tabular-nums tracking-tight ${colorClass}`}>
           {report.match_score}%
         </span>
-        <span className="text-[11px] text-[#999] font-medium">match score</span>
+        <span className="text-[11px] text-[#999] dark:text-[#888] font-medium">match score</span>
       </div>
 
       {/* Summary */}
-      <p className="text-[12px] text-[#666] leading-relaxed">
+      <p className="text-[12px] text-[#666] dark:text-[#aaa] leading-relaxed">
         {report.summary}
       </p>
 
@@ -36,12 +36,12 @@ export function GapReportCard({ report }: { report: GapReport }) {
           <div className="flex flex-wrap gap-1.5">
             {report.matching_skills?.length > 0 ? (
               report.matching_skills.map((skill) => (
-                <span key={skill} className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-medium">
+                <span key={skill} className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-medium">
                   {skill}
                 </span>
               ))
             ) : (
-              <span className="text-[12px] text-[#999] italic">None identified</span>
+              <span className="text-[12px] text-[#999] dark:text-[#888] italic">None identified</span>
             )}
           </div>
         </div>
@@ -54,12 +54,12 @@ export function GapReportCard({ report }: { report: GapReport }) {
           <div className="flex flex-wrap gap-1.5">
             {report.missing_skills?.length > 0 ? (
               report.missing_skills.map((skill) => (
-                <span key={skill} className="px-2 py-0.5 rounded-md bg-red-50 text-red-600 text-[11px] font-medium">
+                <span key={skill} className="px-2 py-0.5 rounded-md bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[11px] font-medium">
                   {skill}
                 </span>
               ))
             ) : (
-              <span className="text-[12px] text-[#999] italic">No major gaps</span>
+              <span className="text-[12px] text-[#999] dark:text-[#888] italic">No major gaps</span>
             )}
           </div>
         </div>

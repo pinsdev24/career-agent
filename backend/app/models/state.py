@@ -25,6 +25,7 @@ class AgentState(TypedDict, total=False):
     cv_structured: dict
     search_preferences: dict  # location, contract_type, remote_preference, etc.
     tone_of_voice: str  # user-selected tone preset
+    language_preference: str  # ISO 639-1 code for LLM output language (en, fr, nl)
 
     # --- Scout output ---
     discovered_offers: list[dict]  # raw offers from Tavily search

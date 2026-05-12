@@ -3,6 +3,8 @@
 The CareerAgent frontend is built using Next.js (App Router), React Server Components, and Tailwind CSS. We use `shadcn/ui` for accessible, reusable component primitives.
 
 ## Design Philosophy
+- **Premium Dark Mode**: Explicitly engineered dual-theme capability using Tailwind CSS hex-based dark variants, ensuring strict contrast ratios, readable components, and a high-fidelity aesthetic across both light and dark themes.
+- **Internationalization (i18n)**: Entire UI supports dynamic locale switching (e.g., English, French) via `next-intl`, adapting dashboards, dialogues, and system text smoothly.
 - **Real-Time Feedback**: Heavy emphasis on keeping the user informed of the AI's background processes using live server-sent event (SSE) terminal logs.
 - **Glassmorphism & Gradients**: A modern, clean aesthetic using subtle shadows, glass-like cards, and soft emerald gradients for success states.
 - **Micro-interactions**: Uses `framer-motion` and `tailwindcss-animate` for smooth transitions between pipeline states.

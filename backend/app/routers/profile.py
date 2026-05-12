@@ -79,6 +79,8 @@ async def update_preferences(
     update_data: dict = {}
     if data.tone_of_voice is not None:
         update_data["tone_of_voice"] = data.tone_of_voice.value
+    if data.language_preference is not None:
+        update_data["language_preference"] = data.language_preference.value
     if data.search_preferences is not None:
         update_data["search_preferences"] = data.search_preferences.model_dump(
             exclude_none=True,

@@ -14,6 +14,7 @@ from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 
 from app.config import get_settings
+from app.graph.language import get_language_instruction
 from app.tools.retry import async_retry
 
 logger = logging.getLogger(__name__)
@@ -29,12 +30,15 @@ async def _invoke_summarizer(llm: ChatOpenAI, prompt: str) -> str:
     return response.content if isinstance(response.content, str) else ""
 
 
-async def summarize_cv(cv_text: str, max_words: int = 200) -> str:
+async def summarize_cv(
+    cv_text: str, max_words: int = 200, language_code: str | None = None
+) -> str:
     """Generate a concise CV summary preserving key skills, experience, and achievements.
 
     Args:
         cv_text: The full raw CV text.
         max_words: Target maximum words for the summary.
+        language_code: ISO 639-1 code for output language.
 
     Returns:
         A condensed CV summary suitable for LLM prompts.
@@ -49,6 +53,8 @@ async def summarize_cv(cv_text: str, max_words: int = 200) -> str:
         temperature=0,
     )
 
+    lang_instruction = get_language_instruction(language_code)
+
     prompt = f"""Summarize this CV in ~{max_words} words. Preserve:
 - Full name, current title, years of experience
 - Top 5-8 technical skills and tools
@@ -59,7 +65,8 @@ async def summarize_cv(cv_text: str, max_words: int = 200) -> str:
 CV:
 {cv_text[:6000]}
 
-Return ONLY the summary, no commentary."""
+Return ONLY the summary, no commentary.
+{lang_instruction}"""
 
     try:
         summary = await _invoke_summarizer(llm, prompt)
@@ -70,12 +77,15 @@ Return ONLY the summary, no commentary."""
         return cv_text[:2000]
 
 
-async def summarize_offer(offer: dict, max_words: int = 150) -> str:
+async def summarize_offer(
+    offer: dict, max_words: int = 150, language_code: str | None = None
+) -> str:
     """Summarize a job offer into key requirements, company, and role details.
 
     Args:
         offer: The selected_offer dict from state (may have raw_text, snippet, structured).
         max_words: Target maximum words for the summary.
+        language_code: ISO 639-1 code for output language.
 
     Returns:
         A condensed offer summary suitable for LLM prompts.
@@ -104,6 +114,8 @@ async def summarize_offer(offer: dict, max_words: int = 150) -> str:
         temperature=0,
     )
 
+    lang_instruction = get_language_instruction(language_code)
+
     prompt = f"""Summarize this job offer in ~{max_words} words. Preserve:
 - Job title, company name, location/remote status
 - Top 5 required skills/qualifications
@@ -114,7 +126,8 @@ async def summarize_offer(offer: dict, max_words: int = 150) -> str:
 JOB OFFER:
 {offer_text[:4000]}
 
-Return ONLY the summary, no commentary."""
+Return ONLY the summary, no commentary.
+{lang_instruction}"""
 
     try:
         summary = await _invoke_summarizer(llm, prompt)

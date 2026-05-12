@@ -10,6 +10,7 @@ import type {
   HITLLetterReview,
   SearchPreferences,
   ToneOfVoice,
+  LanguagePreference,
   Memory,
 } from "@/lib/types";
 
@@ -87,11 +88,12 @@ export async function uploadCV(file: File): Promise<Profile> {
 
 export async function updatePreferences(
   tone_of_voice?: ToneOfVoice,
-  search_preferences?: SearchPreferences
+  search_preferences?: SearchPreferences,
+  language_preference?: LanguagePreference,
 ): Promise<Profile> {
   return request<Profile>("/profile/preferences", {
     method: "PUT",
-    body: JSON.stringify({ tone_of_voice, search_preferences }),
+    body: JSON.stringify({ tone_of_voice, search_preferences, language_preference }),
   });
 }
 
