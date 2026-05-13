@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // Necessary for next-intl to work correctly with Turbopack in current Next.js versions
+  turbopack: {}
 };
 
 export default withNextIntl(nextConfig);
