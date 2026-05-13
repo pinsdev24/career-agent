@@ -6,7 +6,6 @@ from app.exceptions import CVParsingError
 from app.tools.cv_parser import parse_pdf
 
 
-
 class TestParsePdf:
     """Unit tests for PDF text extraction via PyMuPDF."""
 
@@ -48,3 +47,28 @@ class TestParsePdf:
 
         with pytest.raises(CVParsingError, match="No readable text"):
             parse_pdf(pdf_bytes)
+
+    def test_rejects_pdf_above_page_limit(self) -> None:
+        import fitz
+
+        doc = fitz.open()
+        for _ in range(3):
+            page = doc.new_page()
+            page.insert_text((50, 72), "CV content")
+        pdf_bytes = doc.tobytes()
+        doc.close()
+
+        with pytest.raises(CVParsingError, match="too many pages"):
+            parse_pdf(pdf_bytes, max_pages=2)
+
+    def test_rejects_extracted_text_above_limit(self) -> None:
+        import fitz
+
+        doc = fitz.open()
+        page = doc.new_page()
+        page.insert_text((50, 72), "A" * 200)
+        pdf_bytes = doc.tobytes()
+        doc.close()
+
+        with pytest.raises(CVParsingError, match="too large"):
+            parse_pdf(pdf_bytes, max_text_chars=50)

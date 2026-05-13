@@ -14,6 +14,7 @@ from httpx import ASGITransport, AsyncClient
 # ---------------------------------------------------------------------------
 
 os.environ.setdefault("OPENAI_API_KEY", "sk-test-fake-key-for-testing")
+os.environ.setdefault("MOONSHOT_API_KEY", "mk-test-fake-key-for-testing")
 os.environ.setdefault("TAVILY_API_KEY", "tvly-test-fake-key-for-testing")
 os.environ.setdefault("SUPABASE_URL", "https://nbyxjxjpzvovxhoelkzx.supabase.co")
 os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-service-key")
