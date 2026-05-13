@@ -56,6 +56,15 @@ class Settings(BaseSettings):
     max_revisions: int = 3
     critic_threshold: int = 75
 
+    # --- Security limits ---
+    max_cv_upload_bytes: int = 5 * 1024 * 1024
+    max_cv_pdf_pages: int = 10
+    max_cv_text_chars: int = 50_000
+    cv_upload_rate_limit: int = 5
+    cv_upload_rate_window_seconds: int = 15 * 60
+    pipeline_start_rate_limit: int = 10
+    pipeline_start_rate_window_seconds: int = 60 * 60
+
 
 @lru_cache
 def get_settings() -> Settings:

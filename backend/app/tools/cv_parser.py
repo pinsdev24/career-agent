@@ -62,7 +62,12 @@ SYSTEM_PROMPT = (
 # ---------------------------------------------------------------------------
 
 
-def parse_pdf(file_bytes: bytes) -> str:
+def parse_pdf(
+    file_bytes: bytes,
+    *,
+    max_pages: int | None = None,
+    max_text_chars: int | None = None,
+) -> str:
     """Extract raw text from a PDF file using PyMuPDF.
 
     Args:
@@ -79,12 +84,25 @@ def parse_pdf(file_bytes: bytes) -> str:
 
     try:
         doc = fitz.open(stream=file_bytes, filetype="pdf")
-        pages: list[str] = []
-        for page in doc:
-            text = page.get_text("text")
-            if text.strip():
-                pages.append(text)
-        doc.close()
+        try:
+            if max_pages is not None and doc.page_count > max_pages:
+                raise CVParsingError(
+                    f"PDF has too many pages ({doc.page_count}); maximum is {max_pages}"
+                )
+
+            pages: list[str] = []
+            total_chars = 0
+            for page in doc:
+                text = page.get_text("text")
+                if text.strip():
+                    pages.append(text)
+                    total_chars += len(text)
+                if max_text_chars is not None and total_chars > max_text_chars:
+                    raise CVParsingError(
+                        "Extracted CV text is too large; please upload a shorter PDF"
+                    )
+        finally:
+            doc.close()
 
         if not pages:
             raise CVParsingError("No readable text found in the PDF")

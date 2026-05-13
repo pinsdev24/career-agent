@@ -17,6 +17,7 @@ from app.models.schemas import (
     PipelineStatus,
     PipelineStatusResponse,
 )
+from app.rate_limit import rate_limit_pipeline_start
 from app.tools.supabase_ops import create_pipeline_run, get_pipeline_run, get_user_runs
 
 router = APIRouter()
@@ -28,6 +29,7 @@ async def start_pipeline(
     data: PipelineStartRequest,
     user: Annotated[dict, Depends(get_current_user)],
     supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+    _rate_limit: Annotated[None, Depends(rate_limit_pipeline_start)],
 ) -> PipelineStatusResponse:
     """Start a new pipeline run.
 

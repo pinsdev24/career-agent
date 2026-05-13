@@ -51,6 +51,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def enforce_cv_upload_content_length(
+    request: Request,
+    call_next,
+):
+    """Reject obviously oversized CV uploads before multipart parsing."""
+    if request.method == "POST" and request.url.path == "/profile/cv":
+        settings = get_settings()
+        content_length = request.headers.get("content-length")
+        if content_length is not None:
+            try:
+                # Allow a little room for multipart headers/boundaries.
+                max_request_bytes = settings.max_cv_upload_bytes + 64 * 1024
+                if int(content_length) > max_request_bytes:
+                    return JSONResponse(
+                        status_code=413,
+                        content={"detail": "CV upload is too large"},
+                    )
+            except ValueError:
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": "Invalid Content-Length header"},
+                )
+
+    return await call_next(request)
+
 # ---------------------------------------------------------------------------
 # Exception handlers
 # ---------------------------------------------------------------------------
