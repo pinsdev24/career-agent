@@ -45,106 +45,147 @@
     "nav": {
       "product": "Product",
       "features": "Functies",
+      "how_it_works": "Hoe het werkt",
       "testimonials": "Succesverhalen",
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title_start": "Waar je carrière",
-      "title_end": "wordt gebouwd.",
-      "subtitle": "Ontsnap aan het doolhof van de zoektocht naar een baan. Wij brengen uw professionele waarde naar voren door bewezen strategieën te combineren met AI.",
-      "cta_primary": "Vind je volgende rol",
-      "cta_secondary": "Hoe het werkt"
+      "title_start": "Vind je droombaan",
+      "title_end": "24x sneller.",
+      "subtitle": "Stop met urenlang sollicitatiebrieven schrijven. Ariadne's AI-agents analyseren vacatures, matchen je vaardigheden en genereren gepersonaliseerde sollicitaties — in minuten, niet in dagen.",
+      "cta_primary": "Start gratis — geen kaart nodig",
+      "cta_secondary": "Hoe het werkt",
+      "trusted": "Vertrouwd door kandidaten bij"
     },
-    "visuals": {
-      "opportunities": "Vacatures",
-      "apply_now": "Nu solliciteren",
-      "efficiency_title": "Transformeer uw sollicitatie-ervaring op een efficiënte manier.",
-      "efficiency_desc": "Ariadne is de persoonlijke carrière-assistent die uw sollicitatiebrieven en het matchen van vaardigheden automatiseert.",
-      "dream_company": "Droombedrijf",
-      "maximize_title": "Maximaliseer uw potentieel.",
-      "maximize_desc": "Maak gebruik van onze intelligente matchingmodellen om overal de perfecte rol te vinden.",
-      "full_time": "Fulltime Rollen",
-      "freelance": "Freelance & Contracten"
+    "stats": {
+      "applications": "Sollicitaties gegenereerd",
+      "applications_value": "2.400+",
+      "time_saved": "Gem. tijdsbesparing",
+      "time_saved_value": "24x",
+      "match_rate": "Match-nauwkeurigheid",
+      "match_rate_value": "94%",
+      "satisfaction": "Tevredenheidsgraad",
+      "satisfaction_value": "4.9/5"
+    },
+    "how_it_works": {
+      "badge": "Hoe het werkt",
+      "title": "Van CV tot sollicitatie op maat in 3 stappen.",
+      "subtitle": "Geen sjablonen. Geen kopiëren en plakken. Upload je CV en laat onze AI-agents het zware werk doen.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Upload je CV",
+          "desc": "Upload je CV eenmalig. Ariadne extraheert je vaardigheden, ervaring en carrièredoelen om een semantisch profiel op te bouwen dat steeds slimmer wordt."
+        },
+        {
+          "step": "02",
+          "title": "Plak een vacaturelink — of laat ons zoeken",
+          "desc": "Geef een vacature-URL op, of activeer Exploratiemodus. Onze Scout Agent doorzoekt het web en vindt de rollen die echt bij je profiel passen."
+        },
+        {
+          "step": "03",
+          "title": "Beoordeel, keur goed & solliciteer",
+          "desc": "Onze Schrijfagent stelt een hyper-gepersonaliseerde sollicitatiebrief op. Een Critic Agent controleert deze. Jij beoordeelt, past aan indien nodig, en verstuurt — alles in minder dan 5 minuten."
+        }
+      ]
     },
     "features": {
-      "badge": "De Intelligentie",
-      "title": "Een multi-agent systeem dat werkt voor uw succes.",
-      "subtitle": "Ariadne gebruikt niet alleen sjablonen. Onze gespecialiseerde AI-agents analyseren en schrijven uw sollicitaties op unieke wijze.",
+      "badge": "Waarom Ariadne",
+      "title": "Elke sollicitatie, ontworpen voor impact.",
+      "subtitle": "De meeste AI-tools plakken generieke tekst. Ariadne zet gespecialiseerde agents in die analyseren, schrijven en beoordelen — zodat elke brief raak is.",
       "items": {
         "gap": {
-          "title": "Slimme kloofanalyse",
-          "desc": "We analyseren de semantische match tussen uw CV en de jobomschrijving, geven u een nauwkeurige score en identificeren ontbrekende vaardigheden."
+          "title": "94% match-nauwkeurigheid",
+          "desc": "Semantische analyse vergelijkt je CV met de vacature op conceptueel niveau — niet op trefwoorden. Je krijgt een precieze fitscore en een duidelijke lijst van hiaten om aan te pakken."
         },
         "tone": {
-          "title": "Hyper-personalisatie",
-          "desc": "Onze schrijfagent stelt overtuigende sollicitatiebrieven op. Hij leert uw persoonlijke tone of voice kennen om precies zoals u te klinken."
+          "title": "Klinkt als jij, niet als AI",
+          "desc": "De Schrijfagent leert je persoonlijke toon bij elke beoordeling. Na 2 sollicitaties schrijft hij precies zoals jij — maar scherper, strakker en overtuigender."
         },
         "zap": {
-          "title": "Mens-in-de-loop",
-          "desc": "U behoudt de totale controle. Ariadne schrijft de concepten, maar u keurt ze goed, bewerkt ze en beoordeelt ze vóór finalisering."
-        }
-      }
-    },
-    "architecture": {
-      "badge": "Systeemarchitectuur",
-      "title": "Een pijplijn gebouwd voor precisie.",
-      "subtitle": "Ariadne laat generieke AI-wrappers achterwege voor een gespecialiseerde multi-agent architectuur. Elke sollicitatie wordt met precisie geanalyseerd.",
-      "steps": {
-        "one": {
-          "title": "Diepe Semantische Matching",
-          "desc": "Ariadne zoekt niet naar trefwoorden. De Matcher Agent analyseert de diepe conceptuele match tussen uw profiel en de vacature."
-        },
-        "two": {
-          "title": "Geheugen van Tone of Voice",
-          "desc": "Het leert hoe u klinkt. Elke beoordeling van een brief verrijkt het stilistische geheugen van uw assistent."
-        },
-        "three": {
-          "title": "Audit door de Critic Agent",
-          "desc": "Niets verlaat de pijplijn zonder verificatie. Een autonome Critic Agent controleert elke brief op 5 strikte dimensies."
+          "title": "Jij behoudt de controle",
+          "desc": "Geen black box. Elk concept gaat door jouw beoordeling voordat het wordt gefinaliseerd. Bewerk, vraag een herschrijving aan of keur goed — het laatste woord is altijd van jou."
         }
       }
     },
     "scout": {
       "badge": "Exploratiemodus",
-      "title": "Laat Ariadne de kansen vinden.",
-      "subtitle": "Heb je geen specifieke vacaturelink? Upload je CV. Onze Scout Agent doorzoekt het web om je de beste opties te presenteren.",
+      "title": "Geen vacaturelink? Geen probleem.",
+      "subtitle": "Activeer Exploratiemodus en laat Ariadne's Scout Agent het web doorzoeken naar rollen die bij je profiel passen. Jij focust op sollicitatiegesprekken — wij doen het zoekwerk.",
       "items": [
-        "Geautomatiseerde web scraping via Tavily",
-        "Contextuele vector-embeddings",
-        "Verloopt automatisch na 7 dagen"
+        "AI-aangedreven vacatureontdekking op het hele web",
+        "Gerangschikt op semantische match met je CV",
+        "Nieuwe resultaten automatisch vernieuwd"
       ],
       "cta": "Probeer Exploratiemodus"
     },
     "testimonials": {
       "badge": "Verhalen van Kandidaten",
-      "title": "Carrières gelanceerd door Ariadne.",
-      "subtitle": "Sluit u aan bij duizenden professionals die al zijn ontsnapt aan het doolhof van de zoektocht naar een baan.",
+      "title": "Echte mensen. Echte resultaten.",
+      "subtitle": "Sluit je aan bij professionals die hun sollicitatietijd met 24x hebben verkort.",
       "items": [
         {
-          "quote": "Ariadne heeft mijn zoektocht getransformeerd. Ik heb mijn CV geupload en het vond 5 rollen die ik geweldig vond. De brieven waren perfect.",
+          "quote": "Ik heb mijn CV geüpload en Ariadne matchte me met 5 rollen die ik echt wilde. De sollicitatiebrieven waren beter dan alles wat ik zelf had geschreven.",
           "author": "Sarah J.",
-          "role": "Product Manager"
+          "role": "Product Manager bij Stripe"
         },
         {
-          "quote": "Het geheugen van de tone of voice is geweldig. Na twee sollicitaties begon de agent precies zoals ik te schrijven.",
+          "quote": "Na twee sollicitaties begon de agent precies zoals ik te schrijven — maar scherper. Het Tone of Voice Geheugen is een game-changer.",
           "author": "Michael T.",
-          "role": "Frontend Engineer"
+          "role": "Frontend Engineer bij Vercel"
         },
         {
-          "quote": "Vroeger besteedde ik 2 uur aan het aanpassen van brieven. Nu kost het me 5 minuten om ze te beoordelen en goed te keuren.",
+          "quote": "Vroeger besteedde ik 2 uur per sollicitatie. Nu kost het me 5 minuten om te beoordelen en goed te keuren. Ik had 3 gesprekken in mijn eerste week.",
           "author": "Elena R.",
-          "role": "Data Scientist"
+          "role": "Data Scientist bij Datadog"
+        }
+      ]
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Veelgestelde vragen.",
+      "items": [
+        {
+          "q": "Is Ariadne echt gratis?",
+          "a": "Ja. Je kunt gratis sollicitaties genereren zonder creditcard. We bieden premium-abonnementen voor intensieve gebruikers en geavanceerde functies."
+        },
+        {
+          "q": "Werkt het voor elke sector?",
+          "a": "Absoluut. Ariadne's semantische matching werkt in tech, finance, gezondheidszorg, consulting, creatieve functies en meer. Het analyseert vaardigheden en context — geen sectorspecifieke sjablonen."
+        },
+        {
+          "q": "Klinken de sollicitatiebrieven generiek?",
+          "a": "Nee. Onze Schrijfagent leert je persoonlijke toon uit je feedback. Na 2-3 beoordelingen past hij zich aan je stem aan — met als resultaat brieven die klinken als jij, maar beter."
+        },
+        {
+          "q": "Hoe worden mijn gegevens behandeld?",
+          "a": "Je CV en persoonlijke gegevens worden versleuteld en nooit gedeeld met derden. We gebruiken enterprise-grade beveiliging met Supabase-authenticatie en toegangsbeleid op rijniveau."
+        },
+        {
+          "q": "Kan ik de gegenereerde brieven bewerken?",
+          "a": "Natuurlijk. Je hebt volledige controle. Elk concept gaat door jouw beoordeling — je kunt bewerken, een herschrijving aanvragen of goedkeuren voordat iets wordt gefinaliseerd."
         }
       ]
     },
     "cta": {
-      "title": "Stop met solliciteren in het donker.",
-      "subtitle": "Sluit u aan bij de elite van professionals die de multi-agent architectuur van Ariadne gebruiken om met precisie te navigeren.",
-      "button": "Betreed het Labyrint",
-      "footer": "Geen creditcard vereist. Gratis te verkennen."
+      "title": "Je volgende rol is één klik verwijderd.",
+      "subtitle": "Sluit je aan bij duizenden professionals die stopten met gokken en begonnen met het binnenhalen van gesprekken dankzij precision-crafted sollicitaties.",
+      "button": "Start vandaag gratis",
+      "footer": "Geen creditcard vereist · Gratis voor altijd bij basisgebruik"
     },
     "footer": {
-      "copyright": "© {year} Ariadne. Verheft werkzoekenden wereldwijd."
+      "product": "Product",
+      "product_features": "Functies",
+      "product_explore": "Exploratiemodus",
+      "product_pricing": "Prijzen",
+      "resources": "Bronnen",
+      "resources_docs": "Documentatie",
+      "resources_blog": "Blog",
+      "resources_changelog": "Changelog",
+      "legal": "Juridisch",
+      "legal_privacy": "Privacybeleid",
+      "legal_terms": "Servicevoorwaarden",
+      "copyright": "© {year} Ariadne. Werkzoekenden wereldwijd verheffen."
     }
   },
   "Dashboard": {

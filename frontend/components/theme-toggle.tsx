@@ -5,29 +5,36 @@ import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-  const btnClass = (active: boolean) =>
-    `flex items-center justify-center p-2 rounded-md transition-all ${
-      active
-        ? "bg-background shadow-sm text-foreground"
-        : "text-muted-foreground hover:text-foreground"
-    }`;
+  // Avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 dark:border-[#333]">
+        <div className="h-4 w-4" />
+      </div>
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <div className="flex items-center gap-1 bg-muted p-1 rounded-lg border border-border">
-      <button onClick={() => setTheme("light")} className={btnClass(theme === "light")}>
-        <Sun className="h-4 w-4" />
-        <span className="sr-only">Light</span>
-      </button>
-      <button onClick={() => setTheme("system")} className={btnClass(theme === "system")}>
-        <Monitor className="h-4 w-4" />
-        <span className="sr-only">System</span>
-      </button>
-      <button onClick={() => setTheme("dark")} className={btnClass(theme === "dark")}>
-        <Moon className="h-4 w-4" />
-        <span className="sr-only">Dark</span>
-      </button>
-    </div>
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#111] transition-all text-[#111] dark:text-white"
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {isDark ? (
+        <Sun className="h-4 w-4 animate-in zoom-in duration-300" />
+      ) : (
+        <Moon className="h-4 w-4 animate-in zoom-in duration-300" />
+      )}
+      <span className="sr-only">Toggle theme</span>
+    </button>
   );
 }
