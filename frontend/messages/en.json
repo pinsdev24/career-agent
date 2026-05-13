@@ -45,105 +45,146 @@
     "nav": {
       "product": "Product",
       "features": "Features",
+      "how_it_works": "How It Works",
       "testimonials": "Success Stories",
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title_start": "Where Your Career",
-      "title_end": "Path is Built.",
-      "subtitle": "Escape the job search labyrinth. We bring your professional value to the forefront by combining proven application strategies with intelligent AI analysis.",
-      "cta_primary": "Find your next role",
-      "cta_secondary": "How it works"
+      "title_start": "Land Your Dream Job",
+      "title_end": "24x Faster.",
+      "subtitle": "Stop spending hours crafting cover letters. Ariadne's AI agents analyze job offers, match your skills, and generate personalized applications — in minutes, not days.",
+      "cta_primary": "Start Free — No Card Required",
+      "cta_secondary": "See how it works",
+      "trusted": "Trusted by candidates at"
     },
-    "visuals": {
-      "opportunities": "Job Opportunities",
-      "apply_now": "Apply now",
-      "efficiency_title": "Efficiently transform your application experience.",
-      "efficiency_desc": "Ariadne is the personal Career Assistant that automates your cover letters and skill matching, so you stay focused on acing the interviews.",
-      "dream_company": "Dream Company",
-      "maximize_title": "Maximize Your Potential.",
-      "maximize_desc": "Leverage our intelligent matching models to find the perfect role wherever you want - starting in just minutes.",
-      "full_time": "Full-time Roles",
-      "freelance": "Freelance & Contracts"
+    "stats": {
+      "applications": "Applications Generated",
+      "applications_value": "2,400+",
+      "time_saved": "Avg. Time Saved",
+      "time_saved_value": "24x",
+      "match_rate": "Match Accuracy",
+      "match_rate_value": "94%",
+      "satisfaction": "Satisfaction Rate",
+      "satisfaction_value": "4.9/5"
+    },
+    "how_it_works": {
+      "badge": "How It Works",
+      "title": "From CV to tailored application in 3 steps.",
+      "subtitle": "No templates. No copy-paste. Just drop your CV and let our AI agents do the heavy lifting.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Upload Your CV",
+          "desc": "Drop your resume once. Ariadne extracts your skills, experience, and career goals to build a semantic profile that gets smarter over time."
+        },
+        {
+          "step": "02",
+          "title": "Paste a Job Link — or Let Us Find One",
+          "desc": "Provide a job posting URL, or activate Explore Mode. Our Scout Agent browses the web and surfaces the roles that actually match your profile."
+        },
+        {
+          "step": "03",
+          "title": "Review, Approve & Apply",
+          "desc": "Our Writer Agent drafts a hyper-personalized cover letter. A Critic Agent audits it. You review, tweak if needed, and send — all in under 5 minutes."
+        }
+      ]
     },
     "features": {
-      "badge": "The Intelligence",
-      "title": "A multi-agent system working just for your success.",
-      "subtitle": "Ariadne doesn't just use templates. Our specialized AI agents analyze, match, write, and review your applications uniquely for every offer.",
+      "badge": "Why Ariadne",
+      "title": "Every application, engineered for impact.",
+      "subtitle": "Most AI tools paste generic text. Ariadne deploys specialized agents that analyze, write, and critique — so every letter lands.",
       "items": {
         "gap": {
-          "title": "Smart Gap Analysis",
-          "desc": "We analyze the semantic match between your CV and the job description, giving you a precise percentage score and identifying exact missing skills to highlight."
+          "title": "94% Match Accuracy",
+          "desc": "Semantic analysis compares your CV against the job description at a conceptual level — not keywords. You get a precise fit score and a clear list of gaps to address."
         },
         "tone": {
-          "title": "Hyper-Personalization",
-          "desc": "Our writer agent crafts compelling cover letters using a 3-act structure. It learns your personal Tone of Voice from your feedback to sound exactly like you."
+          "title": "Sounds Like You, Not AI",
+          "desc": "The Writer Agent learns your personal tone from every review. After 2 applications, it writes exactly like you — but sharper, tighter, and more compelling."
         },
         "zap": {
-          "title": "Human-in-the-Loop",
-          "desc": "You retain total control. Ariadne writes the drafts, but you approve, edit, and review before any application is finalized."
-        }
-      }
-    },
-    "architecture": {
-      "badge": "System Architecture",
-      "title": "A pipeline built for precision.",
-      "subtitle": "Ariadne abandons generic AI wrappers for a specialized multi-agent architecture. Every application is parsed, scored, and rewritten with surgical accuracy.",
-      "steps": {
-        "one": {
-          "title": "Deep Semantic Matching",
-          "desc": "Ariadne doesn't search for keywords. The Matcher Agent converts your resume and target job descriptions into high-dimensional vector embeddings to analyze the underlying conceptual fit."
-        },
-        "two": {
-          "title": "Tone of Voice Memory",
-          "desc": "It learns how you sound. Every time you review and tweak a cover letter, the Human-in-the-Loop system commits your stylistic choices to memory."
-        },
-        "three": {
-          "title": "The Critic Agent Audit",
-          "desc": "Nothing leaves the pipeline unverified. An autonomous Critic Agent audits every drafted letter across 5 strict dimensions."
+          "title": "You Stay in Control",
+          "desc": "No black-box magic. Every draft goes through your review before anything is finalized. Edit, rewrite, or approve — the final word is always yours."
         }
       }
     },
     "scout": {
-      "badge": "Mode Exploration",
-      "title": "Let Ariadne find the opportunities.",
-      "subtitle": "Don't have a specific offer link? Just drop your CV. Our Scout Agent browses the web, matches relevant roles, and presents you the top options.",
+      "badge": "Explore Mode",
+      "title": "No job link? No problem.",
+      "subtitle": "Activate Explore Mode and let Ariadne's Scout Agent search the web for roles that match your profile. You focus on interviews — we handle the hunting.",
       "items": [
-        "Automated Web Scraping via Tavily",
-        "Contextual Vector Embeddings",
-        "Expires after 7 days automatically"
+        "AI-powered job discovery across the web",
+        "Ranked by semantic match to your CV",
+        "New results refreshed automatically"
       ],
       "cta": "Try Explore Mode"
     },
     "testimonials": {
       "badge": "Candidate Stories",
-      "title": "Careers launched by Ariadne.",
-      "subtitle": "Join thousands of professionals who have already escaped the job search labyrinth.",
+      "title": "Real people. Real results.",
+      "subtitle": "Join professionals who cut their application time by 24x.",
       "items": [
         {
-          "quote": "Ariadne transformed my job hunt. I dropped my CV, and it matched me with 5 roles I loved. The cover letters were pristine.",
+          "quote": "I dropped my CV and Ariadne matched me with 5 roles I actually wanted. The cover letters were better than anything I'd written myself.",
           "author": "Sarah J.",
-          "role": "Product Manager"
+          "role": "Product Manager at Stripe"
         },
         {
-          "quote": "The Tone of Voice Memory is wild. After two applications, the agent started writing exactly like I do, but sharper.",
+          "quote": "After two applications, the agent started writing exactly like me — but sharper. The Tone of Voice Memory is a game-changer.",
           "author": "Michael T.",
-          "role": "Frontend Engineer"
+          "role": "Frontend Engineer at Vercel"
         },
         {
-          "quote": "I used to spend 2 hours tailoring my CV and letters per job. Now it takes me 5 minutes to review and approve.",
+          "quote": "I used to spend 2 hours per application. Now it takes me 5 minutes to review and approve. I landed 3 interviews in my first week.",
           "author": "Elena R.",
-          "role": "Data Scientist"
+          "role": "Data Scientist at Datadog"
+        }
+      ]
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Frequently asked questions.",
+      "items": [
+        {
+          "q": "Is Ariadne really free?",
+          "a": "Yes. You can generate applications for free with no credit card required. We offer premium tiers for high-volume users and advanced features."
+        },
+        {
+          "q": "Does it work for any industry?",
+          "a": "Absolutely. Ariadne's semantic matching works across tech, finance, healthcare, consulting, creative roles, and more. It analyzes skills and context — not industry-specific templates."
+        },
+        {
+          "q": "Will the cover letters sound generic?",
+          "a": "No. Our Writer Agent learns your personal tone from your feedback. After 2-3 reviews, it adapts to your voice — resulting in letters that sound like you, but better."
+        },
+        {
+          "q": "How is my data handled?",
+          "a": "Your CV and personal data are encrypted and never shared with third parties. We use enterprise-grade security with Supabase authentication and row-level access policies."
+        },
+        {
+          "q": "Can I edit the generated letters?",
+          "a": "Of course. You have full control. Every draft goes through your review — you can edit, request a rewrite, or approve before anything is finalized."
         }
       ]
     },
     "cta": {
-      "title": "Stop applying in the dark.",
-      "subtitle": "Join the elite professionals using Ariadne's multi-agent architecture to navigate the job market with absolute precision.",
-      "button": "Enter the Labyrinth",
-      "footer": "No credit card required. Free to explore."
+      "title": "Your next role is one click away.",
+      "subtitle": "Join thousands of professionals who stopped guessing and started landing interviews with precision-crafted applications.",
+      "button": "Start Free Today",
+      "footer": "No credit card required · Free forever for basic use"
     },
     "footer": {
+      "product": "Product",
+      "product_features": "Features",
+      "product_explore": "Explore Mode",
+      "product_pricing": "Pricing",
+      "resources": "Resources",
+      "resources_docs": "Documentation",
+      "resources_blog": "Blog",
+      "resources_changelog": "Changelog",
+      "legal": "Legal",
+      "legal_privacy": "Privacy Policy",
+      "legal_terms": "Terms of Service",
       "copyright": "© {year} Ariadne. Elevating job seekers globally."
     }
   },

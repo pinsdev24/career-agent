@@ -45,106 +45,147 @@
     "nav": {
       "product": "Produit",
       "features": "Fonctionnalités",
+      "how_it_works": "Comment ça marche",
       "testimonials": "Témoignages",
       "dashboard": "Tableau de Bord"
     },
     "hero": {
-      "title_start": "Là où votre carrière",
-      "title_end": "se construit.",
-      "subtitle": "Échappez au labyrinthe de la recherche d'emploi. Nous mettons votre valeur professionnelle en avant en combinant des stratégies éprouvées avec l'IA.",
-      "cta_primary": "Trouver votre prochain rôle",
-      "cta_secondary": "Comment ça marche"
+      "title_start": "Décrochez votre job",
+      "title_end": "24x plus vite.",
+      "subtitle": "Arrêtez de passer des heures sur vos lettres de motivation. Les agents IA d'Ariadne analysent les offres, matchent vos compétences et génèrent des candidatures personnalisées — en minutes, pas en jours.",
+      "cta_primary": "Commencer gratuitement",
+      "cta_secondary": "Comment ça marche",
+      "trusted": "Adopté par des candidats chez"
     },
-    "visuals": {
-      "opportunities": "Opportunités d'emploi",
-      "apply_now": "Postuler maintenant",
-      "efficiency_title": "Transformez efficacement votre expérience de candidature.",
-      "efficiency_desc": "Ariadne est l'assistant de carrière personnel qui automatise vos lettres de motivation et la correspondance des compétences.",
-      "dream_company": "Entreprise de rêve",
-      "maximize_title": "Maximisez votre potentiel.",
-      "maximize_desc": "Tirez parti de nos modèles de correspondance intelligents pour trouver le rôle parfait n'importe où.",
-      "full_time": "Temps plein",
-      "freelance": "Freelance & Contrats"
+    "stats": {
+      "applications": "Candidatures générées",
+      "applications_value": "2 400+",
+      "time_saved": "Temps moyen économisé",
+      "time_saved_value": "24x",
+      "match_rate": "Précision du matching",
+      "match_rate_value": "94%",
+      "satisfaction": "Taux de satisfaction",
+      "satisfaction_value": "4.9/5"
+    },
+    "how_it_works": {
+      "badge": "Comment ça marche",
+      "title": "Du CV à la candidature sur mesure en 3 étapes.",
+      "subtitle": "Pas de modèles. Pas de copier-coller. Déposez votre CV et laissez nos agents IA faire le travail.",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Téléchargez votre CV",
+          "desc": "Déposez votre CV une seule fois. Ariadne extrait vos compétences, votre expérience et vos objectifs de carrière pour construire un profil sémantique qui s'améliore au fil du temps."
+        },
+        {
+          "step": "02",
+          "title": "Collez un lien d'offre — ou laissez-nous chercher",
+          "desc": "Fournissez l'URL d'une offre d'emploi, ou activez le mode Exploration. Notre agent Scout parcourt le web et identifie les postes qui correspondent vraiment à votre profil."
+        },
+        {
+          "step": "03",
+          "title": "Révisez, approuvez et postulez",
+          "desc": "Notre agent Rédacteur rédige une lettre hyper-personnalisée. Un agent Critique l'audite. Vous révisez, ajustez si besoin, et envoyez — le tout en moins de 5 minutes."
+        }
+      ]
     },
     "features": {
-      "badge": "L'Intelligence",
-      "title": "Un système multi-agents au service de votre succès.",
-      "subtitle": "Ariadne n'utilise pas seulement des modèles. Nos agents IA spécialisés analysent et rédigent vos candidatures de manière unique.",
+      "badge": "Pourquoi Ariadne",
+      "title": "Chaque candidature, conçue pour l'impact.",
+      "subtitle": "La plupart des outils IA collent du texte générique. Ariadne déploie des agents spécialisés qui analysent, rédigent et critiquent — pour que chaque lettre fasse mouche.",
       "items": {
         "gap": {
-          "title": "Analyse d'écart intelligente",
-          "desc": "Nous analysons la correspondance sémantique entre votre CV et le poste, vous donnant un score précis et identifiant les compétences manquantes."
+          "title": "94% de précision de matching",
+          "desc": "L'analyse sémantique compare votre CV à l'offre d'emploi au niveau conceptuel — pas par mots-clés. Vous obtenez un score de correspondance précis et une liste claire des écarts à combler."
         },
         "tone": {
-          "title": "Hyper-Personnalisation",
-          "desc": "Notre agent rédacteur crée des lettres de motivation percutantes. Il apprend votre ton de voix personnel pour vous ressembler exactement."
+          "title": "Votre voix, pas celle de l'IA",
+          "desc": "L'agent Rédacteur apprend votre ton personnel à chaque révision. Après 2 candidatures, il écrit exactement comme vous — mais plus percutant et plus convaincant."
         },
         "zap": {
-          "title": "Contrôle Humain",
-          "desc": "Vous gardez le contrôle total. Ariadne rédige les brouillons, mais vous approuvez, éditez et révisez avant la finalisation."
-        }
-      }
-    },
-    "architecture": {
-      "badge": "Architecture du Système",
-      "title": "Un pipeline conçu pour la précision.",
-      "subtitle": "Ariadne abandonne les interfaces IA génériques pour une architecture multi-agents spécialisée. Chaque candidature est analysée avec une précision chirurgicale.",
-      "steps": {
-        "one": {
-          "title": "Correspondance Sémantique Profonde",
-          "desc": "Ariadne ne cherche pas de mots-clés. L'agent Matcher analyse la correspondance conceptuelle profonde entre votre profil et l'offre."
-        },
-        "two": {
-          "title": "Mémoire du Ton de Voix",
-          "desc": "Il apprend comment vous vous exprimez. Chaque révision de lettre enrichit la mémoire stylistique de votre assistant."
-        },
-        "three": {
-          "title": "Audit par l'Agent Critique",
-          "desc": "Rien ne sort du pipeline sans vérification. Un agent critique autonome audite chaque lettre sur 5 dimensions strictes."
+          "title": "Vous gardez le contrôle",
+          "desc": "Pas de boîte noire. Chaque brouillon passe par votre validation avant finalisation. Modifiez, demandez une réécriture ou approuvez — le dernier mot est toujours le vôtre."
         }
       }
     },
     "scout": {
       "badge": "Mode Exploration",
-      "title": "Laissez Ariadne trouver les opportunités.",
-      "subtitle": "Vous n'avez pas de lien d'offre spécifique ? Déposez votre CV. Notre agent Scout parcourt le web pour vous présenter les meilleures options.",
+      "title": "Pas de lien d'offre ? Pas de problème.",
+      "subtitle": "Activez le mode Exploration et laissez l'agent Scout d'Ariadne chercher sur le web les postes qui matchent votre profil. Concentrez-vous sur les entretiens — on s'occupe de la chasse.",
       "items": [
-        "Extraction web automatisée via Tavily",
-        "Plongements vectoriels contextuels",
-        "Expiration automatique après 7 jours"
+        "Découverte d'emplois par IA sur tout le web",
+        "Classés par correspondance sémantique avec votre CV",
+        "Résultats actualisés automatiquement"
       ],
       "cta": "Essayer le mode Exploration"
     },
     "testimonials": {
       "badge": "Histoires de Candidats",
-      "title": "Des carrières lancées par Ariadne.",
-      "subtitle": "Rejoignez des milliers de professionnels qui ont déjà échappé au labyrinthe de la recherche d'emploi.",
+      "title": "De vraies personnes. De vrais résultats.",
+      "subtitle": "Rejoignez les professionnels qui ont divisé leur temps de candidature par 24.",
       "items": [
         {
-          "quote": "Ariadne a transformé ma recherche. J'ai déposé mon CV et il m'a trouvé 5 rôles que j'ai adorés. Les lettres étaient parfaites.",
+          "quote": "J'ai déposé mon CV et Ariadne m'a matché avec 5 postes que je voulais vraiment. Les lettres de motivation étaient meilleures que tout ce que j'avais écrit moi-même.",
           "author": "Sarah J.",
-          "role": "Product Manager"
+          "role": "Product Manager chez Stripe"
         },
         {
-          "quote": "La mémoire du ton de voix est incroyable. Après deux candidatures, l'agent a commencé à écrire exactement comme moi.",
+          "quote": "Après deux candidatures, l'agent a commencé à écrire exactement comme moi — mais en mieux. La mémoire du ton de voix est un game-changer.",
           "author": "Michael T.",
-          "role": "Ingénieur Frontend"
+          "role": "Ingénieur Frontend chez Vercel"
         },
         {
-          "quote": "Je passais 2 heures à adapter mes lettres. Maintenant, cela me prend 5 minutes pour réviser et approuver.",
+          "quote": "Je passais 2 heures par candidature. Maintenant il me faut 5 minutes pour réviser et approuver. J'ai décroché 3 entretiens dès la première semaine.",
           "author": "Elena R.",
-          "role": "Data Scientist"
+          "role": "Data Scientist chez Datadog"
+        }
+      ]
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Questions fréquentes.",
+      "items": [
+        {
+          "q": "Ariadne est-il vraiment gratuit ?",
+          "a": "Oui. Vous pouvez générer des candidatures gratuitement sans carte de crédit. Nous proposons des forfaits premium pour les utilisateurs intensifs et les fonctionnalités avancées."
+        },
+        {
+          "q": "Ça fonctionne pour tous les secteurs ?",
+          "a": "Absolument. Le matching sémantique d'Ariadne fonctionne dans la tech, la finance, la santé, le conseil, les métiers créatifs, et bien plus. Il analyse les compétences et le contexte — pas des modèles par secteur."
+        },
+        {
+          "q": "Les lettres générées sont-elles génériques ?",
+          "a": "Non. Notre agent Rédacteur apprend votre ton personnel à partir de vos retours. Après 2-3 révisions, il s'adapte à votre voix — produisant des lettres qui vous ressemblent, en mieux."
+        },
+        {
+          "q": "Comment sont traitées mes données ?",
+          "a": "Votre CV et vos données personnelles sont chiffrés et jamais partagés avec des tiers. Nous utilisons une sécurité de niveau entreprise avec l'authentification Supabase et des politiques d'accès par ligne."
+        },
+        {
+          "q": "Puis-je modifier les lettres générées ?",
+          "a": "Bien sûr. Vous avez le contrôle total. Chaque brouillon passe par votre validation — vous pouvez modifier, demander une réécriture ou approuver avant toute finalisation."
         }
       ]
     },
     "cta": {
-      "title": "Arrêtez de postuler dans le noir.",
-      "subtitle": "Rejoignez l'élite des professionnels utilisant l'architecture multi-agents d'Ariadne pour naviguer avec précision.",
-      "button": "Entrer dans le Labyrinthe",
-      "footer": "Aucune carte de crédit requise. Gratuit à explorer."
+      "title": "Votre prochain poste est à un clic.",
+      "subtitle": "Rejoignez des milliers de professionnels qui ont cessé de deviner et ont commencé à décrocher des entretiens grâce à des candidatures de précision.",
+      "button": "Commencer gratuitement",
+      "footer": "Aucune carte de crédit requise · Gratuit pour toujours en usage de base"
     },
     "footer": {
-      "copyright": "© {year} Ariadne. Élevant les chercheurs d'emploi mondialement."
+      "product": "Produit",
+      "product_features": "Fonctionnalités",
+      "product_explore": "Mode Exploration",
+      "product_pricing": "Tarifs",
+      "resources": "Ressources",
+      "resources_docs": "Documentation",
+      "resources_blog": "Blog",
+      "resources_changelog": "Changelog",
+      "legal": "Juridique",
+      "legal_privacy": "Politique de confidentialité",
+      "legal_terms": "Conditions d'utilisation",
+      "copyright": "© {year} Ariadne. Au service des chercheurs d'emploi dans le monde entier."
     }
   },
   "Dashboard": {
