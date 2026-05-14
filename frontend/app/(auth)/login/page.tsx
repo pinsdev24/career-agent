@@ -55,12 +55,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen font-sans bg-[#FDFDFC] text-[#111111] selection:bg-orange-500/30">
+    <div className="relative flex min-h-screen font-sans bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#111111] dark:text-white selection:bg-orange-500/30 transition-colors duration-300">
       {/* Visual left panel (hidden on mobile) */}
-      <div className="hidden lg:flex flex-1 relative bg-[#F4F3F0] p-12 overflow-hidden flex-col justify-between border-r border-[#E8E6E1]">
+      <div className="hidden lg:flex flex-1 relative bg-[#F4F3F0] dark:bg-[#111] p-12 overflow-hidden flex-col justify-between border-r border-[#E8E6E1] dark:border-[#222] transition-colors duration-300">
         {/* Subtle Background Grid */}
         <div 
-          className="absolute inset-0 pointer-events-none z-0 opacity-[0.05]"
+          className="absolute inset-0 pointer-events-none z-0 opacity-[0.05] dark:opacity-[0.03]"
           style={{
             backgroundImage: `
               linear-gradient(to right, #000 1px, transparent 1px),
@@ -79,55 +79,55 @@ export default function LoginPage() {
           <div className="flex items-center justify-center gap-3 md:gap-5">
             
             {/* Left Card */}
-            <div className="relative w-24 h-36 md:w-32 md:h-48 xl:w-40 xl:h-56 rounded-[2rem] overflow-hidden shadow-xl transform -translate-y-4 -rotate-6 hover:rotate-0 hover:z-20 hover:scale-105 transition-all duration-500 border-4 border-white bg-gray-100">
+            <div className="relative w-24 h-36 md:w-32 md:h-48 xl:w-40 xl:h-56 rounded-[2rem] overflow-hidden shadow-xl transform -translate-y-4 -rotate-6 hover:rotate-0 hover:z-20 hover:scale-105 transition-all duration-500 border-4 border-white dark:border-[#333] bg-gray-100 dark:bg-[#1a1a1a]">
               <Image 
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" 
                 alt="Candidate 1" 
                 fill 
-                className="object-cover"
+                className="object-cover opacity-90 dark:opacity-80"
               />
             </div>
 
             {/* Center Card (Elevated) */}
-            <div className="relative w-28 h-44 md:w-36 md:h-56 xl:w-44 xl:h-64 rounded-[2.2rem] overflow-hidden shadow-2xl z-10 scale-105 hover:scale-110 transition-all duration-500 border-4 border-white bg-gray-100">
+            <div className="relative w-28 h-44 md:w-36 md:h-56 xl:w-44 xl:h-64 rounded-[2.2rem] overflow-hidden shadow-2xl z-10 scale-105 hover:scale-110 transition-all duration-500 border-4 border-white dark:border-[#333] bg-gray-100 dark:bg-[#1a1a1a]">
               <Image 
                 src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80" 
                 alt="Candidate 2" 
                 fill 
-                className="object-cover"
+                className="object-cover opacity-90 dark:opacity-80"
               />
               {/* Floating aesthetic tag */}
               <div className="absolute inset-x-0 bottom-4 flex justify-center">
-                <div className="bg-white dark:bg-[#111]/90 backdrop-blur-sm text-[#111111] text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> {t("sidebar.hired")}
+                <div className="bg-white/90 dark:bg-[#111]/90 backdrop-blur-md text-[#111111] dark:text-white text-[10px] md:text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 border border-white/20 dark:border-white/10">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> {t("sidebar.hired")}
                 </div>
               </div>
             </div>
 
             {/* Right Card */}
-            <div className="relative w-24 h-36 md:w-32 md:h-48 xl:w-40 xl:h-56 rounded-[2rem] overflow-hidden shadow-xl transform translate-y-6 rotate-6 hover:rotate-0 hover:z-20 hover:scale-105 transition-all duration-500 border-4 border-white bg-gray-100">
+            <div className="relative w-24 h-36 md:w-32 md:h-48 xl:w-40 xl:h-56 rounded-[2rem] overflow-hidden shadow-xl transform translate-y-6 rotate-6 hover:rotate-0 hover:z-20 hover:scale-105 transition-all duration-500 border-4 border-white dark:border-[#333] bg-gray-100 dark:bg-[#1a1a1a]">
               <Image 
                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80" 
                 alt="Candidate 3" 
                 fill 
-                className="object-cover"
+                className="object-cover opacity-90 dark:opacity-80"
               />
             </div>
           </div>
         </div>
         
         <div className="relative z-10 max-w-lg mb-12">
-          <h2 className="text-4xl font-medium tracking-tight mb-4 leading-tight">
+          <h2 className="text-4xl font-medium tracking-tight mb-4 leading-tight text-[#111111] dark:text-white">
             {t("sidebar.title")}
           </h2>
-          <p className="text-gray-500 font-light text-lg">
+          <p className="text-gray-500 dark:text-gray-400 font-light text-lg leading-relaxed">
             {t("sidebar.subtitle")}
           </p>
         </div>
       </div>
 
       {/* Right panel: Login form */}
-      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-24">
+      <div className="flex-1 flex flex-col justify-center px-8 sm:px-12 lg:px-24 bg-[#FDFDFC] dark:bg-[#0a0a0a] transition-colors duration-300">
         {/* Mobile Logo */}
         <div className="lg:hidden mb-12 flex justify-center">
           <Logo />
@@ -135,21 +135,21 @@ export default function LoginPage() {
 
         <div className="w-full max-w-md mx-auto space-y-8">
           <div className="space-y-2">
-            <h1 className="text-3xl font-medium tracking-tight">
+            <h1 className="text-3xl font-medium tracking-tight text-[#111111] dark:text-white">
               {isSignUp ? t("signup.title") : t("login.title")}
             </h1>
-            <p className="text-gray-500 text-sm font-light">
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-light">
               {isSignUp ? t("signup.subtitle") : t("login.subtitle")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("fields.email")}
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   id="email"
                   type="email"
@@ -157,17 +157,17 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder={t("fields.email_placeholder")}
-                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
+                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 dark:border-[#333] text-[#111111] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-[#111111] dark:focus:border-white focus:ring-[#111111]/10 dark:focus:ring-white/10 transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t("fields.password")}
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                   id="password"
                   type="password"
@@ -176,20 +176,20 @@ export default function LoginPage() {
                   required
                   minLength={6}
                   placeholder="••••••••"
-                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 focus:border-[#111111] focus:ring-[#111111]/20 transition-all"
+                  className="pl-10 h-12 rounded-xl bg-white dark:bg-[#111] border-gray-200 dark:border-[#333] text-[#111111] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:border-[#111111] dark:focus:border-white focus:ring-[#111111]/10 dark:focus:ring-white/10 transition-all"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+              <div className="flex items-center gap-2 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 p-3 text-sm text-red-600 dark:text-red-400">
                 <span className="shrink-0 font-medium">!</span>
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+              <div className="flex items-center gap-2 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 p-3 text-sm text-emerald-700 dark:text-emerald-400">
                 <span className="shrink-0 font-medium">✓</span>
                 {message}
               </div>
@@ -197,7 +197,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl bg-[#111111] text-white hover:bg-gray-800 hover:scale-[1.02] transform transition-all font-medium text-sm gap-2"
+              className="w-full h-12 rounded-xl bg-[#111111] dark:bg-white text-white dark:text-[#111] hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-[1.01] active:scale-[0.99] transform transition-all font-medium text-sm gap-2"
               disabled={loading}
             >
               {loading ? (
@@ -212,7 +212,7 @@ export default function LoginPage() {
           </form>
 
           {/* Toggle Login/Signup */}
-          <div className="text-center text-sm text-gray-500 pt-2">
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-2">
             {isSignUp ? t("signup.toggle_text") : t("login.toggle_text")}{" "}
             <button
               type="button"
@@ -221,7 +221,7 @@ export default function LoginPage() {
                 setError(null);
                 setMessage(null);
               }}
-              className="font-medium text-[#111111] hover:underline underline-offset-4 transition-all"
+              className="font-medium text-[#111111] dark:text-white hover:underline underline-offset-4 transition-all"
             >
               {isSignUp ? t("signup.toggle_btn") : t("login.toggle_btn")}
             </button>
