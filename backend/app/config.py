@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langsmith_project: str = "CareerAgent"
 
+    # --- Resend ---
+    resend_api_key: str
+    #from_email: str = "[EMAIL_ADDRESS]"
+
     # --- App ---
     frontend_url: str = "http://localhost:3000"
 

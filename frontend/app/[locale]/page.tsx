@@ -461,7 +461,7 @@ export default function LandingPage() {
                 />
               </div>
               <div className="relative z-10 max-w-3xl mx-auto">
-                <Logo />
+                <Logo variant="white" className="mx-auto" />
                 <h2 className="text-5xl md:text-6xl font-medium tracking-tight mb-8 text-white leading-tight mt-10">
                   {t("cta.title")}
                 </h2>

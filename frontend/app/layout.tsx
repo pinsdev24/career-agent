@@ -4,6 +4,7 @@ import "./globals.css";
 import { getLocale, getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from "@/components/theme-provider";
+import CookieBanner from "@/components/cookie-banner";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -46,6 +47,7 @@ export default async function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <CookieBanner />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

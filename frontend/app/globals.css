@@ -170,3 +170,65 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #ccc;
 }
+
+/* ─────────────── Cookie Banner Components ─────────────── */
+
+@layer components {
+  .cookie-banner {
+    @apply fixed bottom-4 right-4 z-[100] w-[340px] max-w-[calc(100vw-2rem)] p-5;
+    @apply bg-card/70 backdrop-blur-2xl border border-border/40 rounded-2xl shadow-2xl;
+    @apply flex flex-col gap-3 transition-all duration-300;
+  }
+
+  .cookie-banner__header {
+    @apply flex items-center gap-2.5 mb-0.5;
+  }
+
+  .cookie-banner__icon-wrap {
+    @apply w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center;
+  }
+
+  .cookie-banner__title {
+    @apply text-sm font-semibold tracking-tight text-foreground;
+  }
+
+  .cookie-banner__close {
+    @apply ml-auto p-1 rounded-full hover:bg-muted text-muted-foreground transition-colors;
+  }
+
+  .cookie-banner__body {
+    @apply text-[13px] leading-relaxed text-muted-foreground font-light;
+  }
+
+  .cookie-banner__details-toggle {
+    @apply text-[11px] font-medium text-primary hover:underline underline-offset-4 w-fit transition-all;
+  }
+
+  .cookie-banner__details {
+    @apply mt-1 flex flex-col gap-2.5 p-3.5 bg-muted/30 rounded-xl border border-border/20;
+  }
+
+  .cookie-banner__detail-row {
+    @apply flex gap-2.5 text-xs leading-snug text-muted-foreground;
+  }
+
+  .cookie-banner__detail-row strong {
+    @apply text-foreground font-semibold;
+  }
+
+  .cookie-banner__actions {
+    @apply flex gap-2.5 mt-1;
+  }
+
+  .cookie-banner__btn-sm {
+    @apply flex-1 h-9 px-3 rounded-lg text-xs font-medium transition-all duration-200 active:scale-95;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:opacity-90 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply bg-muted text-foreground hover:bg-accent border border-border/50;
+  }
+}

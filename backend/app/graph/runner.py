@@ -204,6 +204,18 @@ async def _run_graph(
                                 await update_pipeline_run(
                                     supabase=supabase, run_id=run_id, **db_updates
                                 )
+                                # Trigger email notification if the pipeline just completed
+                                if db_updates.get("status") == "completed":
+                                    from app.tools.email import notify_user_if_completed
+                                    # initial_state has 'user_id' but we only have run_id in the loop
+                                    # wait, initial_state is passed to _run_graph
+                                    # let's just grab user_id from the initial_state argument if possible.
+                                    # Since initial_state is an argument of _run_graph, we can use it!
+                                    uid = initial_state.get("user_id")
+                                    if uid:
+                                        # Use asyncio.create_task to not block the event loop
+                                        asyncio.create_task(notify_user_if_completed(supabase, run_id, uid, "completed"))
+
                             except Exception as exc:
                                 logger.warning("run=%s | DB update failed: %s", run_id, exc)
 
