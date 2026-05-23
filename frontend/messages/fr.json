@@ -39,7 +39,8 @@
     "sign_out_confirm_title": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "sign_out_confirm_desc": "Vous devrez vous reconnecter pour accéder à votre tableau de bord.",
     "cancel": "Annuler",
-    "confirm": "Oui, me déconnecter"
+    "confirm": "Oui, me déconnecter",
+    "upgrade": "Passer Pro"
   },
   "Landing": {
     "nav": {
@@ -395,6 +396,28 @@
     "theme_desc": "Choisissez entre le mode clair et sombre.",
     "save": "Enregistrer les préférences",
     "saving": "Enregistrement..."
+  },
+  "PlanBadge": {
+    "upgrade": "Passer Pro"
+  },
+  "UpgradeDialog": {
+    "title": "Limite atteinte",
+    "subtitle": "Passez à la version Pro pour débloquer l'accès illimité.",
+    "todays_usage": "{label} aujourd'hui",
+    "pipelines": "missions",
+    "cv_uploads": "CV uploadés",
+    "used": "utilisés",
+    "free": "Gratuit",
+    "pro": "Pro",
+    "compare_runs": "Missions / jour",
+    "compare_cvs": "CV uploadés / jour",
+    "compare_revisions": "Révisions",
+    "compare_notifications": "Notifications email",
+    "compare_memory": "Mémoire à long terme",
+    "compare_model": "Modèle premium",
+    "unlimited": "Illimité",
+    "cancel": "Plus tard",
+    "upgrade_btn": "Passer Pro — 5,99 €/mois"
   },
   "Common": {
     "loading": "Chargement...",

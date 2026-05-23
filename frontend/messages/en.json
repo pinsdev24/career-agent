@@ -39,7 +39,8 @@
     "sign_out_confirm_title": "Are you sure you want to sign out?",
     "sign_out_confirm_desc": "You will need to log in again to access your dashboard.",
     "cancel": "Cancel",
-    "confirm": "Yes, sign out"
+    "confirm": "Yes, sign out",
+    "upgrade": "Upgrade to Pro"
   },
   "Landing": {
     "nav": {
@@ -395,6 +396,28 @@
     "theme_desc": "Choose between light and dark mode.",
     "save": "Save Preferences",
     "saving": "Saving..."
+  },
+  "PlanBadge": {
+    "upgrade": "Upgrade"
+  },
+  "UpgradeDialog": {
+    "title": "Limit reached",
+    "subtitle": "Upgrade to Pro to unlock unlimited runs and premium features.",
+    "todays_usage": "Today's {label}",
+    "pipelines": "pipeline runs",
+    "cv_uploads": "CV uploads",
+    "used": "used",
+    "free": "Free",
+    "pro": "Pro",
+    "compare_runs": "Pipeline runs / day",
+    "compare_cvs": "CV uploads / day",
+    "compare_revisions": "Letter revisions",
+    "compare_notifications": "Email notifications",
+    "compare_memory": "Long-term memory",
+    "compare_model": "Premium writer model",
+    "unlimited": "Unlimited",
+    "cancel": "Maybe later",
+    "upgrade_btn": "Upgrade to Pro — €5.99/mo"
   },
   "Common": {
     "loading": "Loading...",

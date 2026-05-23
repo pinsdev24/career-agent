@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { getProfile, uploadCV, getMemories, updateMemory } from "@/lib/api";
-import type { Profile, Memory } from "@/lib/types";
+import { getProfile, uploadCV, getMemories, updateMemory, getUserPlan, ApiError } from "@/lib/api";
+import type { Profile, Memory, PlanUsage } from "@/lib/types";
 import {
   FileCheck,
   Brain,
@@ -33,6 +33,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import UpgradeDialog from "@/components/upgrade-dialog";
 
 export default function ProfilePage() {
   const t = useTranslations("Profile");
@@ -46,6 +47,8 @@ export default function ProfilePage() {
 
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loadingMemories, setLoadingMemories] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [planUsage, setPlanUsage] = useState<PlanUsage | null>(null);
 
   const loadProfile = useCallback(async () => {
     try {
@@ -84,7 +87,12 @@ export default function ProfilePage() {
       setProfile(p);
       setSuccess(t("cv_active"));
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      if (err instanceof ApiError && err.isQuotaExceeded) {
+        getUserPlan().then(setPlanUsage).catch(() => {});
+        setShowUpgradeDialog(true);
+      } else {
+        setError(err instanceof Error ? err.message : "Upload failed");
+      }
     } finally {
       setUploading(false);
     }
@@ -449,7 +457,13 @@ export default function ProfilePage() {
           </AlertDialog>
         </div>
       </div>
+
+      <UpgradeDialog
+        open={showUpgradeDialog}
+        onClose={() => setShowUpgradeDialog(false)}
+        planUsage={planUsage}
+        triggerType="cv_upload"
+      />
     </div>
   );
-
 }

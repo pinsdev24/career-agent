@@ -39,7 +39,8 @@
     "sign_out_confirm_title": "Weet u zeker dat u wilt uitloggen?",
     "sign_out_confirm_desc": "U moet opnieuw inloggen om toegang te krijgen tot uw dashboard.",
     "cancel": "Annuleren",
-    "confirm": "Ja, uitloggen"
+    "confirm": "Ja, uitloggen",
+    "upgrade": "Upgrade naar Pro"
   },
   "Landing": {
     "nav": {
@@ -395,6 +396,28 @@
     "theme_desc": "Kies tussen lichte en donkere modus.",
     "save": "Voorkeuren opslaan",
     "saving": "Opslaan..."
+  },
+  "PlanBadge": {
+    "upgrade": "Upgrade"
+  },
+  "UpgradeDialog": {
+    "title": "Limiet bereikt",
+    "subtitle": "Upgrade naar Pro voor onbeperkte toegang.",
+    "todays_usage": "Huidige {label}",
+    "pipelines": "missies",
+    "cv_uploads": "CV uploads",
+    "used": "gebruikt",
+    "free": "Gratis",
+    "pro": "Pro",
+    "compare_runs": "Missies / dag",
+    "compare_cvs": "CV uploads / dag",
+    "compare_revisions": "Revisies",
+    "compare_notifications": "E-mailmeldingen",
+    "compare_memory": "Langetermijngeheugen",
+    "compare_model": "Premium model",
+    "unlimited": "Onbeperkt",
+    "cancel": "Misschien later",
+    "upgrade_btn": "Upgrade naar Pro — €5,99/mnd"
   },
   "Common": {
     "loading": "Laden...",

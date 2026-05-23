@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { startPipeline } from "@/lib/api";
-import type { EntryMode } from "@/lib/types";
+import { startPipeline, getUserPlan, ApiError } from "@/lib/api";
+import type { EntryMode, PlanUsage } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import UpgradeDialog from "@/components/upgrade-dialog";
 import {
   Link2,
   Search,
@@ -18,6 +19,7 @@ import {
   Globe,
   ArrowRight,
   Check,
+  Zap,
 } from "lucide-react";
 
 export default function NewPipelinePage() {
@@ -26,7 +28,16 @@ export default function NewPipelinePage() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [planUsage, setPlanUsage] = useState<PlanUsage | null>(null);
   const router = useRouter();
+
+  // Fetch plan usage on mount for the quota indicator
+  useEffect(() => {
+    getUserPlan()
+      .then(setPlanUsage)
+      .catch(() => {}); // silently fail
+  }, []);
 
   const handleStart = async () => {
     setError(null);
@@ -45,13 +56,25 @@ export default function NewPipelinePage() {
       );
       router.push(`/pipeline/${result.id}`);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Failed to start pipeline"
-      );
+      if (err instanceof ApiError && err.isQuotaExceeded) {
+        // Refresh plan usage and show upgrade dialog
+        getUserPlan().then(setPlanUsage).catch(() => {});
+        setShowUpgradeDialog(true);
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Failed to start pipeline"
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // Calculate remaining runs for the inline indicator
+  const hasQuotaInfo = planUsage && planUsage.pipelines_limit_today > 0;
+  const runsRemaining = hasQuotaInfo
+    ? planUsage!.pipelines_limit_today - planUsage!.pipelines_used_today
+    : null;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -62,6 +85,31 @@ export default function NewPipelinePage() {
           {t("subtitle")}
         </p>
       </div>
+
+      {/* Quota indicator banner (for free users near their limit) */}
+      {hasQuotaInfo && runsRemaining !== null && runsRemaining <= 1 && runsRemaining > 0 && (
+        <div className="flex items-center gap-3 rounded-xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10 px-4 py-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 dark:bg-amber-900/30 shrink-0">
+            <Zap className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[12px] font-medium text-amber-700 dark:text-amber-300">
+              {runsRemaining === 1
+                ? "Last run available today"
+                : `${runsRemaining} runs remaining today`}
+            </p>
+            <p className="text-[11px] text-amber-600/70 dark:text-amber-400/60">
+              {planUsage!.pipelines_used_today}/{planUsage!.pipelines_limit_today} daily limit on Free plan
+            </p>
+          </div>
+          <Link
+            href="/#pricing"
+            className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:underline shrink-0"
+          >
+            Upgrade →
+          </Link>
+        </div>
+      )}
 
       {/* Mode selector */}
       <div className="grid grid-cols-2 gap-3">
@@ -150,6 +198,14 @@ export default function NewPipelinePage() {
         {loading ? t("starting") : t("start_btn")}
         {!loading && <ArrowRight className="h-3.5 w-3.5 ml-0.5" />}
       </Button>
+
+      {/* Upgrade dialog — shown when quota exceeded */}
+      <UpgradeDialog
+        open={showUpgradeDialog}
+        onClose={() => setShowUpgradeDialog(false)}
+        planUsage={planUsage}
+        triggerType="pipeline"
+      />
     </div>
   );
 }

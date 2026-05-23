@@ -20,9 +20,28 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  detail: unknown;  // raw detail from the API (string or structured object)
+  code: string | undefined;  // e.g. "QUOTA_EXCEEDED"
+  constructor(status: number, detail: unknown) {
+    // Extract a human-readable message from either string or object detail
+    const message =
+      typeof detail === "string"
+        ? detail
+        : (detail as Record<string, unknown>)?.message as string ??
+          (detail as Record<string, unknown>)?.detail as string ??
+          "API error";
     super(message);
     this.status = status;
+    this.detail = detail;
+    this.code =
+      typeof detail === "object" && detail !== null
+        ? (detail as Record<string, unknown>).code as string | undefined
+        : undefined;
+  }
+
+  /** Check if this is a quota exceeded error from the plan system. */
+  get isQuotaExceeded(): boolean {
+    return this.status === 403 && this.code === "QUOTA_EXCEEDED";
   }
 }
 

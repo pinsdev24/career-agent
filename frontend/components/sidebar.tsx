@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getUserPlan } from "@/lib/api";
+import type { PlanUsage } from "@/lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,8 +36,10 @@ import {
   ChevronsUpDown,
   User,
   Settings,
+  Crown,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import UpgradeDialog from "@/components/upgrade-dialog";
 
 const navItemsConfig = [
   { href: "/dashboard", labelKey: "missions", icon: LayoutGrid },
@@ -51,9 +55,11 @@ export function Sidebar() {
   const [userName, setUserName] = useState("User");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [planUsage, setPlanUsage] = useState<PlanUsage | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndPlan = async () => {
       const supabase = createClient();
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
@@ -62,8 +68,14 @@ export function Sidebar() {
         setUserName(meta?.full_name || meta?.name || "User");
         setAvatarUrl(meta?.avatar_url || meta?.picture || "");
       }
+      try {
+        const usage = await getUserPlan();
+        setPlanUsage(usage);
+      } catch (err) {
+        console.error("Failed to load plan usage in sidebar", err);
+      }
     };
-    fetchUser();
+    fetchUserAndPlan();
   }, []);
 
   const handleLogout = async () => {
@@ -157,10 +169,21 @@ export function Sidebar() {
 
             {!isCollapsed && (
               <div className="flex flex-1 flex-col items-start overflow-hidden leading-none">
-                <span className="truncate text-[13px] font-medium text-[#1a1a1a] dark:text-white">
-                  {userName}
-                </span>
-                <span className="truncate text-[11px] text-[#999] dark:text-[#888] w-full text-left mt-0.5">
+                <div className="flex items-center gap-1.5 w-full">
+                  <span className="truncate text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                    {userName}
+                  </span>
+                  {planUsage && (
+                    <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider leading-none shrink-0 border ${
+                      planUsage.tier === "pro" 
+                        ? "bg-[#111] dark:bg-white text-white dark:text-[#111] border-[#111] dark:border-white font-semibold" 
+                        : "bg-[#FAFAFA] dark:bg-[#1C1C1A] text-[#666] dark:text-[#aaa] border-[#EBEBEB] dark:border-[#333]"
+                    }`}>
+                      {planUsage.tier === "pro" ? "Pro" : "Free"}
+                    </span>
+                  )}
+                </div>
+                <span className="truncate text-[11px] text-[#999] dark:text-[#888] w-full text-left mt-1.5">
                   {userEmail}
                 </span>
               </div>
@@ -179,8 +202,19 @@ export function Sidebar() {
           >
             <DropdownMenuGroup>
               <DropdownMenuLabel className="flex flex-col gap-0.5 px-2 py-1.5">
-                <span className="text-[13px] font-semibold text-[#1a1a1a] dark:text-white">{userName}</span>
-                <span className="text-[11px] text-[#999] dark:text-[#888] font-normal">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[13px] font-semibold text-[#1a1a1a] dark:text-white">{userName}</span>
+                  {planUsage && (
+                    <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider leading-none shrink-0 border ${
+                      planUsage.tier === "pro" 
+                        ? "bg-[#111] dark:bg-white text-white dark:text-[#111] border-[#111] dark:border-white font-semibold" 
+                        : "bg-[#FAFAFA] dark:bg-[#1C1C1A] text-[#666] dark:text-[#aaa] border-[#EBEBEB] dark:border-[#333]"
+                    }`}>
+                      {planUsage.tier === "pro" ? "Pro" : "Free"}
+                    </span>
+                  )}
+                </div>
+                <span className="text-[11px] text-[#999] dark:text-[#888] font-normal truncate mt-0.5">
                   {userEmail}
                 </span>
               </DropdownMenuLabel>
@@ -209,6 +243,19 @@ export function Sidebar() {
               <Settings className="mr-2 h-3.5 w-3.5 shrink-0 text-[#999] dark:text-[#888]" />
               <span>{t("settings")}</span>
             </DropdownMenuItem>
+
+            {planUsage?.tier !== "pro" && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowUpgradeDialog(true);
+                }}
+                className="cursor-pointer py-1.5 rounded-lg text-[13px] font-medium text-white dark:text-[#111] bg-[#111] dark:bg-white hover:bg-[#222] dark:hover:bg-gray-100 transition-colors"
+              >
+                <Crown className="mr-2 h-3.5 w-3.5 shrink-0 text-white dark:text-[#111]" />
+                <span>{t("upgrade")}</span>
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuSeparator className="bg-[#EBEBEB] dark:bg-[#333]" />
 
@@ -249,6 +296,12 @@ export function Sidebar() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <UpgradeDialog
+        open={showUpgradeDialog}
+        onClose={() => setShowUpgradeDialog(false)}
+        planUsage={planUsage}
+        triggerType="pipeline"
+      />
     </aside>
   );
 }
