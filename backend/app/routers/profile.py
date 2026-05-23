@@ -5,10 +5,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile
 
+from app.analytics import Events, track_event, track_event_bg
 from app.config import Settings, get_settings
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import CVParsingError
 from app.models.schemas import ProfilePreferencesUpdate, ProfileResponse
+from app.plans import UserPlan, require_cv_upload_quota
 from app.rate_limit import rate_limit_cv_upload
 from app.tools.cv_parser import parse_pdf, structure_cv
 from app.tools.embedding_tools import chunk_and_embed
@@ -25,6 +27,7 @@ async def upload_cv(
     user: Annotated[dict, Depends(get_current_user)],
     supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
     settings: Annotated[Settings, Depends(get_settings)],
+    plan: Annotated[UserPlan, Depends(require_cv_upload_quota)],
     _rate_limit: Annotated[None, Depends(rate_limit_cv_upload)],
 ) -> ProfileResponse:
     """Upload and process a CV (PDF only).
@@ -80,6 +83,12 @@ async def upload_cv(
         user_id=user["id"],
         embeddings=embeddings,
     )
+
+    # Track event (also used for CV upload quota counting)
+    await track_event(supabase, user["id"], Events.CV_UPLOADED, {
+        "filename": file.filename,
+        "plan": plan.tier.value,
+    })
 
     logger.info("CV processed successfully for user %s", user["id"])
     return ProfileResponse(**profile)

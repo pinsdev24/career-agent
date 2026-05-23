@@ -47,6 +47,7 @@
       "features": "Features",
       "how_it_works": "How It Works",
       "testimonials": "Success Stories",
+      "pricing": "Pricing",
       "dashboard": "Dashboard"
     },
     "hero": {
@@ -186,6 +187,38 @@
       "legal_privacy": "Privacy Policy",
       "legal_terms": "Terms of Service",
       "copyright": "© {year} Ariadne. Elevating job seekers globally."
+    },
+    "pricing": {
+      "badge": "Simple Pricing",
+      "title": "Invest in your career",
+      "subtitle": "Start for free. Upgrade when you need more power.",
+      "free": {
+        "title": "Base",
+        "price": "Free",
+        "description": "Perfect for casual job seekers.",
+        "features": [
+          "3 pipeline runs per day",
+          "URL mode only",
+          "Basic writer model",
+          "Up to 2 letter revisions"
+        ],
+        "button": "Get Started"
+      },
+      "pro": {
+        "title": "Pro",
+        "price": "€5.99",
+        "period": "/month",
+        "description": "For serious professionals.",
+        "features": [
+          "Unlimited pipeline runs",
+          "Explore & URL modes",
+          "Premium writer model (Kimi)",
+          "Up to 5 letter revisions",
+          "Long-term memory",
+          "Email notifications"
+        ],
+        "button": "Upgrade to Pro"
+      }
     }
   },
   "Dashboard": {

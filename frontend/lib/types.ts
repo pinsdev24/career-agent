@@ -164,3 +164,41 @@ export const PIPELINE_STEPS: PipelineStatus[] = [
   "waiting_letter_review",
   "completed",
 ];
+
+// ---------------------------------------------------------------------------
+// Plans
+// ---------------------------------------------------------------------------
+
+export type PlanTier = "free" | "pro";
+
+export interface PlanFeatures {
+  email_notifications: boolean;
+  long_term_memory: boolean;
+}
+
+export interface PlanConfig {
+  tier: PlanTier;
+  label: string;
+  price_monthly_eur: number;
+  daily_pipeline_limit: number;    // 0 = unlimited
+  daily_cv_upload_limit: number;
+  max_revisions: number;
+  writer_model: string;
+  features: PlanFeatures;
+}
+
+export interface PlanUsage {
+  tier: PlanTier;
+  label: string;
+  price_monthly_eur: number;
+  pipelines_used_today: number;
+  pipelines_limit_today: number;   // 0 = unlimited
+  cv_uploads_used_today: number;
+  cv_uploads_limit_today: number;
+  max_revisions: number;
+  features: PlanFeatures;
+}
+
+export interface PlanLimitsResponse {
+  plans: PlanConfig[];
+}

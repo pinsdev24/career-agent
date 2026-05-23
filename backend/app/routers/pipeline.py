@@ -8,6 +8,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from supabase import AsyncClient
 
+from app.analytics import Events, track_event_bg
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import NotFoundError
 from app.graph.runner import cancel_pipeline, run_pipeline
@@ -17,6 +18,7 @@ from app.models.schemas import (
     PipelineStatus,
     PipelineStatusResponse,
 )
+from app.plans import UserPlan, require_pipeline_quota
 from app.rate_limit import rate_limit_pipeline_start
 from app.tools.supabase_ops import create_pipeline_run, get_pipeline_run, get_user_runs
 
@@ -29,20 +31,23 @@ async def start_pipeline(
     data: PipelineStartRequest,
     user: Annotated[dict, Depends(get_current_user)],
     supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+    plan: Annotated[UserPlan, Depends(require_pipeline_quota)],
     _rate_limit: Annotated[None, Depends(rate_limit_pipeline_start)],
 ) -> PipelineStatusResponse:
     """Start a new pipeline run.
 
     Creates a pipeline_runs row then kicks off the LangGraph graph as a
     non-blocking background task so the HTTP response returns immediately.
+    Plan quota is enforced before run creation.
     """
     run_id = str(uuid.uuid4())
 
     logger.info(
-        "Starting pipeline run %s for user %s (mode=%s)",
+        "Starting pipeline run %s for user %s (mode=%s, plan=%s)",
         run_id,
         user["id"],
         data.entry_mode.value,
+        plan.tier.value,
     )
 
     # Create the run record first so the frontend can poll immediately
@@ -54,7 +59,15 @@ async def start_pipeline(
         offer_url=str(data.offer_url) if data.offer_url else None,
     )
 
+    # Track analytics event
+    track_event_bg(supabase, user["id"], Events.PIPELINE_STARTED, {
+        "run_id": run_id,
+        "entry_mode": data.entry_mode.value,
+        "plan": plan.tier.value,
+    })
+
     # Launch the graph in the background (non-blocking)
+    # Pass plan overrides so the graph uses tier-appropriate settings
     asyncio.create_task(
         run_pipeline(
             run_id=run_id,
@@ -62,6 +75,11 @@ async def start_pipeline(
             entry_mode=data.entry_mode.value,
             offer_url=str(data.offer_url) if data.offer_url else None,
             supabase=supabase,
+            plan_overrides={
+                "max_revisions": plan.config.max_revisions,
+                "writer_model": plan.config.writer_model,
+                "features": plan.config.features,
+            },
         )
     )
 

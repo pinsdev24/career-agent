@@ -53,12 +53,15 @@ def _route_after_critic(state: AgentState) -> str:
         logger.info("Manual rewrite loop completed. Routing directly back to HITL-2 (run=%s)", state.get("run_id"))
         return "hitl2"
 
+    # Read max_revisions from state (plan-aware) with fallback to settings
+    max_revisions = state.get("max_revisions", settings.max_revisions)
+
     if score >= settings.critic_threshold:
         return "hitl2"
-    if revisions >= settings.max_revisions:
+    if revisions >= max_revisions:
         logger.warning(
             "Max revisions (%d) reached for run=%s — forcing HITL-2",
-            settings.max_revisions,
+            max_revisions,
             state.get("run_id"),
         )
         return "hitl2"

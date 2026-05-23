@@ -12,6 +12,8 @@ import type {
   ToneOfVoice,
   LanguagePreference,
   Memory,
+  PlanUsage,
+  PlanLimitsResponse,
 } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -174,6 +176,18 @@ export async function updateMemory(key: string, data: Record<string, any>): Prom
     method: "PUT",
     body: JSON.stringify({ memory_data: data }),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Plans
+// ---------------------------------------------------------------------------
+
+export async function getUserPlan(): Promise<PlanUsage> {
+  return request<PlanUsage>("/plans/current");
+}
+
+export async function getPlanLimits(): Promise<PlanLimitsResponse> {
+  return request<PlanLimitsResponse>("/plans/limits");
 }
 
 export { ApiError };

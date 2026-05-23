@@ -27,6 +27,11 @@ class AgentState(TypedDict, total=False):
     tone_of_voice: str  # user-selected tone preset
     language_preference: str  # ISO 639-1 code for LLM output language (en, fr, nl)
 
+    # --- Plan-aware limits (injected by runner from plan system) ---
+    max_revisions: int
+    writer_model: str
+    plan_features: dict  # {"email_notifications": bool, "long_term_memory": bool}
+
     # --- Scout output ---
     discovered_offers: list[dict]  # raw offers from Tavily search
 

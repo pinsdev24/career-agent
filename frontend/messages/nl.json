@@ -47,7 +47,8 @@
       "features": "Functies",
       "how_it_works": "Hoe het werkt",
       "testimonials": "Succesverhalen",
-      "dashboard": "Dashboard"
+      "dashboard": "Dashboard",
+      "pricing": "Prijzen"
     },
     "hero": {
       "title_start": "Vind je droombaan",
@@ -186,6 +187,38 @@
       "legal_privacy": "Privacybeleid",
       "legal_terms": "Servicevoorwaarden",
       "copyright": "© {year} Ariadne. Werkzoekenden wereldwijd verheffen."
+    },
+    "pricing": {
+      "badge": "Eenvoudige prijzen",
+      "title": "Investeer in je carrière",
+      "subtitle": "Begin gratis. Upgrade wanneer je meer kracht nodig hebt.",
+      "free": {
+        "title": "Base",
+        "price": "Gratis",
+        "description": "Perfect voor casual werkzoekenden.",
+        "features": [
+          "3 sollicitaties per dag",
+          "Alleen URL-modus",
+          "Standaard schrijfmodel",
+          "Tot 2 briefrevisies"
+        ],
+        "button": "Beginnen"
+      },
+      "pro": {
+        "title": "Pro",
+        "price": "€5.99",
+        "period": "/maand",
+        "description": "Voor serieuze professionals.",
+        "features": [
+          "Onbeperkte sollicitaties",
+          "Verkennen & URL-modi",
+          "Premium schrijfmodel (Kimi)",
+          "Tot 5 briefrevisies",
+          "Langetermijngeheugen",
+          "E-mailmeldingen"
+        ],
+        "button": "Upgrade naar Pro"
+      }
     }
   },
   "Dashboard": {

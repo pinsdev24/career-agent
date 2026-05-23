@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from supabase import AsyncClient
 
+from app.analytics import Events, track_event_bg
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import HITLError, NotFoundError
 from app.graph.runner import resume_pipeline
@@ -66,6 +67,12 @@ async def select_offer(
     run["status"] = PipelineStatus.MATCHING.value
     run["selected_offer"] = selected_offer
 
+    # Track analytics
+    track_event_bg(supabase, user["id"], Events.OFFER_SELECTED, {
+        "run_id": run_id,
+        "offer_id": data.selected_offer_id,
+    })
+
     # Resume the interrupted graph in the background
     asyncio.create_task(
         resume_pipeline(
@@ -121,6 +128,14 @@ async def review_letter(
     run["status"] = next_status
     if data.approved:
         run["final_letter"] = final_letter
+
+    # Track analytics
+    event_name = Events.LETTER_APPROVED if data.approved else Events.LETTER_REVIEWED
+    track_event_bg(supabase, user["id"], event_name, {
+        "run_id": run_id,
+        "approved": data.approved,
+        "has_feedback": data.user_feedback is not None,
+    })
 
     # Resume the interrupted graph with the edited letter and approval decision
     asyncio.create_task(

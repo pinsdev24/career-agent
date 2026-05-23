@@ -60,3 +60,10 @@ class HITLError(CareerAgentError):
 
     def __init__(self, message: str = "HITL operation failed") -> None:
         super().__init__(message, status_code=400)
+
+
+class QuotaExceededError(CareerAgentError):
+    """Raised when the user exceeds their plan quota."""
+
+    def __init__(self, message: str = "Plan quota exceeded") -> None:
+        super().__init__(message, status_code=403)

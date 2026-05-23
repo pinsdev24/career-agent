@@ -47,7 +47,8 @@
       "features": "Fonctionnalités",
       "how_it_works": "Comment ça marche",
       "testimonials": "Témoignages",
-      "dashboard": "Tableau de Bord"
+      "dashboard": "Tableau de Bord",
+      "pricing": "Tarifs"
     },
     "hero": {
       "title_start": "Décrochez votre job",
@@ -186,6 +187,38 @@
       "legal_privacy": "Politique de confidentialité",
       "legal_terms": "Conditions d'utilisation",
       "copyright": "© {year} Ariadne. Au service des chercheurs d'emploi dans le monde entier."
+    },
+    "pricing": {
+      "badge": "Tarifs simples",
+      "title": "Investissez dans votre carrière",
+      "subtitle": "Commencez gratuitement. Passez à la vitesse supérieure quand vous en avez besoin.",
+      "free": {
+        "title": "Base",
+        "price": "Gratuit",
+        "description": "Parfait pour les chercheurs d'emploi occasionnels.",
+        "features": [
+          "3 candidatures par jour",
+          "Mode URL uniquement",
+          "Modèle de rédaction standard",
+          "Jusqu'à 2 révisions de lettre"
+        ],
+        "button": "Commencer"
+      },
+      "pro": {
+        "title": "Pro",
+        "price": "€5.99",
+        "period": "/mois",
+        "description": "Pour les professionnels sérieux.",
+        "features": [
+          "Candidatures illimitées",
+          "Modes Explorer & URL",
+          "Modèle premium (Kimi)",
+          "Jusqu'à 5 révisions de lettre",
+          "Mémoire à long terme",
+          "Notifications par e-mail"
+        ],
+        "button": "Passer à Pro"
+      }
     }
   },
   "Dashboard": {

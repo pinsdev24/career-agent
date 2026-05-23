@@ -64,6 +64,7 @@ export default function LandingPage() {
           <Link href="#product" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.product")}</Link>
           <Link href="#how-it-works" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.how_it_works")}</Link>
           <Link href="#features" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.features")}</Link>
+          <Link href="#pricing" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.pricing")}</Link>
           <Link href="#testimonials" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.testimonials")}</Link>
         </nav>
 
@@ -113,6 +114,7 @@ export default function LandingPage() {
                 { href: "#product", label: t("nav.product") },
                 { href: "#how-it-works", label: t("nav.how_it_works") },
                 { href: "#features", label: t("nav.features") },
+                { href: "#pricing", label: t("nav.pricing") },
                 { href: "#testimonials", label: t("nav.testimonials") },
               ].map((item) => (
                 <Link
@@ -405,6 +407,92 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        {/* === Pricing Section === */}
+        <section id="pricing" className="py-24 lg:py-32 bg-[#FDFDFC] dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-[#333]">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeUp}
+              className="text-center max-w-3xl mx-auto mb-20"
+            >
+              <span className="text-sm font-bold tracking-wider uppercase text-gray-400 mb-4 block">{t("pricing.badge")}</span>
+              <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 dark:text-white">{t("pricing.title")}</h2>
+              <p className="text-xl text-gray-500 dark:text-gray-400 font-light">
+                {t("pricing.subtitle")}
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Free Plan */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="bg-[#F9F8F6] dark:bg-[#1C1C1A] rounded-[2rem] p-10 border border-gray-100 dark:border-[#333] flex flex-col"
+              >
+                <div className="mb-8">
+                  <h3 className="text-2xl font-medium mb-2 dark:text-white">{t("pricing.free.title")}</h3>
+                  <div className="flex items-baseline gap-2 mb-4">
+                    <span className="text-5xl font-bold tracking-tight text-[#111] dark:text-white">{t("pricing.free.price")}</span>
+                  </div>
+                  <p className="text-gray-500 dark:text-gray-400 font-light">{t("pricing.free.description")}</p>
+                </div>
+                <div className="space-y-4 mb-10 flex-1">
+                  {t.raw("pricing.free.features").map((feature: string, i: number) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-gray-300 dark:text-[#444] shrink-0" />
+                      <span className="text-gray-600 dark:text-gray-300 text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/login">
+                  <Button variant="outline" className="w-full rounded-full border-gray-200 dark:border-[#333] text-[#111] dark:text-white hover:bg-gray-50 dark:hover:bg-[#111] h-12 text-base font-medium">
+                    {t("pricing.free.button")}
+                  </Button>
+                </Link>
+              </motion.div>
+
+              {/* Pro Plan */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+                className="bg-[#111111] dark:bg-white text-white dark:text-[#111] rounded-[2rem] p-10 border border-[#222] dark:border-gray-200 shadow-2xl relative flex flex-col"
+              >
+                <div className="absolute top-0 right-10 transform -translate-y-1/2">
+                  <div className="bg-emerald-400 text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Most Popular
+                  </div>
+                </div>
+                <div className="mb-8">
+                  <h3 className="text-2xl font-medium mb-2">{t("pricing.pro.title")}</h3>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-5xl font-bold tracking-tight">{t("pricing.pro.price")}</span>
+                    <span className="text-gray-400 dark:text-gray-500">{t("pricing.pro.period")}</span>
+                  </div>
+                  <p className="text-gray-400 dark:text-gray-500 font-light">{t("pricing.pro.description")}</p>
+                </div>
+                <div className="space-y-4 mb-10 flex-1">
+                  {t.raw("pricing.pro.features").map((feature: string, i: number) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                      <span className="text-gray-200 dark:text-[#333] text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link href="/login">
+                  <Button className="w-full rounded-full bg-white dark:bg-[#111] text-[#111] dark:text-white hover:bg-gray-100 dark:hover:bg-[#222] h-12 text-base font-medium">
+                    {t("pricing.pro.button")}
+                  </Button>
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
         {/* === FAQ Section === */}
         <section className="py-24 lg:py-32 bg-[#FDFDFC] dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-[#333]">
@@ -497,7 +585,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
                 <li><Link href="#features" className="hover:text-[#111] dark:hover:text-white transition-colors">{t("footer.product_features")}</Link></li>
                 <li><Link href="#how-it-works" className="hover:text-[#111] dark:hover:text-white transition-colors">{t("footer.product_explore")}</Link></li>
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.product_pricing")}</span></li>
+                <li><Link href="#pricing" className="hover:text-[#111] dark:hover:text-white transition-colors">{t("footer.product_pricing")}</Link></li>
               </ul>
             </div>
             <div>

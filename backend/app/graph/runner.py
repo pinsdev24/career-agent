@@ -21,6 +21,7 @@ from supabase import AsyncClient
 from app.config import get_settings
 from app.graph.builder import compile_graph
 from app.tools.supabase_ops import update_pipeline_run
+from app.analytics import Events, track_event_bg
 
 logger = logging.getLogger(__name__)
 
@@ -204,17 +205,19 @@ async def _run_graph(
                                 await update_pipeline_run(
                                     supabase=supabase, run_id=run_id, **db_updates
                                 )
-                                # Trigger email notification if the pipeline just completed
+                                # Trigger notifications if the pipeline just completed
                                 if db_updates.get("status") == "completed":
-                                    from app.tools.email import notify_user_if_completed
-                                    # initial_state has 'user_id' but we only have run_id in the loop
-                                    # wait, initial_state is passed to _run_graph
-                                    # let's just grab user_id from the initial_state argument if possible.
-                                    # Since initial_state is an argument of _run_graph, we can use it!
                                     uid = initial_state.get("user_id")
                                     if uid:
-                                        # Use asyncio.create_task to not block the event loop
-                                        asyncio.create_task(notify_user_if_completed(supabase, run_id, uid, "completed"))
+                                        # Analytics: track completion
+                                        track_event_bg(supabase, uid, Events.PIPELINE_COMPLETED, {
+                                            "run_id": run_id,
+                                        })
+                                        # Email notification: only for users with the feature enabled
+                                        plan_features = initial_state.get("plan_features", {})
+                                        if plan_features.get("email_notifications"):
+                                            from app.tools.email import notify_user_if_completed
+                                            asyncio.create_task(notify_user_if_completed(supabase, run_id, uid, "completed"))
 
                             except Exception as exc:
                                 logger.warning("run=%s | DB update failed: %s", run_id, exc)
@@ -243,6 +246,11 @@ async def _run_graph(
             )
         except Exception:
             pass
+        uid = initial_state.get("user_id")
+        if uid:
+            track_event_bg(supabase, uid, Events.PIPELINE_FAILED, {
+                "run_id": run_id, "reason": "timeout",
+            })
 
     except asyncio.CancelledError:
         logger.info("run=%s | task cancelled", run_id)
@@ -263,6 +271,11 @@ async def _run_graph(
             await update_pipeline_run(supabase=supabase, run_id=run_id, status="failed")
         except Exception:
             pass
+        uid = initial_state.get("user_id")
+        if uid:
+            track_event_bg(supabase, uid, Events.PIPELINE_FAILED, {
+                "run_id": run_id, "reason": str(exc),
+            })
 
 
 # ──────────────────────────────────────────────
@@ -276,6 +289,7 @@ async def run_pipeline(
     entry_mode: str,
     offer_url: str | None,
     supabase: AsyncClient,
+    plan_overrides: dict | None = None,
 ) -> None:
     """Build initial graph state from the DB profile and launch the pipeline."""
     from app.tools.supabase_ops import get_profile
@@ -293,6 +307,10 @@ async def run_pipeline(
             await update_pipeline_run(supabase=supabase, run_id=run_id, status="failed")
             return
 
+        # Plan-aware settings: use overrides from the plan system, fall back to config defaults
+        overrides = plan_overrides or {}
+        settings = get_settings()
+
         initial_state: dict = {
             "run_id": run_id,
             "user_id": user_id,
@@ -304,6 +322,10 @@ async def run_pipeline(
             "tone_of_voice": profile.get("tone_of_voice", "professional"),
             "language_preference": profile.get("language_preference", "en"),
             "status": "started",
+            # Plan-aware limits injected into state
+            "max_revisions": overrides.get("max_revisions", settings.max_revisions),
+            "writer_model": overrides.get("writer_model", settings.writer_model),
+            "plan_features": overrides.get("features", {}),
             # Initialize Best-of-N tracking
             "draft_history": [],
             "best_draft": "",
@@ -312,7 +334,7 @@ async def run_pipeline(
             "user_preferences": {},
         }
 
-        logger.info("run=%s | starting graph (mode=%s)", run_id, entry_mode)
+        logger.info("run=%s | starting graph (mode=%s, max_revisions=%d)", run_id, entry_mode, initial_state["max_revisions"])
         await _run_graph(run_id=run_id, initial_state=initial_state, supabase=supabase)
 
     finally:
