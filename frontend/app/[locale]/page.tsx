@@ -11,11 +11,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { Logo } from "@/components/logo";
 
-// Reusable animation variants
-const fadeUp: Variants = {
+// Framer Motion expects a fixed-length bezier tuple, not a generic number[].
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } }
-};
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
+} satisfies Variants;
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
@@ -55,7 +57,7 @@ export default function LandingPage() {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, ease: EASE_OUT }}
         className="relative z-10 mx-auto max-w-7xl px-6 py-6 flex items-center justify-between"
       >
         <Logo />
@@ -97,7 +99,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.25, ease: EASE_OUT }}
             className="fixed top-0 left-0 right-0 z-30 md:hidden bg-white dark:bg-[#111] border-b border-gray-100 dark:border-[#333] shadow-xl pt-20 pb-8 px-6"
           >
             {/* Close area at top */}
@@ -186,7 +188,7 @@ export default function LandingPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 0.6, ease: EASE_OUT }}
             className="max-w-5xl mx-auto px-6"
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-[#F9F8F6] dark:bg-[#1C1C1A] rounded-[2rem] p-8 md:p-10 border border-gray-100 dark:border-[#333]">
