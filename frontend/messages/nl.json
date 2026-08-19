@@ -45,6 +45,7 @@
     "nav": {
       "features": "Functies",
       "how_it_works": "Hoe het werkt",
+      "product": "Product",
       "control": "Jouw controle",
       "faq": "FAQ",
       "sign_in": "Inloggen",
@@ -150,6 +151,25 @@
           "title": "Review en verstuur",
           "desc": "Writer schrijft. Critic scoort. Jij keurt goed. Een brief op maat in minuten — de pen blijft van jou."
         }
+      ]
+    },
+    "product": {
+      "badge": "Binnenin",
+      "title": "Het werk,",
+      "title_muted": "niet de pitch.",
+      "subtitle": "Missions met matchscores. Drafts naast de gaps. Je ziet altijd waarom — en jij keurt altijd goed.",
+      "dashboard_label": "Missions",
+      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_caption": "Elke pipeline in één lijst — matchscore, status, volgende actie.",
+      "dashboard_alt": "Ariadne-dashboard met missions, matchscores en reviewstatus",
+      "review_label": "Review",
+      "review_url": "ariadne.app/review",
+      "review_caption": "Draft links. Gap-analyse rechts. Goedkeuren, herschrijven of bewerken.",
+      "review_alt": "Coverletter-review met gap-analyse, matching skills, en goedkeuren of herschrijven",
+      "insights": [
+        { "k": "Match", "v": "Semantische fit op elke rol, geen keyword-ruis." },
+        { "k": "Status", "v": "Brief reviewen of completed — de volgende actie is duidelijk." },
+        { "k": "Controle", "v": "Niets vertrekt zonder jouw herschrijving of goedkeuring." }
       ]
     },
     "scout": {
@@ -273,6 +293,7 @@
       "product_features": "Functies",
       "product_explore": "Exploratiemodus",
       "product_how": "Hoe het werkt",
+      "product_inside": "Binnenin",
       "resources": "Bronnen",
       "resources_docs": "Documentatie",
       "resources_faq": "FAQ",

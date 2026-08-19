@@ -11,6 +11,7 @@ import { LanguageToggle } from "@/components/language-toggle";
 const NAV_LINKS = [
   { href: "#features", key: "features" },
   { href: "#how-it-works", key: "how_it_works" },
+  { href: "#product", key: "product" },
   { href: "#control", key: "control" },
   { href: "#faq", key: "faq" },
 ] as const;
@@ -42,7 +43,7 @@ export function LandingNavbar() {
             <span className="font-display text-xl tracking-tight">Ariadne</span>
           </Link>
 
-          <div className="hidden items-center gap-12 md:flex">
+          <div className="hidden items-center gap-8 lg:gap-12 md:flex">
             {NAV_LINKS.map((item) => (
               <Link
                 key={item.href}

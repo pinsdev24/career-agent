@@ -13,6 +13,7 @@ import { GridBackground } from "@/components/landing/grid-background";
 import { LandingNavbar } from "@/components/landing/navbar";
 import { ParticleSphere } from "@/components/landing/particle-sphere";
 import { PipelinePreview } from "@/components/landing/pipeline-preview";
+import { ProductInsight } from "@/components/landing/product-insight";
 import { StatsMarquee } from "@/components/landing/stats-marquee";
 
 const FEATURE_VISUALS = [MatchVisual, ToneVisual, ControlVisual, ScoutVisual];
@@ -204,6 +205,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <ProductInsight />
 
         {/* Scout */}
         <section className="relative overflow-hidden py-24 lg:py-32">
@@ -489,6 +492,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link href="#features" className="hover:text-foreground">{t("footer.product_features")}</Link></li>
                 <li><Link href="#how-it-works" className="hover:text-foreground">{t("footer.product_how")}</Link></li>
+                <li><Link href="#product" className="hover:text-foreground">{t("footer.product_inside")}</Link></li>
                 <li><Link href="#control" className="hover:text-foreground">{t("footer.product_explore")}</Link></li>
               </ul>
             </div>

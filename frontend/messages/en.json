@@ -45,6 +45,7 @@
     "nav": {
       "features": "Features",
       "how_it_works": "How it works",
+      "product": "Product",
       "control": "Your control",
       "faq": "FAQ",
       "sign_in": "Sign in",
@@ -150,6 +151,25 @@
           "title": "Review and send",
           "desc": "Writer drafts. Critic scores. You approve. A tailored letter in minutes — with you still holding the pen."
         }
+      ]
+    },
+    "product": {
+      "badge": "Inside",
+      "title": "The work,",
+      "title_muted": "not the pitch.",
+      "subtitle": "Missions with match scores. Drafts beside the gaps. You always see why — and you always approve.",
+      "dashboard_label": "Missions",
+      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_caption": "Every pipeline in one list — match score, status, next action.",
+      "dashboard_alt": "Ariadne dashboard showing missions with match scores and review status",
+      "review_label": "Review",
+      "review_url": "ariadne.app/review",
+      "review_caption": "Draft on the left. Gap analysis on the right. Approve, rewrite, or edit.",
+      "review_alt": "Cover letter review with gap analysis, matching skills, and approve or rewrite controls",
+      "insights": [
+        { "k": "Match", "v": "Semantic fit on every role, not keyword noise." },
+        { "k": "Status", "v": "Review letter or completed — the next action is obvious." },
+        { "k": "Control", "v": "Nothing leaves without your rewrite or approval." }
       ]
     },
     "scout": {
@@ -273,6 +293,7 @@
       "product_features": "Features",
       "product_explore": "Explore Mode",
       "product_how": "How it works",
+      "product_inside": "Inside",
       "resources": "Resources",
       "resources_docs": "Documentation",
       "resources_faq": "FAQ",

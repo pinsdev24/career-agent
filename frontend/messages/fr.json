@@ -45,6 +45,7 @@
     "nav": {
       "features": "Fonctionnalités",
       "how_it_works": "Comment ça marche",
+      "product": "Produit",
       "control": "Votre contrôle",
       "faq": "FAQ",
       "sign_in": "Connexion",
@@ -150,6 +151,25 @@
           "title": "Relisez et envoyez",
           "desc": "Le Rédacteur écrit. Le Critique note. Vous approuvez. Une lettre sur mesure en minutes — le stylo reste dans votre main."
         }
+      ]
+    },
+    "product": {
+      "badge": "En coulisses",
+      "title": "Le travail,",
+      "title_muted": "pas le pitch.",
+      "subtitle": "Des missions avec un score de match. Le brouillon à côté des écarts. Vous voyez toujours pourquoi — et vous approuvez toujours.",
+      "dashboard_label": "Missions",
+      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_caption": "Tous les pipelines dans une liste — score, statut, prochaine action.",
+      "dashboard_alt": "Tableau de bord Ariadne avec les missions, scores de match et statuts de relecture",
+      "review_label": "Relecture",
+      "review_url": "ariadne.app/review",
+      "review_caption": "Le brouillon à gauche. L'analyse d'écarts à droite. Approuver, réécrire, ou modifier.",
+      "review_alt": "Relecture de lettre avec analyse d'écarts, compétences matchées, et boutons approuver ou réécrire",
+      "insights": [
+        { "k": "Match", "v": "Affinité sémantique sur chaque poste, pas du bruit de mots-clés." },
+        { "k": "Statut", "v": "Lettre à relire ou terminée — la prochaine action est évidente." },
+        { "k": "Contrôle", "v": "Rien ne part sans votre réécriture ou votre accord." }
       ]
     },
     "scout": {
@@ -273,6 +293,7 @@
       "product_features": "Fonctionnalités",
       "product_explore": "Mode Exploration",
       "product_how": "Comment ça marche",
+      "product_inside": "En coulisses",
       "resources": "Ressources",
       "resources_docs": "Documentation",
       "resources_faq": "FAQ",
