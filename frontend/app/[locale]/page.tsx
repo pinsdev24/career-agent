@@ -1,529 +1,520 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import React from "react";
 import { useTranslations } from "next-intl";
-import { motion, type Variants } from "framer-motion";
-import { ArrowUpRight, Menu, X, CheckCircle2, Zap, Target, PenTool, Upload, Search, Send, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
-import { Logo } from "@/components/logo";
+import { AnimatedWord } from "@/components/landing/animated-word";
+import { ControlVisual, MatchVisual, ScoutVisual, ToneVisual } from "@/components/landing/feature-visuals";
+import { GridBackground } from "@/components/landing/grid-background";
+import { LandingNavbar } from "@/components/landing/navbar";
+import { ParticleSphere } from "@/components/landing/particle-sphere";
+import { PipelinePreview } from "@/components/landing/pipeline-preview";
+import { StatsMarquee } from "@/components/landing/stats-marquee";
 
-// Framer Motion expects a fixed-length bezier tuple, not a generic number[].
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+const FEATURE_VISUALS = [MatchVisual, ToneVisual, ControlVisual, ScoutVisual];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
-} satisfies Variants;
+function SectionEyebrow({ children, inverted = false }: { children: React.ReactNode; inverted?: boolean }) {
+  return (
+    <span className={`mb-6 inline-flex items-center gap-3 font-mono text-sm ${inverted ? "text-background/50" : "text-muted-foreground"}`}>
+      <span className={`h-px w-8 ${inverted ? "bg-background/30" : "bg-foreground/30"}`} />
+      {children}
+    </span>
+  );
+}
 
-const staggerContainer: Variants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15
-    }
-  }
-};
+function LiveClock() {
+  const [now, setNow] = React.useState("");
 
-// Logos for social proof
-const COMPANY_LOGOS = ["Google", "Microsoft", "Stripe", "Vercel", "Datadog"];
+  React.useEffect(() => {
+    const tick = () => setNow(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return <span className="font-mono text-sm text-muted-foreground tabular-nums">{now}</span>;
+}
 
 export default function LandingPage() {
   const t = useTranslations("Landing");
-  const [openFaq, setOpenFaq] = React.useState<number | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [openFaq, setOpenFaq] = React.useState<number | null>(0);
+  const [testimonial, setTestimonial] = React.useState(0);
 
-  const closeMobileMenu = () => setMobileMenuOpen(false);
+  const words = t.raw("hero.title_words") as string[];
+  const features = t.raw("features.items") as { n: string; title: string; desc: string }[];
+  const steps = t.raw("how_it_works.steps") as { roman: string; title: string; desc: string }[];
+  const sources = t.raw("scout.sources") as { city: string; region: string; ms: string }[];
+  const securityItems = t.raw("security.items") as { title: string; desc: string }[];
+  const securityBadges = t.raw("security.badges") as string[];
+  const controlItems = t.raw("control.items") as { title: string; desc: string }[];
+  const testimonials = t.raw("testimonials.items") as { quote: string; author: string; role: string; result: string }[];
+  const faqs = t.raw("faq.items") as { q: string; a: string }[];
+
+  React.useEffect(() => {
+    const id = window.setInterval(() => {
+      setActiveStep((s) => (s + 1) % steps.length);
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [steps.length]);
+
+  const quote = testimonials[testimonial];
 
   return (
-    <div className="min-h-screen bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#111111] dark:text-white font-sans selection:bg-orange-500/30 overflow-hidden transition-colors">
-      {/* Subtle Background Grid */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] dark:opacity-[0.04]"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, #000 1px, transparent 1px),
-            linear-gradient(to bottom, #000 1px, transparent 1px)
-          `,
-          backgroundSize: "6rem 6rem"
-        }}
-      />
+    <div id="top" className="min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
+      <LandingNavbar />
 
-      {/* Top Navbar */}
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: EASE_OUT }}
-        className="relative z-10 mx-auto max-w-7xl px-6 py-6 flex items-center justify-between"
-      >
-        <Logo />
+      <main>
+        {/* Hero */}
+        <section className="relative flex min-h-screen flex-col justify-center overflow-hidden">
+          <GridBackground />
+          <div className="pointer-events-none absolute top-1/2 right-0 h-[600px] w-[600px] -translate-y-1/2 opacity-40 lg:h-[800px] lg:w-[800px]">
+            <ParticleSphere />
+          </div>
 
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600 dark:text-gray-300">
-          <Link href="#product" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.product")}</Link>
-          <Link href="#how-it-works" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.how_it_works")}</Link>
-          <Link href="#features" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.features")}</Link>
-          <Link href="#testimonials" className="hover:text-black dark:hover:text-white transition-colors">{t("nav.testimonials")}</Link>
-        </nav>
+          <div className="relative z-10 mx-auto w-full max-w-[1400px] px-6 py-32 lg:px-12 lg:py-40">
+            <div className="mb-8">
+              <SectionEyebrow>{t("hero.eyebrow")}</SectionEyebrow>
+            </div>
 
-        <div className="flex items-center gap-3">
-          <LanguageToggle />
-          <ThemeToggle />
-          <Link href="/dashboard" className="hidden sm:block">
-            <Button className="rounded-full bg-[#111111] dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 px-6 h-10 text-sm font-medium flex items-center gap-2 transition-all">
-              {t("nav.dashboard")} <ArrowUpRight className="w-4 h-4" />
-            </Button>
-          </Link>
-          <button
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 dark:border-[#333] text-[#111] dark:text-white hover:bg-gray-50 dark:hover:bg-[#111] transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-          </button>
-        </div>
-      </motion.header>
+            <h1 className="font-display mb-12 text-[clamp(3rem,12vw,10rem)] leading-[0.9] tracking-tight">
+              <span className="block">{t("hero.title_line1")}</span>
+              <span className="block">
+                {t("hero.title_prefix")} <AnimatedWord words={words} />
+              </span>
+            </h1>
 
-      {/* === Mobile Menu Panel === */}
-      {mobileMenuOpen && (
-        <>
-          {/* Backdrop */}
+            <div className="grid items-end gap-12 lg:grid-cols-2 lg:gap-24">
+              <p className="max-w-xl text-xl leading-relaxed text-muted-foreground lg:text-2xl">
+                {t("hero.subtitle")}
+              </p>
+              <div className="flex flex-col items-start gap-4 sm:flex-row">
+                <Link href="/login">
+                  <Button className="group h-14 rounded-full bg-foreground px-8 text-base text-background hover:bg-foreground/90">
+                    {t("hero.cta_primary")}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </Button>
+                </Link>
+                <Link href="#how-it-works">
+                  <Button variant="outline" className="h-14 rounded-full border-foreground/20 bg-background px-8 text-base">
+                    {t("hero.cta_secondary")}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <StatsMarquee />
+        </section>
+
+        {/* Features */}
+        <section id="features" className="relative py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 lg:mb-24">
+              <SectionEyebrow>{t("features.badge")}</SectionEyebrow>
+              <h2 className="font-display text-4xl tracking-tight lg:text-6xl">
+                {t("features.title")}
+                <br />
+                <span className="text-muted-foreground">{t("features.title_muted")}</span>
+              </h2>
+            </div>
+
+            <div>
+              {features.map((item, i) => {
+                const Visual = FEATURE_VISUALS[i] ?? MatchVisual;
+                return (
+                  <div key={item.n} className="group border-b border-foreground/10 py-12 lg:py-20">
+                    <div className="flex flex-col gap-8 lg:flex-row lg:gap-16">
+                      <div className="shrink-0">
+                        <span className="font-mono text-sm text-muted-foreground">{item.n}</span>
+                      </div>
+                      <div className="grid flex-1 items-center gap-8 lg:grid-cols-2">
+                        <div>
+                          <h3 className="font-display mb-4 text-3xl transition-transform duration-500 group-hover:translate-x-2 lg:text-4xl">
+                            {item.title}
+                          </h3>
+                          <p className="text-lg leading-relaxed text-muted-foreground">{item.desc}</p>
+                        </div>
+                        <div className="flex justify-center lg:justify-end">
+                          <Visual />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* How it works */}
+        <section id="how-it-works" className="relative overflow-hidden bg-foreground py-24 text-background lg:py-32">
           <div
-            className="fixed inset-0 z-20 bg-black/20 dark:bg-black/50 backdrop-blur-sm md:hidden"
-            onClick={closeMobileMenu}
+            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+            style={{
+              backgroundImage: "repeating-linear-gradient(-45deg, transparent, transparent 40px, currentColor 40px, currentColor 41px)",
+            }}
           />
-          <motion.nav
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.25, ease: EASE_OUT }}
-            className="fixed top-0 left-0 right-0 z-30 md:hidden bg-white dark:bg-[#111] border-b border-gray-100 dark:border-[#333] shadow-xl pt-20 pb-8 px-6"
-          >
-            {/* Close area at top */}
-            <button
-              onClick={closeMobileMenu}
-              className="absolute top-5 right-5 flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 dark:border-[#333] text-[#111] dark:text-white"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <div className="flex flex-col gap-1">
-              {[
-                { href: "#product", label: t("nav.product") },
-                { href: "#how-it-works", label: t("nav.how_it_works") },
-                { href: "#features", label: t("nav.features") },
-                { href: "#testimonials", label: t("nav.testimonials") },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeMobileMenu}
-                  className="flex items-center py-3.5 px-2 text-base font-medium text-gray-700 dark:text-gray-200 hover:text-black dark:hover:text-white border-b border-gray-100 dark:border-[#222] last:border-0 transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              <div className="pt-6 flex flex-col gap-3">
-                <Link href="/login" onClick={closeMobileMenu}>
-                  <Button className="w-full rounded-full bg-[#111111] dark:bg-white text-white dark:text-[#111] hover:bg-gray-800 dark:hover:bg-gray-200 h-12 text-base font-medium flex items-center justify-center gap-2">
-                    {t("hero.cta_primary")} <ArrowUpRight className="w-4 h-4" />
-                  </Button>
-                </Link>
-                <Link href="/dashboard" onClick={closeMobileMenu}>
-                  <Button variant="outline" className="w-full rounded-full border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300 h-12 text-base font-medium">
-                    {t("nav.dashboard")}
-                  </Button>
-                </Link>
-              </div>
-
-              <div className="pt-4 flex items-center justify-center gap-3">
-                <LanguageToggle />
-                <ThemeToggle />
-              </div>
-            </div>
-          </motion.nav>
-        </>
-      )}
-
-      <main className="relative z-10">
-        {/* === Hero Section === */}
-        <section className="mx-auto max-w-7xl px-6 pt-16 pb-12" id="product">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="max-w-4xl mx-auto text-center space-y-8"
-          >
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 bg-[#F4F3F0] dark:bg-[#1C1C1A] border border-[#E8E6E1] dark:border-[#333] rounded-full px-4 py-1.5 text-sm text-gray-600 dark:text-gray-400">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              {t("hero.trusted")}
-            </motion.div>
-            <motion.h1 variants={fadeUp} className="text-5xl sm:text-6xl md:text-8xl font-medium tracking-tight leading-[1.05]">
-              {t("hero.title_start")} <br className="hidden md:block" /> {t("hero.title_end")}
-            </motion.h1>
-            <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-light leading-relaxed">
-              {t("hero.subtitle")}
-            </motion.p>
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Link href="/login">
-                <Button className="rounded-full bg-[#111111] dark:bg-white text-white dark:text-[#111] hover:bg-gray-800 dark:hover:bg-gray-200 hover:scale-105 transition-all duration-300 px-8 h-12 text-base font-medium flex items-center gap-2">
-                  {t("hero.cta_primary")} <ArrowUpRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link href="#how-it-works">
-                <Button variant="outline" className="rounded-full border-gray-200 dark:border-[#333] text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#111] hover:border-gray-300 px-8 h-12 text-base font-medium flex items-center gap-2 transition-all">
-                  {t("hero.cta_secondary")} <ArrowUpRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* === Social Proof Stats Bar === */}
-        <section className="pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: EASE_OUT }}
-            className="max-w-5xl mx-auto px-6"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 bg-[#F9F8F6] dark:bg-[#1C1C1A] rounded-[2rem] p-8 md:p-10 border border-gray-100 dark:border-[#333]">
-              {(["applications", "time_saved", "match_rate", "satisfaction"] as const).map((key, i) => (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + i * 0.1, duration: 0.5 }}
-                  className="text-center"
-                >
-                  <div className="text-3xl md:text-4xl font-semibold tracking-tight text-[#111] dark:text-white mb-1">
-                    {t(`stats.${key}_value`)}
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 font-light">
-                    {t(`stats.${key}`)}
-                  </div>
-                </motion.div>
-              ))}
+          <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 lg:mb-24">
+              <SectionEyebrow inverted>{t("how_it_works.badge")}</SectionEyebrow>
+              <h2 className="font-display text-4xl tracking-tight lg:text-6xl">
+                {t("how_it_works.title")}
+                <br />
+                <span className="text-background/50">{t("how_it_works.title_muted")}</span>
+              </h2>
             </div>
 
-            {/* Logo Cloud */}
-            <div className="flex items-center justify-center gap-8 md:gap-12 mt-10 opacity-40 dark:opacity-30">
-              {COMPANY_LOGOS.map((name) => (
-                <span key={name} className="text-sm md:text-base font-semibold tracking-wider uppercase text-gray-400 dark:text-gray-500">
-                  {name}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </section>
-
-        {/* === How It Works Section === */}
-        <section id="how-it-works" className="py-24 lg:py-32 bg-white dark:bg-[#111] border-t border-gray-100 dark:border-[#333]">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeUp}
-              className="text-center max-w-3xl mx-auto mb-20"
-            >
-              <span className="text-sm font-bold tracking-wider uppercase text-gray-400 mb-4 block">{t("how_it_works.badge")}</span>
-              <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 dark:text-white">{t("how_it_works.title")}</h2>
-              <p className="text-xl text-gray-500 dark:text-gray-400 font-light">
-                {t("how_it_works.subtitle")}
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {t.raw("how_it_works.steps").map((step: any, i: number) => {
-                const icons = [Upload, Search, Send];
-                const Icon = icons[i];
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ delay: i * 0.2, duration: 0.6, ease: "easeOut" }}
-                    className="relative bg-[#FDFDFC] dark:bg-[#0a0a0a] rounded-[2rem] p-8 border border-gray-100 dark:border-[#333] hover:border-gray-200 dark:hover:border-[#555] transition-all group"
+            <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
+              <div>
+                {steps.map((step, i) => (
+                  <button
+                    key={step.roman}
+                    type="button"
+                    onClick={() => setActiveStep(i)}
+                    className={`group w-full border-b border-background/10 py-8 text-left transition-opacity duration-500 ${
+                      activeStep === i ? "opacity-100" : "opacity-40 hover:opacity-70"
+                    }`}
                   >
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="w-12 h-12 bg-[#111111] dark:bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Icon className="w-5 h-5 text-white dark:text-[#111]" />
+                    <div className="flex items-start gap-6">
+                      <span className="font-display text-3xl text-background/30">{step.roman}</span>
+                      <div className="flex-1">
+                        <h3 className="font-display mb-3 text-2xl transition-transform duration-300 group-hover:translate-x-2 lg:text-3xl">
+                          {step.title}
+                        </h3>
+                        <p className="leading-relaxed text-background/60">{step.desc}</p>
+                        {activeStep === i && (
+                          <div className="mt-4 h-px overflow-hidden bg-background/20">
+                            <div key={i} className="animate-progress-bar h-full bg-background" />
+                          </div>
+                        )}
                       </div>
-                      <span className="text-5xl font-bold text-gray-100 dark:text-[#222] select-none">{step.step}</span>
                     </div>
-                    <h3 className="text-xl font-medium mb-3 dark:text-white">{step.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed font-light text-sm">{step.desc}</p>
-                    {i < 2 && (
-                      <div className="hidden md:block absolute -right-5 top-1/2 -translate-y-1/2 z-10">
-                        <ArrowUpRight className="w-5 h-5 text-gray-300 dark:text-[#444] rotate-0" />
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
+                  </button>
+                ))}
+              </div>
+
+              <div className="self-start lg:sticky lg:top-32">
+                <PipelinePreview active={activeStep} />
+              </div>
             </div>
           </div>
         </section>
 
-        {/* === Feature Section === */}
-        <section id="features" className="py-24 lg:py-32 bg-[#FDFDFC] dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-[#333]">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeUp}
-              className="text-center max-w-3xl mx-auto mb-20"
-            >
-              <span className="text-sm font-bold tracking-wider uppercase text-gray-400 mb-4 block">{t("features.badge")}</span>
-              <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 dark:text-white">{t("features.title")}</h2>
-              <p className="text-xl text-gray-500 dark:text-gray-400 font-light">
-                {t("features.subtitle")}
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {Object.entries(t.raw("features.items")).map(([key, item]: [string, any], i) => {
-                const icons = { gap: Target, tone: PenTool, zap: Zap };
-                const Icon = icons[key as keyof typeof icons];
-                return (
-                  <motion.div
-                    key={key}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ delay: i * 0.2, duration: 0.6, ease: "easeOut" }}
-                    className="bg-[#F9F8F6] dark:bg-[#1C1C1A] rounded-[2rem] p-8 border border-gray-100 dark:border-[#333] hover:border-gray-200 dark:hover:border-[#555] transition-colors"
-                  >
-                    <div className="w-12 h-12 bg-white dark:bg-[#111] rounded-xl flex items-center justify-center shadow-sm border border-gray-100 dark:border-[#333] mb-6">
-                      <Icon className="w-6 h-6 text-[#111111] dark:text-white" />
-                    </div>
-                    <h3 className="text-2xl font-medium mb-3 dark:text-white">{item.title}</h3>
-                    <p className="text-gray-500 dark:text-gray-400 leading-relaxed font-light">{item.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* === Scout Mode Section === */}
-        <section className="py-10 pb-32">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="bg-[#1C1C1A] rounded-[3rem] p-10 md:p-16 text-white grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
-            >
-              <div className="relative z-10">
-                <span className="text-gray-400 font-bold tracking-wider text-xs mb-4 block uppercase">{t("scout.badge")}</span>
-                <h2 className="text-4xl md:text-5xl font-medium tracking-tight mb-6 leading-tight text-white">
+        {/* Scout */}
+        <section className="relative overflow-hidden py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="grid items-start gap-16 lg:grid-cols-2">
+              <div>
+                <SectionEyebrow>{t("scout.badge")}</SectionEyebrow>
+                <h2 className="font-display mb-8 text-4xl tracking-tight lg:text-6xl">
                   {t("scout.title")}
+                  <br />
+                  <span className="text-muted-foreground">{t("scout.title_muted")}</span>
                 </h2>
-                <p className="text-gray-400 text-lg mb-8 font-light leading-relaxed">
+                <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
                   {t("scout.subtitle")}
                 </p>
-                <div className="space-y-4 mb-10">
-                  {t.raw("scout.items").map((item: string, i: number) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                      <span className="text-gray-300 text-sm">{item}</span>
+                <div className="mt-12 grid grid-cols-3 gap-6">
+                  {[
+                    ["stat_sources_value", "stat_sources"],
+                    ["stat_rank_value", "stat_rank"],
+                    ["stat_refresh_value", "stat_refresh"],
+                  ].map(([value, label]) => (
+                    <div key={label}>
+                      <div className="font-display text-3xl tracking-tight">{t(`scout.${value}`)}</div>
+                      <div className="mt-1 text-sm text-muted-foreground">{t(`scout.${label}`)}</div>
                     </div>
                   ))}
                 </div>
-                <Link href="/dashboard">
-                  <Button className="rounded-full bg-white text-[#111111] hover:bg-gray-100 px-8 h-12 text-base font-medium flex items-center gap-2 transition-all">
-                    {t("scout.cta")} <ArrowUpRight className="w-4 h-4" />
-                  </Button>
-                </Link>
               </div>
-              <div className="relative hidden lg:block h-[450px] rounded-3xl overflow-hidden border border-white/10">
-                <Image src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&q=80" alt="Scout mode" fill className="object-cover opacity-80 hover:scale-105 transition-transform duration-700" />
+
+              <div className="border border-foreground/10">
+                <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
+                  <span className="font-mono text-xs text-muted-foreground">{t("scout.status")}</span>
+                  <span className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    {t("scout.status_ok")}
+                  </span>
+                </div>
+                <div>
+                  {sources.map((source) => (
+                    <div
+                      key={source.city}
+                      className="flex items-center justify-between border-b border-foreground/5 px-5 py-4 last:border-0"
+                    >
+                      <div>
+                        <div className="text-sm">{source.city}</div>
+                        <div className="font-mono text-[11px] text-muted-foreground">{source.region}</div>
+                      </div>
+                      <div className="font-mono text-sm tabular-nums">{source.ms}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
 
-        {/* === Testimonials Section === */}
-        <section className="py-24 lg:py-32 bg-[#111111] text-[#FDFDFC]" id="testimonials">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-              <div className="max-w-2xl">
-                <span className="text-gray-500 font-bold tracking-wider text-xs mb-4 block uppercase flex items-center gap-2">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  {t("testimonials.badge")}
-                </span>
-                <h2 className="text-4xl md:text-5xl font-medium tracking-tight leading-[1.1]">
-                  {t("testimonials.title")}
+        {/* Metrics */}
+        <section className="relative border-y border-foreground/10 py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 flex flex-col justify-between gap-6 lg:mb-24 lg:flex-row lg:items-end">
+              <div>
+                <SectionEyebrow>{t("metrics.badge")}</SectionEyebrow>
+                <h2 className="font-display text-4xl tracking-tight lg:text-6xl">
+                  {t("metrics.title")}
+                  <br />
+                  <span className="text-muted-foreground">{t("metrics.title_muted")}</span>
                 </h2>
               </div>
-              <div className="text-gray-400 font-light max-w-sm text-lg">
-                {t("testimonials.subtitle")}
+              <div className="flex items-center gap-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                {t("metrics.live")}
+                <span className="text-foreground/20">|</span>
+                <LiveClock />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-16">
-              {t.raw("testimonials.items").map((testi: any, i: number) => {
-                const avatars = [
-                  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-                  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80",
-                  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80"
-                ];
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: i * 0.15, ease: "easeOut" }}
-                    className="group flex flex-col justify-between"
-                  >
-                    <div className="mb-12">
-                      <div className="h-[1px] w-full bg-white/20 mb-10 group-hover:bg-white/40 transition-colors duration-700" />
-                      <p className="text-gray-300 text-lg md:text-xl font-light leading-relaxed">
-                        &ldquo;{testi.quote}&rdquo;
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-5">
-                      <div className="w-14 h-14 rounded-full overflow-hidden relative border border-white/20">
-                        <Image src={avatars[i % avatars.length]} alt={testi.author} fill className="object-cover" />
-                      </div>
-                      <div>
-                        <h4 className="text-white font-medium text-sm">{testi.author}</h4>
-                        <p className="text-gray-500 text-xs mt-0.5 tracking-wide">{testi.role}</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* === FAQ Section === */}
-        <section className="py-24 lg:py-32 bg-[#FDFDFC] dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-[#333]">
-          <div className="max-w-3xl mx-auto px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeUp}
-              className="text-center mb-16"
-            >
-              <span className="text-sm font-bold tracking-wider uppercase text-gray-400 mb-4 block">{t("faq.badge")}</span>
-              <h2 className="text-4xl md:text-5xl font-medium tracking-tight dark:text-white">{t("faq.title")}</h2>
-            </motion.div>
-
-            <div className="space-y-4">
-              {t.raw("faq.items").map((item: any, i: number) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.4 }}
-                  className="border border-gray-100 dark:border-[#333] rounded-2xl overflow-hidden bg-white dark:bg-[#111] hover:border-gray-200 dark:hover:border-[#444] transition-colors"
-                >
-                  <button
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between px-6 py-5 text-left"
-                  >
-                    <span className="text-base font-medium text-[#111] dark:text-white pr-4">{item.q}</span>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 shrink-0 transition-transform duration-300 ${openFaq === i ? "rotate-180" : ""}`} />
-                  </button>
-                  <div className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${openFaq === i ? "max-h-48 pb-5" : "max-h-0"}`}>
-                    <p className="px-6 text-gray-500 dark:text-gray-400 font-light leading-relaxed text-sm">
-                      {item.a}
-                    </p>
-                  </div>
-                </motion.div>
+            <div className="grid gap-px bg-foreground/10 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                [t("stats.applications_value"), t("metrics.applications")],
+                ["100%", t("metrics.uptime")],
+                ["5 min", t("metrics.latency")],
+                [t("stats.match_rate_value"), t("metrics.countries")],
+              ].map(([value, label]) => (
+                <div key={label} className="bg-background p-8 lg:p-10">
+                  <div className="font-display text-4xl tracking-tight lg:text-5xl">{value}</div>
+                  <div className="mt-3 text-sm text-muted-foreground">{label}</div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* === Final CTA Section === */}
-        <section className="pb-12 pt-6 bg-[#FDFDFC] dark:bg-[#0a0a0a]">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="bg-[#111111] dark:bg-[#1C1C1A] rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden border border-[#333]">
-              <div className="absolute inset-0 opacity-10">
-                <div
-                  className="w-full h-full"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 70%)`,
-                  }}
-                />
+        {/* Security */}
+        <section className="relative overflow-hidden bg-foreground/[0.02] py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 max-w-3xl lg:mb-24">
+              <SectionEyebrow>{t("security.badge")}</SectionEyebrow>
+              <h2 className="font-display mb-6 text-4xl tracking-tight lg:text-6xl">
+                {t("security.title")}
+                <br />
+                <span className="text-muted-foreground">{t("security.title_muted")}</span>
+              </h2>
+              <p className="text-lg leading-relaxed text-muted-foreground">{t("security.subtitle")}</p>
+              <div className="mt-8 flex flex-wrap gap-2">
+                {securityBadges.map((badge) => (
+                  <span key={badge} className="border border-foreground/10 px-3 py-1 font-mono text-[11px] tracking-widest uppercase">
+                    {badge}
+                  </span>
+                ))}
               </div>
-              <div className="relative z-10 max-w-3xl mx-auto">
-                <Logo variant="white" className="mx-auto" />
-                <h2 className="text-5xl md:text-6xl font-medium tracking-tight mb-8 text-white leading-tight mt-10">
-                  {t("cta.title")}
-                </h2>
-                <p className="text-xl text-gray-400 font-light mb-12 max-w-2xl mx-auto leading-relaxed">
-                  {t("cta.subtitle")}
-                </p>
-                <Link href="/login">
-                  <Button className="rounded-full bg-white text-[#111] hover:bg-gray-200 hover:scale-105 transform transition-all duration-300 h-14 px-10 text-base font-medium flex items-center gap-2 mx-auto shadow-2xl shadow-white/10">
-                    {t("cta.button")} <ArrowUpRight className="w-5 h-5" />
-                  </Button>
-                </Link>
-                <p className="text-sm text-gray-500 font-light mt-6">
-                  {t("cta.footer")}
-                </p>
+            </div>
+
+            <div className="grid gap-px bg-foreground/10 sm:grid-cols-2">
+              {securityItems.map((item) => (
+                <div key={item.title} className="bg-background p-8 lg:p-10">
+                  <h3 className="font-display mb-3 text-2xl">{item.title}</h3>
+                  <p className="leading-relaxed text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Control */}
+        <section id="control" className="relative overflow-hidden py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 max-w-3xl lg:mb-24">
+              <SectionEyebrow>{t("control.badge")}</SectionEyebrow>
+              <h2 className="font-display mb-6 text-4xl tracking-tight lg:text-6xl">
+                {t("control.title")}
+                <br />
+                <span className="text-muted-foreground">{t("control.title_muted")}</span>
+              </h2>
+              <p className="text-lg leading-relaxed text-muted-foreground">{t("control.subtitle")}</p>
+            </div>
+
+            <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+              {controlItems.map((item) => (
+                <div key={item.title} className="border-t border-foreground/10 pt-6">
+                  <h3 className="font-display mb-3 text-xl">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="relative border-t border-foreground/10 py-32 lg:py-40">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 flex items-center justify-between">
+              <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">{t("testimonials.badge")}</span>
+              <span className="font-mono text-xs text-muted-foreground">
+                {String(testimonial + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
+              </span>
+            </div>
+
+            {quote && (
+              <div className="grid gap-12 lg:grid-cols-[1fr_auto] lg:items-end">
+                <blockquote className="font-serif max-w-4xl text-3xl leading-snug lg:text-5xl">
+                  “{quote.quote}”
+                </blockquote>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setTestimonial((i) => (i - 1 + testimonials.length) % testimonials.length)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 hover:bg-foreground/5"
+                    aria-label="Previous testimonial"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTestimonial((i) => (i + 1) % testimonials.length)}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 hover:bg-foreground/5"
+                    aria-label="Next testimonial"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {quote && (
+              <div className="mt-12 flex flex-col justify-between gap-8 border-t border-foreground/10 pt-8 sm:flex-row sm:items-end">
+                <div>
+                  <div className="font-medium">{quote.author}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{quote.role}</div>
+                </div>
+                <div>
+                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
+                    {t("testimonials.result_label")}
+                  </div>
+                  <div className="font-display mt-1 text-xl">{quote.result}</div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className="relative border-t border-foreground/10 py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="mb-16 lg:mb-24">
+              <SectionEyebrow>{t("faq.badge")}</SectionEyebrow>
+              <h2 className="font-display text-4xl tracking-tight lg:text-6xl">
+                {t("faq.title")}
+                <br />
+                <span className="text-muted-foreground">{t("faq.title_muted")}</span>
+              </h2>
+            </div>
+
+            <div className="mx-auto max-w-3xl">
+              {faqs.map((item, i) => (
+                <div key={item.q} className="border-b border-foreground/10">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                    className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                  >
+                    <span className="font-display text-lg lg:text-xl">{item.q}</span>
+                    <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                  </button>
+                  <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? "max-h-48 pb-6" : "max-h-0"}`}>
+                    <p className="leading-relaxed text-muted-foreground">{item.a}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="relative overflow-hidden py-24 lg:py-32">
+          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+            <div className="relative border border-foreground">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-10"
+                style={{ background: "radial-gradient(600px at 0% 0%, currentColor, transparent 40%)" }}
+              />
+              <div className="relative z-10 flex flex-col items-start justify-between gap-12 px-8 py-16 lg:flex-row lg:items-center lg:px-16 lg:py-24">
+                <div className="flex-1">
+                  <h2 className="font-display mb-8 text-4xl leading-[0.95] tracking-tight lg:text-7xl">
+                    {t("cta.title")}
+                  </h2>
+                  <p className="mb-12 max-w-xl text-xl leading-relaxed text-muted-foreground">
+                    {t("cta.subtitle")}
+                  </p>
+                  <div className="flex flex-col items-start gap-4 sm:flex-row">
+                    <Link href="/login">
+                      <Button className="h-14 rounded-full bg-foreground px-8 text-base text-background hover:bg-foreground/90">
+                        {t("cta.button")}
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Link href="/dashboard">
+                      <Button variant="outline" className="h-14 rounded-full border-foreground/20 px-8 text-base">
+                        {t("cta.secondary")}
+                      </Button>
+                    </Link>
+                  </div>
+                  <p className="mt-6 text-sm text-muted-foreground">{t("cta.footer")}</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* === Rich Footer === */}
-      <footer className="border-t border-gray-100 dark:border-[#333] bg-[#FDFDFC] dark:bg-[#0a0a0a] py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
+      <footer className="border-t border-foreground/10 py-16">
+        <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
+          <div className="mb-16 grid gap-10 md:grid-cols-4">
             <div>
-              <Logo />
-              <p className="text-gray-400 text-sm mt-4 font-light leading-relaxed max-w-[200px]">
-                AI-powered career navigation for the modern professional.
+              <Link href="#top" className="flex items-center">
+                <span className="font-display text-xl tracking-tight">Ariadne</span>
+              </Link>
+              <p className="mt-4 max-w-[240px] text-sm leading-relaxed text-muted-foreground">
+                {t("footer.tagline")}
               </p>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-[#111] dark:text-white mb-4 uppercase tracking-wider">{t("footer.product")}</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                <li><Link href="#features" className="hover:text-[#111] dark:hover:text-white transition-colors">{t("footer.product_features")}</Link></li>
-                <li><Link href="#how-it-works" className="hover:text-[#111] dark:hover:text-white transition-colors">{t("footer.product_explore")}</Link></li>
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.product_pricing")}</span></li>
+              <h4 className="mb-4 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">{t("footer.product")}</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link href="#features" className="hover:text-foreground">{t("footer.product_features")}</Link></li>
+                <li><Link href="#how-it-works" className="hover:text-foreground">{t("footer.product_how")}</Link></li>
+                <li><Link href="#control" className="hover:text-foreground">{t("footer.product_explore")}</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-[#111] dark:text-white mb-4 uppercase tracking-wider">{t("footer.resources")}</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.resources_docs")}</span></li>
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.resources_blog")}</span></li>
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.resources_changelog")}</span></li>
+              <h4 className="mb-4 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">{t("footer.resources")}</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link href="#faq" className="hover:text-foreground">{t("footer.resources_faq")}</Link></li>
+                <li><span className="cursor-default text-foreground/25">{t("footer.resources_docs")}</span></li>
+                <li><span className="cursor-default text-foreground/25">{t("footer.resources_changelog")}</span></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-[#111] dark:text-white mb-4 uppercase tracking-wider">{t("footer.legal")}</h4>
-              <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.legal_privacy")}</span></li>
-                <li><span className="text-gray-300 dark:text-gray-600 cursor-default">{t("footer.legal_terms")}</span></li>
+              <h4 className="mb-4 font-mono text-[11px] tracking-widest text-muted-foreground uppercase">{t("footer.legal")}</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><span className="cursor-default text-foreground/25">{t("footer.legal_privacy")}</span></li>
+                <li><span className="cursor-default text-foreground/25">{t("footer.legal_terms")}</span></li>
+                <li><Link href="#faq" className="hover:text-foreground">{t("footer.legal_security")}</Link></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-100 dark:border-[#333] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-foreground/10 pt-8 md:flex-row">
+            <p className="text-sm text-muted-foreground">
               {t("footer.copyright", { year: new Date().getFullYear() })}
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <LanguageToggle />
               <ThemeToggle />
             </div>

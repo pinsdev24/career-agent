@@ -1,39 +1,49 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun, Monitor } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
+
+function applyTheme(next: "light" | "dark") {
+  const root = document.documentElement;
+  root.classList.toggle("dark", next === "dark");
+  root.classList.toggle("light", next === "light");
+  root.style.colorScheme = next;
+  try {
+    localStorage.setItem("theme", next);
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
+  const { setTheme } = useTheme();
+  const [isDark, setIsDark] = React.useState(false);
 
-  // Avoid hydration mismatch
   React.useEffect(() => {
-    setMounted(true);
+    const root = document.documentElement;
+    const sync = () => setIsDark(root.classList.contains("dark"));
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 dark:border-[#333]">
-        <div className="h-4 w-4" />
-      </div>
-    );
-  }
-
-  const isDark = resolvedTheme === "dark";
+  const toggle = React.useCallback(() => {
+    const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+    applyTheme(next);
+    setTheme(next);
+  }, [setTheme]);
 
   return (
     <button
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-[#333] hover:bg-gray-50 dark:hover:bg-[#111] transition-all text-[#111] dark:text-white"
+      id="theme-toggle"
+      type="button"
+      onClick={toggle}
+      className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-all hover:bg-muted"
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {isDark ? (
-        <Sun className="h-4 w-4 animate-in zoom-in duration-300" />
-      ) : (
-        <Moon className="h-4 w-4 animate-in zoom-in duration-300" />
-      )}
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
       <span className="sr-only">Toggle theme</span>
     </button>
   );
