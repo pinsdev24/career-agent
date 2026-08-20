@@ -19,7 +19,8 @@ os.environ.setdefault("TAVILY_API_KEY", "tvly-test-fake-key-for-testing")
 os.environ.setdefault("SUPABASE_URL", "https://nbyxjxjpzvovxhoelkzx.supabase.co")
 os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-service-key")
 os.environ.setdefault("SUPABASE_DB_URL", "postgresql://postgres:test@localhost:5432/postgres")
-os.environ.setdefault("FRONTEND_URL", "http://localhost:3000")
+os.environ.setdefault("RESEND_API_KEY", "")
+os.environ.setdefault("REDIS_URL", "")
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +183,7 @@ def mock_supabase() -> MagicMock:
     table.upsert.return_value = table
     table.delete.return_value = table
     table.eq.return_value = table
+    table.limit.return_value = table
     table.order.return_value = table
     table.gte.return_value = table
     table.execute = AsyncMock(return_value=MagicMock(data=[]))

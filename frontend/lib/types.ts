@@ -164,3 +164,55 @@ export const PIPELINE_STEPS: PipelineStatus[] = [
   "waiting_letter_review",
   "completed",
 ];
+
+export type ApplicationStatus =
+  | "draft"
+  | "generating"
+  | "packet_ready"
+  | "approved"
+  | "submitted"
+  | "interviewing"
+  | "rejected"
+  | "withdrawn";
+
+export interface ApplicationPacket {
+  id?: string;
+  gap_report?: GapReport | null;
+  draft_letter?: string | null;
+  final_letter?: string | null;
+  best_draft?: string | null;
+  best_score?: number | null;
+  critic_score?: CriticScore | null;
+  revision_count?: number;
+  user_feedback?: string | null;
+}
+
+export interface Application {
+  id: string;
+  user_id: string;
+  posting_id: string;
+  status: ApplicationStatus;
+  error_details?: Record<string, unknown> | null;
+  submitted_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  packet?: ApplicationPacket | null;
+  posting?: {
+    id: string;
+    title?: string;
+    company_name?: string;
+    apply_url?: string;
+    location?: string | null;
+    status?: string;
+  } | null;
+}
+
+export interface WorkItem {
+  id: string;
+  user_id: string;
+  application_id?: string | null;
+  item_type: "review_packet" | "confirm_submitted";
+  status: string;
+  payload?: Record<string, unknown>;
+  created_at?: string | null;
+}

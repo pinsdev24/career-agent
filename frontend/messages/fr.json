@@ -31,6 +31,8 @@
   },
   "Sidebar": {
     "missions": "Missions",
+    "jobs": "Emplois",
+    "applications": "Candidatures",
     "new_mission": "Nouvelle Mission",
     "profile": "Profil",
     "settings": "Paramètres",
@@ -41,32 +43,60 @@
     "cancel": "Annuler",
     "confirm": "Oui, me déconnecter"
   },
+  "Jobs": {
+    "title": "Emplois recommandés",
+    "subtitle": "Personnalisés selon votre profil et préférences — annonces ATS directes uniquement.",
+    "search_placeholder": "Rechercher postes, compétences, entreprises…",
+    "search": "Rechercher",
+    "loading": "Recherche des offres…",
+    "empty": "Aucune offre dans votre fil pour le moment.",
+    "empty_hint": "Uploadez un CV, définissez vos préférences, puis laissez le job engine synchroniser les boards.",
+    "load_more": "Charger plus",
+    "remote": "Télétravail",
+    "why_match": "Pourquoi ça match",
+    "apply": "Ouvrir l'offre",
+    "prepare_packet": "Préparer le dossier",
+    "packet_started": "Dossier en file — ouvrez Candidatures pour relire.",
+    "save": "Sauvegarder",
+    "dismiss": "Pas intéressé",
+    "open_in_careeragent": "Rédiger une lettre avec CareerAgent →",
+    "select_hint": "Sélectionnez une offre pour voir le détail et les raisons du match.",
+    "error_generic": "Impossible de charger les offres. Le job engine tourne-t-il ?"
+  },
+  "Applications": {
+    "title": "Candidatures",
+    "subtitle": "Dossiers générés par l'agent. Vous relisez, puis postulez sur l'ATS.",
+    "empty": "Aucune candidature pour le moment.",
+    "empty_hint": "Choisissez une offre dans le fil et demandez un dossier.",
+    "inbox": "Boîte de relecture",
+    "inbox_empty": "Rien à relire.",
+    "status": "Statut",
+    "review": "Relire le dossier",
+    "approve": "Approuver la lettre",
+    "rewrite": "Réécrire avec un commentaire",
+    "feedback_placeholder": "Que faut-il changer ?",
+    "mark_submitted": "J'ai postulé",
+    "open_ats": "Ouvrir la page de candidature",
+    "copy_letter": "Copier la lettre",
+    "generating": "Génération du dossier…",
+    "error_generic": "Impossible de charger les candidatures."
+  },
   "Landing": {
     "nav": {
+      "product": "Produit",
       "features": "Fonctionnalités",
       "how_it_works": "Comment ça marche",
-      "product": "Produit",
-      "control": "Votre contrôle",
-      "faq": "FAQ",
-      "sign_in": "Connexion",
-      "start": "Commencer",
+      "testimonials": "Témoignages",
       "dashboard": "Tableau de Bord"
     },
     "hero": {
-      "eyebrow": "La plateforme carrière pour les ambitieux",
-      "title_line1": "L'agent",
-      "title_prefix": "pour",
-      "title_words": ["décrocher", "postuler", "matcher", "réussir"],
-      "subtitle": "Votre boîte à outils pour arrêter les lettres génériques et commencer à décrocher des entretiens. Analysez les offres, matchez vos compétences, et envoyez des candidatures qui sonnent comme vous.",
-      "cta_primary": "Essai gratuit",
-      "cta_secondary": "Voir comment ça marche"
+      "title_start": "Décrochez votre job",
+      "title_end": "24x plus vite.",
+      "subtitle": "Arrêtez de passer des heures sur vos lettres de motivation. Les agents IA d'Ariadne analysent les offres, matchent vos compétences et génèrent des candidatures personnalisées — en minutes, pas en jours.",
+      "cta_primary": "Commencer gratuitement",
+      "cta_secondary": "Comment ça marche",
+      "trusted": "Adopté par des candidats chez"
     },
-    "marquee": [
-      { "value": "24x", "label": "candidatures plus rapides" },
-      { "value": "94%", "label": "précision de matching" },
-      { "value": "5 min", "label": "pour relire un brouillon" },
-      { "value": "3", "label": "entretiens dès la 1re semaine" }
-    ],
     "stats": {
       "applications": "Candidatures générées",
       "applications_value": "2 400+",
@@ -77,233 +107,125 @@
       "satisfaction": "Taux de satisfaction",
       "satisfaction_value": "4.9/5"
     },
-    "features": {
-      "badge": "Capacités",
-      "title": "Tout ce qu'il faut.",
-      "title_muted": "Rien de trop.",
-      "items": [
-        {
-          "n": "01",
-          "title": "Matching sémantique",
-          "desc": "Comparez votre CV à l'offre au niveau conceptuel — pas par mots-clés. Un score de fit précis et une liste claire des écarts à combler."
-        },
-        {
-          "n": "02",
-          "title": "Votre voix",
-          "desc": "L'agent Rédacteur apprend votre ton à chaque relecture. Après deux candidatures, il écrit comme vous — plus net, plus convaincant."
-        },
-        {
-          "n": "03",
-          "title": "Humain dans la boucle",
-          "desc": "Rien n'est envoyé dans votre dos. Chaque brouillon passe par vous : modifier, réécrire, ou approuver."
-        },
-        {
-          "n": "04",
-          "title": "Mode Exploration",
-          "desc": "Pas de lien d'offre ? Scout cherche sur le web les postes qui matchent vraiment votre profil, classés par fit sémantique."
-        }
-      ]
-    },
     "how_it_works": {
-      "badge": "Processus",
-      "title": "Trois étapes.",
-      "title_muted": "Des entretiens en série.",
-      "preview_title": "Console Agent",
-      "preview_status": "En direct",
-      "preview_events": "{count} événements",
-      "preview_run": "run_7f3a",
-      "preview_logs": [
-        [
-          { "type": "info", "time": "14:02:11", "text": "Pipeline initialisé." },
-          { "type": "agent_action", "time": "14:02:13", "text": "Lecture du CV — 2 pages" },
-          { "type": "agent_action", "time": "14:02:16", "text": "Extraction des compétences, rôles et intentions" },
-          { "type": "node_finish", "time": "14:02:19", "text": "Étape terminée : Profil" },
-          { "type": "info", "time": "14:02:20", "text": "18 compétences cartographiées. Profil prêt." }
-        ],
-        [
-          { "type": "info", "time": "14:08:02", "text": "Scout : recherche sur le web ouvert" },
-          { "type": "agent_action", "time": "14:08:05", "text": "Classement des postes par affinité sémantique" },
-          { "type": "agent_action", "time": "14:08:09", "text": "Matcher : analyse des écarts" },
-          { "type": "node_finish", "time": "14:08:12", "text": "Étape terminée : Matcher" },
-          { "type": "info", "time": "14:08:13", "text": "Match 94 %. Shortlist prête." }
-        ],
-        [
-          { "type": "info", "time": "14:14:31", "text": "Rédacteur : brouillon dans votre ton" },
-          { "type": "agent_action", "time": "14:14:34", "text": "Critique : notation sur 5 dimensions" },
-          { "type": "node_finish", "time": "14:14:38", "text": "Score 91/100 — nouveau meilleur brouillon" },
-          { "type": "info", "time": "14:14:39", "text": "En pause pour votre relecture" },
-          { "type": "node_finish", "time": "14:14:40", "text": "Lettre prête à approuver." }
-        ]
-      ],
+      "badge": "Comment ça marche",
+      "title": "Du CV à la candidature sur mesure en 3 étapes.",
+      "subtitle": "Pas de modèles. Pas de copier-coller. Déposez votre CV et laissez nos agents IA faire le travail.",
       "steps": [
         {
-          "roman": "I",
+          "step": "01",
           "title": "Téléchargez votre CV",
-          "desc": "Déposez-le une fois. Ariadne extrait compétences, expérience et objectifs dans un profil sémantique qui s'améliore avec le temps."
+          "desc": "Déposez votre CV une seule fois. Ariadne extrait vos compétences, votre expérience et vos objectifs de carrière pour construire un profil sémantique qui s'améliore au fil du temps."
         },
         {
-          "roman": "II",
-          "title": "Visez un poste",
-          "desc": "Collez une URL, ou laissez Scout chercher. Les agents analysent l'entreprise et cartographient les écarts qui comptent vraiment."
+          "step": "02",
+          "title": "Collez un lien d'offre — ou laissez-nous chercher",
+          "desc": "Fournissez l'URL d'une offre d'emploi, ou activez le mode Exploration. Notre agent Scout parcourt le web et identifie les postes qui correspondent vraiment à votre profil."
         },
         {
-          "roman": "III",
-          "title": "Relisez et envoyez",
-          "desc": "Le Rédacteur écrit. Le Critique note. Vous approuvez. Une lettre sur mesure en minutes — le stylo reste dans votre main."
+          "step": "03",
+          "title": "Révisez, approuvez et postulez",
+          "desc": "Notre agent Rédacteur rédige une lettre hyper-personnalisée. Un agent Critique l'audite. Vous révisez, ajustez si besoin, et envoyez — le tout en moins de 5 minutes."
         }
       ]
     },
-    "product": {
-      "badge": "En coulisses",
-      "title": "Le travail,",
-      "title_muted": "pas le pitch.",
-      "subtitle": "Des missions avec un score de match. Le brouillon à côté des écarts. Vous voyez toujours pourquoi — et vous approuvez toujours.",
-      "dashboard_label": "Missions",
-      "dashboard_url": "ariadne.app/dashboard",
-      "dashboard_caption": "Tous les pipelines dans une liste — score, statut, prochaine action.",
-      "dashboard_alt": "Tableau de bord Ariadne avec les missions, scores de match et statuts de relecture",
-      "review_label": "Relecture",
-      "review_url": "ariadne.app/review",
-      "review_caption": "Le brouillon à gauche. L'analyse d'écarts à droite. Approuver, réécrire, ou modifier.",
-      "review_alt": "Relecture de lettre avec analyse d'écarts, compétences matchées, et boutons approuver ou réécrire",
-      "insights": [
-        { "k": "Match", "v": "Affinité sémantique sur chaque poste, pas du bruit de mots-clés." },
-        { "k": "Statut", "v": "Lettre à relire ou terminée — la prochaine action est évidente." },
-        { "k": "Contrôle", "v": "Rien ne part sans votre réécriture ou votre accord." }
-      ]
+    "features": {
+      "badge": "Pourquoi Ariadne",
+      "title": "Chaque candidature, conçue pour l'impact.",
+      "subtitle": "La plupart des outils IA collent du texte générique. Ariadne déploie des agents spécialisés qui analysent, rédigent et critiquent — pour que chaque lettre fasse mouche.",
+      "items": {
+        "gap": {
+          "title": "94% de précision de matching",
+          "desc": "L'analyse sémantique compare votre CV à l'offre d'emploi au niveau conceptuel — pas par mots-clés. Vous obtenez un score de correspondance précis et une liste claire des écarts à combler."
+        },
+        "tone": {
+          "title": "Votre voix, pas celle de l'IA",
+          "desc": "L'agent Rédacteur apprend votre ton personnel à chaque révision. Après 2 candidatures, il écrit exactement comme vous — mais plus percutant et plus convaincant."
+        },
+        "zap": {
+          "title": "Vous gardez le contrôle",
+          "desc": "Pas de boîte noire. Chaque brouillon passe par votre validation avant finalisation. Modifiez, demandez une réécriture ou approuvez — le dernier mot est toujours le vôtre."
+        }
+      }
     },
     "scout": {
-      "badge": "Exploration",
-      "title": "Scout par",
-      "title_muted": "défaut.",
-      "subtitle": "Pas besoin de lien. Scout parcourt le web et classe les postes par correspondance sémantique : vous passez du temps en entretien, pas à chasser.",
-      "stat_sources_value": "Web",
-      "stat_sources": "Découverte live",
-      "stat_rank_value": "94%",
-      "stat_rank": "Classement",
-      "stat_refresh_value": "Auto",
-      "stat_refresh": "Résultats frais",
-      "status": "Réseau Scout",
-      "status_ok": "Tout opérationnel",
-      "sources": [
-        { "city": "LinkedIn", "region": "Professionnel", "ms": "96%" },
-        { "city": "Welcome to the Jungle", "region": "Europe", "ms": "91%" },
-        { "city": "Indeed", "region": "Global", "ms": "88%" },
-        { "city": "Pages carrières", "region": "Direct", "ms": "93%" },
-        { "city": "Jobboards", "region": "Niche", "ms": "87%" },
-        { "city": "Votre URL", "region": "Manuel", "ms": "100%" }
-      ]
-    },
-    "metrics": {
-      "badge": "Métriques live",
-      "title": "Une perf que",
-      "title_muted": "vous mesurez.",
-      "live": "Live",
-      "applications": "Candidatures générées",
-      "uptime": "Brouillons sous votre contrôle",
-      "latency": "Temps de relecture moyen",
-      "countries": "Précision de matching"
-    },
-    "security": {
-      "badge": "Sécurité",
-      "title": "La confiance",
-      "title_muted": "n'est pas négociable.",
-      "subtitle": "Votre CV et vos lettres restent les vôtres. Chiffrement, accès par ligne, et validation avant envoi — intégrés à chaque couche.",
-      "badges": ["Auth Supabase", "RLS", "TLS", "Chiffré"],
+      "badge": "Mode Exploration",
+      "title": "Pas de lien d'offre ? Pas de problème.",
+      "subtitle": "Activez le mode Exploration et laissez l'agent Scout d'Ariadne chercher sur le web les postes qui matchent votre profil. Concentrez-vous sur les entretiens — on s'occupe de la chasse.",
       "items": [
-        { "title": "Chiffrement au repos", "desc": "Données personnelles et documents chiffrés, jamais vendus ni partagés avec des tiers." },
-        { "title": "Accès par ligne", "desc": "Chaque requête est authentifiée. Vous ne voyez que vos missions, brouillons et profil." },
-        { "title": "Vous approuvez d'abord", "desc": "Rien n'est envoyé en votre nom. L'humain dans la boucle est le défaut, pas une option." },
-        { "title": "Privé par conception", "desc": "Surface minimale : CV, contexte de l'offre, et la lettre que vous choisissez de garder." }
-      ]
-    },
-    "control": {
-      "badge": "Votre contrôle",
-      "title": "Conçu avec vous.",
-      "title_muted": "Pas autour de vous.",
-      "subtitle": "Les agents font la recherche et le premier jet. Vous gardez le jugement — modifier, réécrire, ou approuver avant que quoi que ce soit parte.",
-      "items": [
-        { "title": "Mémoire de ton", "desc": "Vos retours s'accumulent. Plus vous relisez, plus ça sonne comme vous." },
-        { "title": "Rapports d'écarts", "desc": "Voyez exactement où vous matchez — et où non — puis choisissez comment vous positionner." },
-        { "title": "Scores du Critique", "desc": "Structure, pertinence et ton notés avant même d'ouvrir le brouillon." },
-        { "title": "Boucles de réécriture", "desc": "Demandez une passe. Le pipeline relance. Gardez la version qui vous va." }
-      ]
+        "Découverte d'emplois par IA sur tout le web",
+        "Classés par correspondance sémantique avec votre CV",
+        "Résultats actualisés automatiquement"
+      ],
+      "cta": "Essayer le mode Exploration"
     },
     "testimonials": {
-      "badge": "Ce qu'ils en disent",
-      "result_label": "Résultat clé",
+      "badge": "Histoires de Candidats",
+      "title": "De vraies personnes. De vrais résultats.",
+      "subtitle": "Rejoignez les professionnels qui ont divisé leur temps de candidature par 24.",
       "items": [
         {
-          "quote": "J'ai déposé mon CV et Ariadne m'a matché avec 5 postes que je voulais vraiment. Les lettres étaient meilleures que tout ce que j'avais écrit moi-même.",
+          "quote": "J'ai déposé mon CV et Ariadne m'a matché avec 5 postes que je voulais vraiment. Les lettres de motivation étaient meilleures que tout ce que j'avais écrit moi-même.",
           "author": "Sarah J.",
-          "role": "Product Manager",
-          "result": "5 postes matchés"
+          "role": "Product Manager chez Stripe"
         },
         {
-          "quote": "Après deux candidatures, l'agent écrivait exactement comme moi — mais plus net. La mémoire de ton change tout.",
+          "quote": "Après deux candidatures, l'agent a commencé à écrire exactement comme moi — mais en mieux. La mémoire du ton de voix est un game-changer.",
           "author": "Michael T.",
-          "role": "Ingénieur Frontend",
-          "result": "Ça sonne comme moi"
+          "role": "Ingénieur Frontend chez Vercel"
         },
         {
-          "quote": "Je passais 2 heures par candidature. Maintenant, 5 minutes pour relire et approuver. 3 entretiens dès la première semaine.",
+          "quote": "Je passais 2 heures par candidature. Maintenant il me faut 5 minutes pour réviser et approuver. J'ai décroché 3 entretiens dès la première semaine.",
           "author": "Elena R.",
-          "role": "Data Scientist",
-          "result": "3 entretiens, semaine 1"
+          "role": "Data Scientist chez Datadog"
         }
       ]
     },
     "faq": {
       "badge": "FAQ",
-      "title": "Des réponses claires.",
-      "title_muted": "Sans surprise.",
+      "title": "Questions fréquentes.",
       "items": [
         {
           "q": "Ariadne est-il vraiment gratuit ?",
-          "a": "Oui. Vous pouvez générer des candidatures gratuitement, sans carte. Des offres premium existent pour les volumes élevés et les fonctions avancées."
+          "a": "Oui. Vous pouvez générer des candidatures gratuitement sans carte de crédit. Nous proposons des forfaits premium pour les utilisateurs intensifs et les fonctionnalités avancées."
         },
         {
-          "q": "Ça marche pour tous les secteurs ?",
-          "a": "Oui. Le matching sémantique fonctionne en tech, finance, santé, conseil, métiers créatifs, et plus. Il analyse compétences et contexte — pas des modèles par secteur."
+          "q": "Ça fonctionne pour tous les secteurs ?",
+          "a": "Absolument. Le matching sémantique d'Ariadne fonctionne dans la tech, la finance, la santé, le conseil, les métiers créatifs, et bien plus. Il analyse les compétences et le contexte — pas des modèles par secteur."
         },
         {
-          "q": "Les lettres sonnent-elles génériques ?",
-          "a": "Non. L'agent Rédacteur apprend votre ton. Après deux ou trois relectures, il s'adapte à votre voix."
+          "q": "Les lettres générées sont-elles génériques ?",
+          "a": "Non. Notre agent Rédacteur apprend votre ton personnel à partir de vos retours. Après 2-3 révisions, il s'adapte à votre voix — produisant des lettres qui vous ressemblent, en mieux."
         },
         {
           "q": "Comment sont traitées mes données ?",
-          "a": "CV et données personnelles chiffrés, jamais partagés. Authentification Supabase et politiques d'accès par ligne."
+          "a": "Votre CV et vos données personnelles sont chiffrés et jamais partagés avec des tiers. Nous utilisons une sécurité de niveau entreprise avec l'authentification Supabase et des politiques d'accès par ligne."
         },
         {
-          "q": "Puis-je modifier les lettres ?",
-          "a": "Oui. Chaque brouillon passe par vous : modifier, demander une réécriture, ou approuver."
+          "q": "Puis-je modifier les lettres générées ?",
+          "a": "Bien sûr. Vous avez le contrôle total. Chaque brouillon passe par votre validation — vous pouvez modifier, demander une réécriture ou approuver avant toute finalisation."
         }
       ]
     },
     "cta": {
-      "title": "Prêt à décrocher quelque chose de grand ?",
-      "subtitle": "Rejoignez les candidats qui ont arrêté de deviner et ont commencé à envoyer des candidatures qui sonnent vraiment comme eux.",
+      "title": "Votre prochain poste est à un clic.",
+      "subtitle": "Rejoignez des milliers de professionnels qui ont cessé de deviner et ont commencé à décrocher des entretiens grâce à des candidatures de précision.",
       "button": "Commencer gratuitement",
-      "secondary": "Aller au tableau de bord",
-      "footer": "Aucune carte requise"
+      "footer": "Aucune carte de crédit requise · Gratuit pour toujours en usage de base"
     },
     "footer": {
-      "tagline": "Le lab carrière pour ceux qui envoient des candidatures, pas des modèles.",
       "product": "Produit",
       "product_features": "Fonctionnalités",
       "product_explore": "Mode Exploration",
-      "product_how": "Comment ça marche",
-      "product_inside": "En coulisses",
+      "product_pricing": "Tarifs",
       "resources": "Ressources",
       "resources_docs": "Documentation",
-      "resources_faq": "FAQ",
+      "resources_blog": "Blog",
       "resources_changelog": "Changelog",
-      "company": "Entreprise",
       "legal": "Juridique",
-      "legal_privacy": "Confidentialité",
-      "legal_terms": "Conditions",
-      "legal_security": "Sécurité",
-      "copyright": "© {year} Ariadne. Tous droits réservés."
+      "legal_privacy": "Politique de confidentialité",
+      "legal_terms": "Conditions d'utilisation",
+      "copyright": "© {year} Ariadne. Au service des chercheurs d'emploi dans le monde entier."
     }
   },
   "Dashboard": {

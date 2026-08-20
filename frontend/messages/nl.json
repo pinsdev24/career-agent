@@ -31,6 +31,8 @@
   },
   "Sidebar": {
     "missions": "Missies",
+    "jobs": "Banen",
+    "applications": "Sollicitaties",
     "new_mission": "Nieuwe Missie",
     "profile": "Profiel",
     "settings": "Instellingen",
@@ -41,32 +43,60 @@
     "cancel": "Annuleren",
     "confirm": "Ja, uitloggen"
   },
+  "Jobs": {
+    "title": "Aanbevolen banen",
+    "subtitle": "Gepersonaliseerd op basis van je profiel en voorkeuren — alleen directe ATS-vacatures.",
+    "search_placeholder": "Zoek rollen, skills, bedrijven…",
+    "search": "Zoeken",
+    "loading": "Matches zoeken…",
+    "empty": "Nog geen banen in je feed.",
+    "empty_hint": "Upload een CV, stel voorkeuren in, en wacht tot de job engine boards synchroniseert.",
+    "load_more": "Meer laden",
+    "remote": "Remote",
+    "why_match": "Waarom dit matcht",
+    "apply": "Vacature openen",
+    "prepare_packet": "Sollicitatiedossier voorbereiden",
+    "packet_started": "Dossier in de wachtrij — open Sollicitaties om te reviewen.",
+    "save": "Opslaan",
+    "dismiss": "Niet interessant",
+    "open_in_careeragent": "Motivatiebrief met CareerAgent →",
+    "select_hint": "Selecteer een baan voor details en matchredenen.",
+    "error_generic": "Kon banen niet laden. Draait de job engine?"
+  },
+  "Applications": {
+    "title": "Sollicitaties",
+    "subtitle": "Pakketten die de agent heeft opgesteld. Jij reviewt, daarna dien je zelf in op de ATS.",
+    "empty": "Nog geen sollicitaties.",
+    "empty_hint": "Kies een baan in de feed en vraag een dossier aan.",
+    "inbox": "Inbox",
+    "inbox_empty": "Niets te reviewen.",
+    "status": "Status",
+    "review": "Dossier reviewen",
+    "approve": "Brief goedkeuren",
+    "rewrite": "Herschrijven met feedback",
+    "feedback_placeholder": "Wat moet er veranderen?",
+    "mark_submitted": "Ik heb gesolliciteerd",
+    "open_ats": "Sollicitatiepagina openen",
+    "copy_letter": "Brief kopiëren",
+    "generating": "Dossier wordt gegenereerd…",
+    "error_generic": "Kon sollicitaties niet laden."
+  },
   "Landing": {
     "nav": {
+      "product": "Product",
       "features": "Functies",
       "how_it_works": "Hoe het werkt",
-      "product": "Product",
-      "control": "Jouw controle",
-      "faq": "FAQ",
-      "sign_in": "Inloggen",
-      "start": "Aan de slag",
+      "testimonials": "Succesverhalen",
       "dashboard": "Dashboard"
     },
     "hero": {
-      "eyebrow": "Het carrièreplatform voor ambitieuze mensen",
-      "title_line1": "De agent",
-      "title_prefix": "om te",
-      "title_words": ["landen", "solliciteren", "matchen", "slagen"],
-      "subtitle": "Je toolkit om te stoppen met generieke brieven en te beginnen met gesprekken binnenhalen. Analyseer vacatures, match je skills, en verstuur sollicitaties die klinken als jij.",
-      "cta_primary": "Start gratis trial",
-      "cta_secondary": "Bekijk hoe het werkt"
+      "title_start": "Vind je droombaan",
+      "title_end": "24x sneller.",
+      "subtitle": "Stop met urenlang sollicitatiebrieven schrijven. Ariadne's AI-agents analyseren vacatures, matchen je vaardigheden en genereren gepersonaliseerde sollicitaties — in minuten, niet in dagen.",
+      "cta_primary": "Start gratis — geen kaart nodig",
+      "cta_secondary": "Hoe het werkt",
+      "trusted": "Vertrouwd door kandidaten bij"
     },
-    "marquee": [
-      { "value": "24x", "label": "snellere sollicitaties" },
-      { "value": "94%", "label": "match-nauwkeurigheid" },
-      { "value": "5 min", "label": "om een draft te reviewen" },
-      { "value": "3", "label": "gesprekken in week één" }
-    ],
     "stats": {
       "applications": "Sollicitaties gegenereerd",
       "applications_value": "2.400+",
@@ -77,233 +107,125 @@
       "satisfaction": "Tevredenheidsgraad",
       "satisfaction_value": "4.9/5"
     },
-    "features": {
-      "badge": "Mogelijkheden",
-      "title": "Alles wat je nodig hebt.",
-      "title_muted": "Niets wat je niet nodig hebt.",
-      "items": [
-        {
-          "n": "01",
-          "title": "Semantische matching",
-          "desc": "Vergelijk je CV met de vacature op conceptueel niveau — niet op keywords. Een precieze fitscore en een duidelijke lijst hiaten."
-        },
-        {
-          "n": "02",
-          "title": "Klinkt als jij",
-          "desc": "De Schrijfagent leert je toon bij elke review. Na twee sollicitaties schrijft hij zoals jij — scherper, strakker, overtuigender."
-        },
-        {
-          "n": "03",
-          "title": "Mens in de loop",
-          "desc": "Niets wordt achter je rug verstuurd. Elk concept gaat door jouw review: bewerken, herschrijven of goedkeuren."
-        },
-        {
-          "n": "04",
-          "title": "Exploratiemodus",
-          "desc": "Geen vacaturelink? Scout zoekt op het web naar rollen die écht bij je profiel passen, gerangschikt op semantische fit."
-        }
-      ]
-    },
     "how_it_works": {
-      "badge": "Proces",
-      "title": "Drie stappen.",
-      "title_muted": "Oneindig veel gesprekken.",
-      "preview_title": "Agent Console",
-      "preview_status": "Live",
-      "preview_events": "{count} events",
-      "preview_run": "run_7f3a",
-      "preview_logs": [
-        [
-          { "type": "info", "time": "14:02:11", "text": "Pipeline gestart." },
-          { "type": "agent_action", "time": "14:02:13", "text": "CV lezen — 2 pagina's" },
-          { "type": "agent_action", "time": "14:02:16", "text": "Skills, rollen en intentie extraheren" },
-          { "type": "node_finish", "time": "14:02:19", "text": "Stap voltooid: Profiel" },
-          { "type": "info", "time": "14:02:20", "text": "18 skills gemapt. Profiel klaar." }
-        ],
-        [
-          { "type": "info", "time": "14:08:02", "text": "Scout: zoeken op het open web" },
-          { "type": "agent_action", "time": "14:08:05", "text": "Rollen rangschikken op semantische fit" },
-          { "type": "agent_action", "time": "14:08:09", "text": "Matcher: hiaatanalyse" },
-          { "type": "node_finish", "time": "14:08:12", "text": "Stap voltooid: Matcher" },
-          { "type": "info", "time": "14:08:13", "text": "Match 94%. Shortlist klaar." }
-        ],
-        [
-          { "type": "info", "time": "14:14:31", "text": "Writer: draft in jouw toon" },
-          { "type": "agent_action", "time": "14:14:34", "text": "Critic: scoring over 5 dimensies" },
-          { "type": "node_finish", "time": "14:14:38", "text": "Score 91/100 — nieuwe beste draft" },
-          { "type": "info", "time": "14:14:39", "text": "Gepauzeerd voor jouw review" },
-          { "type": "node_finish", "time": "14:14:40", "text": "Brief klaar om goed te keuren." }
-        ]
-      ],
+      "badge": "Hoe het werkt",
+      "title": "Van CV tot sollicitatie op maat in 3 stappen.",
+      "subtitle": "Geen sjablonen. Geen kopiëren en plakken. Upload je CV en laat onze AI-agents het zware werk doen.",
       "steps": [
         {
-          "roman": "I",
+          "step": "01",
           "title": "Upload je CV",
-          "desc": "Eén keer droppen. Ariadne haalt skills, ervaring en doelen uit je CV tot een semantisch profiel dat slimmer wordt."
+          "desc": "Upload je CV eenmalig. Ariadne extraheert je vaardigheden, ervaring en carrièredoelen om een semantisch profiel op te bouwen dat steeds slimmer wordt."
         },
         {
-          "roman": "II",
-          "title": "Richt op een rol",
-          "desc": "Plak een URL, of laat Scout zoeken. Agents onderzoeken het bedrijf en mappen de hiaten die ertoe doen."
+          "step": "02",
+          "title": "Plak een vacaturelink — of laat ons zoeken",
+          "desc": "Geef een vacature-URL op, of activeer Exploratiemodus. Onze Scout Agent doorzoekt het web en vindt de rollen die echt bij je profiel passen."
         },
         {
-          "roman": "III",
-          "title": "Review en verstuur",
-          "desc": "Writer schrijft. Critic scoort. Jij keurt goed. Een brief op maat in minuten — de pen blijft van jou."
+          "step": "03",
+          "title": "Beoordeel, keur goed & solliciteer",
+          "desc": "Onze Schrijfagent stelt een hyper-gepersonaliseerde sollicitatiebrief op. Een Critic Agent controleert deze. Jij beoordeelt, past aan indien nodig, en verstuurt — alles in minder dan 5 minuten."
         }
       ]
     },
-    "product": {
-      "badge": "Binnenin",
-      "title": "Het werk,",
-      "title_muted": "niet de pitch.",
-      "subtitle": "Missions met matchscores. Drafts naast de gaps. Je ziet altijd waarom — en jij keurt altijd goed.",
-      "dashboard_label": "Missions",
-      "dashboard_url": "ariadne.app/dashboard",
-      "dashboard_caption": "Elke pipeline in één lijst — matchscore, status, volgende actie.",
-      "dashboard_alt": "Ariadne-dashboard met missions, matchscores en reviewstatus",
-      "review_label": "Review",
-      "review_url": "ariadne.app/review",
-      "review_caption": "Draft links. Gap-analyse rechts. Goedkeuren, herschrijven of bewerken.",
-      "review_alt": "Coverletter-review met gap-analyse, matching skills, en goedkeuren of herschrijven",
-      "insights": [
-        { "k": "Match", "v": "Semantische fit op elke rol, geen keyword-ruis." },
-        { "k": "Status", "v": "Brief reviewen of completed — de volgende actie is duidelijk." },
-        { "k": "Controle", "v": "Niets vertrekt zonder jouw herschrijving of goedkeuring." }
-      ]
+    "features": {
+      "badge": "Waarom Ariadne",
+      "title": "Elke sollicitatie, ontworpen voor impact.",
+      "subtitle": "De meeste AI-tools plakken generieke tekst. Ariadne zet gespecialiseerde agents in die analyseren, schrijven en beoordelen — zodat elke brief raak is.",
+      "items": {
+        "gap": {
+          "title": "94% match-nauwkeurigheid",
+          "desc": "Semantische analyse vergelijkt je CV met de vacature op conceptueel niveau — niet op trefwoorden. Je krijgt een precieze fitscore en een duidelijke lijst van hiaten om aan te pakken."
+        },
+        "tone": {
+          "title": "Klinkt als jij, niet als AI",
+          "desc": "De Schrijfagent leert je persoonlijke toon bij elke beoordeling. Na 2 sollicitaties schrijft hij precies zoals jij — maar scherper, strakker en overtuigender."
+        },
+        "zap": {
+          "title": "Jij behoudt de controle",
+          "desc": "Geen black box. Elk concept gaat door jouw beoordeling voordat het wordt gefinaliseerd. Bewerk, vraag een herschrijving aan of keur goed — het laatste woord is altijd van jou."
+        }
+      }
     },
     "scout": {
-      "badge": "Explore",
-      "title": "Scout als",
-      "title_muted": "standaard.",
-      "subtitle": "Geen link nodig. Scout doorzoekt het open web en rangschikt rollen op semantische match, zodat jij interviewt — niet jaagt.",
-      "stat_sources_value": "Web",
-      "stat_sources": "Live discovery",
-      "stat_rank_value": "94%",
-      "stat_rank": "Match-ranking",
-      "stat_refresh_value": "Auto",
-      "stat_refresh": "Verse resultaten",
-      "status": "Scout-netwerk",
-      "status_ok": "Alles operationeel",
-      "sources": [
-        { "city": "LinkedIn", "region": "Professional", "ms": "96%" },
-        { "city": "Welcome to the Jungle", "region": "Europa", "ms": "91%" },
-        { "city": "Indeed", "region": "Globaal", "ms": "88%" },
-        { "city": "Company careers", "region": "Direct", "ms": "93%" },
-        { "city": "Boards", "region": "Niche", "ms": "87%" },
-        { "city": "Jouw URL", "region": "Handmatig", "ms": "100%" }
-      ]
-    },
-    "metrics": {
-      "badge": "Live metrics",
-      "title": "Performance die",
-      "title_muted": "je kunt meten.",
-      "live": "Live",
-      "applications": "Sollicitaties gegenereerd",
-      "uptime": "Drafts die jij nog stuurt",
-      "latency": "Gemiddelde reviewtijd",
-      "countries": "Match-nauwkeurigheid"
-    },
-    "security": {
-      "badge": "Beveiliging",
-      "title": "Vertrouwen is",
-      "title_muted": "niet onderhandelbaar.",
-      "subtitle": "Je CV en brieven blijven van jou. Encryptie, row-level access en review-before-send zitten in elke laag — niet erachteraan geplakt.",
-      "badges": ["Supabase Auth", "RLS", "TLS", "Encrypted"],
+      "badge": "Exploratiemodus",
+      "title": "Geen vacaturelink? Geen probleem.",
+      "subtitle": "Activeer Exploratiemodus en laat Ariadne's Scout Agent het web doorzoeken naar rollen die bij je profiel passen. Jij focust op sollicitatiegesprekken — wij doen het zoekwerk.",
       "items": [
-        { "title": "Encrypted at rest", "desc": "Persoonsgegevens en documenten zijn versleuteld en worden nooit verkocht of gedeeld." },
-        { "title": "Row-level access", "desc": "Elke request is geauthenticeerd. Je ziet alleen je eigen missies, drafts en profiel." },
-        { "title": "Jij keurt eerst goed", "desc": "Niets wordt namens jou verstuurd. Human-in-the-loop is de default, geen optie." },
-        { "title": "Privé by design", "desc": "Kleine surface: CV, vacaturecontext, en de brief die jij bewaart." }
-      ]
-    },
-    "control": {
-      "badge": "Jouw controle",
-      "title": "Gebouwd mét jou.",
-      "title_muted": "Niet om je heen.",
-      "subtitle": "Agents doen research en de eerste draft. Jij houdt het oordeel — bewerk, herschrijf of keur goed voordat iets je bureau verlaat.",
-      "items": [
-        { "title": "Toongeheugen", "desc": "Feedback stapelt. Hoe meer je reviewt, hoe meer het klinkt als jij." },
-        { "title": "Gap-rapporten", "desc": "Zie precies waar je matcht en waar niet — en kies hoe je het positioneert." },
-        { "title": "Critic-scores", "desc": "Structuur, relevantie en toon gescoord voordat je de draft opent." },
-        { "title": "Herschrijflussen", "desc": "Vraag een pass. De pipeline draait opnieuw. Houd de versie die klopt." }
-      ]
+        "AI-aangedreven vacatureontdekking op het hele web",
+        "Gerangschikt op semantische match met je CV",
+        "Nieuwe resultaten automatisch vernieuwd"
+      ],
+      "cta": "Probeer Exploratiemodus"
     },
     "testimonials": {
-      "badge": "Wat mensen zeggen",
-      "result_label": "Kernresultaat",
+      "badge": "Verhalen van Kandidaten",
+      "title": "Echte mensen. Echte resultaten.",
+      "subtitle": "Sluit je aan bij professionals die hun sollicitatietijd met 24x hebben verkort.",
       "items": [
         {
-          "quote": "Ik dropte mijn CV en Ariadne matchte me met 5 rollen die ik écht wilde. De brieven waren beter dan alles wat ik zelf had geschreven.",
+          "quote": "Ik heb mijn CV geüpload en Ariadne matchte me met 5 rollen die ik echt wilde. De sollicitatiebrieven waren beter dan alles wat ik zelf had geschreven.",
           "author": "Sarah J.",
-          "role": "Product Manager",
-          "result": "5 gematchte rollen"
+          "role": "Product Manager bij Stripe"
         },
         {
-          "quote": "Na twee sollicitaties schreef de agent precies zoals ik — maar scherper. Het toongeheugen is een game-changer.",
+          "quote": "Na twee sollicitaties begon de agent precies zoals ik te schrijven — maar scherper. Het Tone of Voice Geheugen is een game-changer.",
           "author": "Michael T.",
-          "role": "Frontend Engineer",
-          "result": "Klinkt als ik"
+          "role": "Frontend Engineer bij Vercel"
         },
         {
-          "quote": "Ik was 2 uur kwijt per sollicitatie. Nu 5 minuten reviewen en goedkeuren. 3 gesprekken in mijn eerste week.",
+          "quote": "Vroeger besteedde ik 2 uur per sollicitatie. Nu kost het me 5 minuten om te beoordelen en goed te keuren. Ik had 3 gesprekken in mijn eerste week.",
           "author": "Elena R.",
-          "role": "Data Scientist",
-          "result": "3 gesprekken, week één"
+          "role": "Data Scientist bij Datadog"
         }
       ]
     },
     "faq": {
       "badge": "FAQ",
-      "title": "Eenvoudige antwoorden.",
-      "title_muted": "Geen verrassingen.",
+      "title": "Veelgestelde vragen.",
       "items": [
         {
           "q": "Is Ariadne echt gratis?",
-          "a": "Ja. Je kunt gratis sollicitaties genereren zonder creditcard. Premium-tiers bestaan voor high-volume gebruik en advanced features."
+          "a": "Ja. Je kunt gratis sollicitaties genereren zonder creditcard. We bieden premium-abonnementen voor intensieve gebruikers en geavanceerde functies."
         },
         {
           "q": "Werkt het voor elke sector?",
-          "a": "Ja. Semantische matching werkt in tech, finance, zorg, consulting, creatieve rollen en meer. Het analyseert skills en context — geen sectorsjablonen."
+          "a": "Absoluut. Ariadne's semantische matching werkt in tech, finance, gezondheidszorg, consulting, creatieve functies en meer. Het analyseert vaardigheden en context — geen sectorspecifieke sjablonen."
         },
         {
-          "q": "Klinken de brieven generiek?",
-          "a": "Nee. De Schrijfagent leert je toon uit je feedback. Na twee of drie reviews past hij zich aan je stem aan."
+          "q": "Klinken de sollicitatiebrieven generiek?",
+          "a": "Nee. Onze Schrijfagent leert je persoonlijke toon uit je feedback. Na 2-3 beoordelingen past hij zich aan je stem aan — met als resultaat brieven die klinken als jij, maar beter."
         },
         {
-          "q": "Hoe worden mijn data behandeld?",
-          "a": "Je CV en persoonsgegevens zijn versleuteld en worden nooit gedeeld. We gebruiken Supabase-auth en row-level access."
+          "q": "Hoe worden mijn gegevens behandeld?",
+          "a": "Je CV en persoonlijke gegevens worden versleuteld en nooit gedeeld met derden. We gebruiken enterprise-grade beveiliging met Supabase-authenticatie en toegangsbeleid op rijniveau."
         },
         {
-          "q": "Kan ik gegenereerde brieven bewerken?",
-          "a": "Natuurlijk. Elk concept gaat door jouw review — bewerk, vraag een herschrijving, of keur goed."
+          "q": "Kan ik de gegenereerde brieven bewerken?",
+          "a": "Natuurlijk. Je hebt volledige controle. Elk concept gaat door jouw beoordeling — je kunt bewerken, een herschrijving aanvragen of goedkeuren voordat iets wordt gefinaliseerd."
         }
       ]
     },
     "cta": {
-      "title": "Klaar om iets groots te landen?",
-      "subtitle": "Sluit je aan bij kandidaten die stopten met gokken en sollicitaties gingen versturen die écht klinken als zij.",
-      "button": "Start gratis",
-      "secondary": "Naar het dashboard",
-      "footer": "Geen creditcard vereist"
+      "title": "Je volgende rol is één klik verwijderd.",
+      "subtitle": "Sluit je aan bij duizenden professionals die stopten met gokken en begonnen met het binnenhalen van gesprekken dankzij precision-crafted sollicitaties.",
+      "button": "Start vandaag gratis",
+      "footer": "Geen creditcard vereist · Gratis voor altijd bij basisgebruik"
     },
     "footer": {
-      "tagline": "Het carrière-lab voor mensen die sollicitaties versturen, geen sjablonen.",
       "product": "Product",
       "product_features": "Functies",
       "product_explore": "Exploratiemodus",
-      "product_how": "Hoe het werkt",
-      "product_inside": "Binnenin",
+      "product_pricing": "Prijzen",
       "resources": "Bronnen",
       "resources_docs": "Documentatie",
-      "resources_faq": "FAQ",
+      "resources_blog": "Blog",
       "resources_changelog": "Changelog",
-      "company": "Bedrijf",
       "legal": "Juridisch",
-      "legal_privacy": "Privacy",
-      "legal_terms": "Voorwaarden",
-      "legal_security": "Beveiliging",
-      "copyright": "© {year} Ariadne. Alle rechten voorbehouden."
+      "legal_privacy": "Privacybeleid",
+      "legal_terms": "Servicevoorwaarden",
+      "copyright": "© {year} Ariadne. Werkzoekenden wereldwijd verheffen."
     }
   },
   "Dashboard": {

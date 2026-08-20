@@ -71,10 +71,18 @@ async def get_checkpointer():
 
         _checkpointer = AsyncPostgresSaver(pool)
         await _checkpointer.setup()  # Creates checkpoint tables if not yet present
-        logger.info("Checkpointer: ✅ using AsyncPostgresSaver with connection pool")
+        logger.info("Checkpointer: using AsyncPostgresSaver with connection pool")
         return _checkpointer
 
     except Exception as exc:
+        settings = get_settings()
+        if settings.require_postgres_checkpointer:
+            logger.error(
+                "Checkpointer: AsyncPostgresSaver failed and fail-closed is on (%s: %s)",
+                type(exc).__name__,
+                exc,
+            )
+            raise
         logger.warning(
             "Checkpointer: AsyncPostgresSaver failed (%s: %s), "
             "falling back to MemorySaver",

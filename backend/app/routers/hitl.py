@@ -1,6 +1,5 @@
 """HITL router — resolve Human-in-the-Loop interrupts."""
 
-import asyncio
 import logging
 from typing import Annotated
 
@@ -9,7 +8,7 @@ from supabase import AsyncClient
 
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import HITLError, NotFoundError
-from app.graph.runner import resume_pipeline
+from app.workers import enqueue_job
 from app.models.schemas import (
     HITLLetterReview,
     HITLOfferSelection,
@@ -66,13 +65,11 @@ async def select_offer(
     run["status"] = PipelineStatus.MATCHING.value
     run["selected_offer"] = selected_offer
 
-    # Resume the interrupted graph in the background
-    asyncio.create_task(
-        resume_pipeline(
-            run_id=run_id,
-            resume_value=selected_offer,
-            supabase=supabase,
-        )
+    await enqueue_job(
+        "resume_pipeline_job",
+        run_id,
+        selected_offer,
+        _job_id=f"resume-offer:{run_id}",
     )
 
     return PipelineRunResponse(**run)
@@ -122,17 +119,15 @@ async def review_letter(
     if data.approved:
         run["final_letter"] = final_letter
 
-    # Resume the interrupted graph with the edited letter and approval decision
-    asyncio.create_task(
-        resume_pipeline(
-            run_id=run_id,
-            resume_value={
-                "edited_letter": data.edited_letter,
-                "approved": data.approved,
-                "user_feedback": data.user_feedback,
-            },
-            supabase=supabase,
-        )
+    await enqueue_job(
+        "resume_pipeline_job",
+        run_id,
+        {
+            "edited_letter": data.edited_letter,
+            "approved": data.approved,
+            "user_feedback": data.user_feedback,
+        },
+        _job_id=f"resume-letter:{run_id}",
     )
 
     return PipelineRunResponse(**run)

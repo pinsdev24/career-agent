@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { startPipeline } from "@/lib/api";
@@ -22,11 +22,20 @@ import {
 
 export default function NewPipelinePage() {
   const t = useTranslations("NewMission");
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<EntryMode>("url");
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const prefill = searchParams.get("url");
+    if (prefill) {
+      setUrl(prefill);
+      setMode("url");
+    }
+  }, [searchParams]);
 
   const handleStart = async () => {
     setError(null);

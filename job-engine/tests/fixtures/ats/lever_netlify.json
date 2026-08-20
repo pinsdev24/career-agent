@@ -1,0 +1,16 @@
+[
+  {
+    "id": "abc-123",
+    "text": "Backend Engineer",
+    "hostedUrl": "https://jobs.lever.co/netlify/abc-123",
+    "applyUrl": "https://jobs.lever.co/netlify/abc-123/apply",
+    "descriptionPlain": "Design distributed systems in Go and TypeScript.",
+    "lists": [],
+    "categories": {
+      "location": "Remote",
+      "commitment": "Full-time"
+    },
+    "workplaceType": "remote",
+    "createdAt": 1700000000000
+  }
+]

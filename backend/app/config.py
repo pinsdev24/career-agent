@@ -37,9 +37,14 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langsmith_project: str = "CareerAgent"
 
-    # --- Resend ---
-    resend_api_key: str
-    #from_email: str = "[EMAIL_ADDRESS]"
+    # --- Resend (optional) ---
+    resend_api_key: str = ""
+    from_email: str = "Ariadne <onboarding@resend.dev>"
+
+    # --- Redis / ARQ ---
+    redis_url: str = ""
+    require_redis: bool = False
+    require_postgres_checkpointer: bool = False
 
     # --- App ---
     frontend_url: str = "http://localhost:3000"

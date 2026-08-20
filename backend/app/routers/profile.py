@@ -1,6 +1,7 @@
 """Profile router — CV upload, parsing, preferences."""
 
 import logging
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, UploadFile
@@ -10,6 +11,7 @@ from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import CVParsingError
 from app.models.schemas import ProfilePreferencesUpdate, ProfileResponse
 from app.rate_limit import rate_limit_cv_upload
+from app.db.applications import insert_cv_version
 from app.tools.cv_parser import parse_pdf, structure_cv
 from app.tools.embedding_tools import chunk_and_embed
 from app.tools.supabase_ops import get_profile, store_cv_embeddings, upsert_profile
@@ -80,6 +82,33 @@ async def upload_cv(
         user_id=user["id"],
         embeddings=embeddings,
     )
+
+    storage_path = None
+    try:
+        version_id = str(uuid.uuid4())
+        storage_path = f"{user['id']}/{version_id}.pdf"
+        await supabase.storage.from_("cvs").upload(
+            storage_path,
+            content,
+            {"content-type": "application/pdf"},
+        )
+    except Exception as exc:
+        logger.warning("CV storage upload failed for user %s: %s", user["id"], exc)
+        storage_path = None
+
+    try:
+        version = await insert_cv_version(
+            supabase,
+            user_id=user["id"],
+            raw_text=raw_text,
+            structured=structured,
+            storage_path=storage_path,
+        )
+        await supabase.table("profiles").update(
+            {"active_cv_version_id": version["id"]}
+        ).eq("id", user["id"]).execute()
+    except Exception as exc:
+        logger.warning("CV version row failed for user %s: %s", user["id"], exc)
 
     logger.info("CV processed successfully for user %s", user["id"])
     return ProfileResponse(**profile)

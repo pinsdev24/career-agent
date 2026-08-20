@@ -1,0 +1,12 @@
+{
+  "jobs": [
+    {
+      "id": 123,
+      "title": "Software Engineer",
+      "absolute_url": "https://boards.greenhouse.io/stripe/jobs/123",
+      "updated_at": "2026-01-15T10:00:00.000Z",
+      "location": { "name": "Remote" },
+      "content": "<p>Build APIs with Python and FastAPI. Collaborate with product.</p>"
+    }
+  ]
+}

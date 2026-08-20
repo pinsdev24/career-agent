@@ -83,11 +83,12 @@ class TestPipelineEndpoints:
             return_value=MagicMock(data=[{"id": "run-new-123"}])
         )
 
-        response = await async_client.post(
-            "/pipeline/start",
-            json={"entry_mode": "url", "offer_url": "https://example.com/job/1"},
-            headers={"Authorization": FAKE_TOKEN},
-        )
+        with patch("app.routers.pipeline.enqueue_job", new_callable=AsyncMock):
+            response = await async_client.post(
+                "/pipeline/start",
+                json={"entry_mode": "url", "offer_url": "https://example.com/job/1"},
+                headers={"Authorization": FAKE_TOKEN},
+            )
         assert response.status_code == 200
         data = response.json()
         assert "id" in data

@@ -21,6 +21,8 @@ const handleI18nRouting = createIntlMiddleware({
  */
 const APP_PATHS = [
   '/dashboard',
+  '/jobs',
+  '/applications',
   '/profile',
   '/settings',
   '/pipeline',
