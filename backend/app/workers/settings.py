@@ -9,6 +9,8 @@ from app.dependencies import create_supabase_client
 from app.graph.pubsub import configure_log_redis
 from app.workers.jobs import generate_packet_job, resume_pipeline_job, run_pipeline_job
 
+QUEUE_NAME = "arq:careeragent"
+
 
 def _redis_settings() -> RedisSettings:
     settings = get_settings()
@@ -35,6 +37,7 @@ class WorkerSettings:
     on_startup = startup
     on_shutdown = shutdown
     redis_settings = _redis_settings()
+    queue_name = QUEUE_NAME
     max_tries = 3
     job_timeout = 600
     keep_result = 3600

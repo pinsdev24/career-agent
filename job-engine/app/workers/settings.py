@@ -16,6 +16,8 @@ from app.workers.sync import seed_companies_from_yaml, sync_company_board
 
 logger = get_logger(__name__)
 
+QUEUE_NAME = "arq:job-engine"
+
 
 def _redis_settings() -> RedisSettings:
     settings = get_settings()
@@ -34,7 +36,10 @@ async def startup(ctx: dict) -> None:
 
     # Ensure catalog fills on boot — don't wait for the next cron window.
     try:
-        pool = await create_pool(RedisSettings.from_dsn(settings.redis_url))
+        pool = await create_pool(
+            RedisSettings.from_dsn(settings.redis_url),
+            default_queue_name=QUEUE_NAME,
+        )
         await pool.enqueue_job("sync_all_companies")
         await pool.aclose()
         logger.info("startup_sync_enqueued")
@@ -102,5 +107,6 @@ class WorkerSettings:
     on_startup = startup
     on_shutdown = shutdown
     redis_settings = _redis_settings()
+    queue_name = QUEUE_NAME
     max_tries = 3
     job_timeout = 600

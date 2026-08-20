@@ -11,6 +11,7 @@ from app.config import get_settings
 from app.db.repository import JobRepository
 from app.dependencies import get_supabase_client, require_admin
 from app.models.schemas import IngestStatsResponse
+from app.workers.settings import QUEUE_NAME
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -29,7 +30,10 @@ async def trigger_sync(
     _: Annotated[None, Depends(require_admin)],
 ) -> dict:
     settings = get_settings()
-    redis = await create_pool(RedisSettings.from_dsn(settings.redis_url))
+    redis = await create_pool(
+        RedisSettings.from_dsn(settings.redis_url),
+        default_queue_name=QUEUE_NAME,
+    )
     job = await redis.enqueue_job("sync_all_companies")
     await redis.aclose()
     return {"enqueued": True, "job_id": job.job_id if job else None}
@@ -40,7 +44,10 @@ async def trigger_discover(
     _: Annotated[None, Depends(require_admin)],
 ) -> dict:
     settings = get_settings()
-    redis = await create_pool(RedisSettings.from_dsn(settings.redis_url))
+    redis = await create_pool(
+        RedisSettings.from_dsn(settings.redis_url),
+        default_queue_name=QUEUE_NAME,
+    )
     job = await redis.enqueue_job("job_discover_tavily")
     await redis.aclose()
     return {"enqueued": True, "job_id": job.job_id if job else None}

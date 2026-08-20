@@ -1,7 +1,9 @@
 /** Centralized API client — sends requests to FastAPI backend with Supabase JWT. */
 
 import { createClient } from "@/lib/supabase/client";
+import { API_URL, formatErrorDetail } from "@/lib/api-base";
 import type {
+  AgentLogEvent,
   Profile,
   PipelineRun,
   PipelineStatusResponse,
@@ -16,8 +18,6 @@ import type {
   WorkItem,
 } from "@/lib/types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
 class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -28,6 +28,13 @@ class ApiError extends Error {
 
 async function getAuthHeaders(): Promise<HeadersInit> {
   const supabase = createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError || !user) {
+    throw new ApiError(401, "Not authenticated");
+  }
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -44,14 +51,21 @@ async function getAuthHeaders(): Promise<HeadersInit> {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const headers = await getAuthHeaders();
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: { ...headers, ...options?.headers },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers: { ...headers, ...options?.headers },
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error && err.message ? err.message : "Failed to fetch";
+    throw new ApiError(0, message);
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new ApiError(res.status, body.detail || "API error");
+    throw new ApiError(res.status, formatErrorDetail(body.detail, "API error"));
   }
 
   return res.json();
@@ -115,6 +129,11 @@ export async function startPipeline(
 
 export async function getPipelineRun(runId: string): Promise<PipelineRun> {
   return request<PipelineRun>(`/pipeline/${runId}`);
+}
+
+export async function getPipelineLogs(runId: string): Promise<AgentLogEvent[]> {
+  const data = await request<{ events?: AgentLogEvent[] }>(`/pipeline/${runId}/logs`);
+  return Array.isArray(data.events) ? data.events : [];
 }
 
 export async function cancelPipeline(runId: string): Promise<{ status: string; cancelled: boolean }> {
@@ -208,6 +227,12 @@ export async function reviewApplication(
   return request<Application>(`/applications/${applicationId}/review`, {
     method: "POST",
     body: JSON.stringify(data),
+  });
+}
+
+export async function retryApplication(applicationId: string): Promise<Application> {
+  return request<Application>(`/applications/${applicationId}/retry`, {
+    method: "POST",
   });
 }
 

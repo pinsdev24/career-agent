@@ -198,8 +198,26 @@ async def async_client(mock_supabase: MagicMock) -> AsyncGenerator[AsyncClient, 
 
     app.state.supabase = mock_supabase
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    ) as client:
-        yield client
+    class FakeAuthClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def get(self, url, headers=None):
+            response = MagicMock()
+            response.status_code = 200
+            response.json.return_value = {"id": "user-abc", "email": "jane@example.com"}
+            response.text = ""
+            return response
+
+    with patch("app.dependencies.httpx.AsyncClient", FakeAuthClient):
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client

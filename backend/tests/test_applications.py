@@ -75,6 +75,45 @@ async def test_create_application_enqueues_packet(
 
 
 @pytest.mark.asyncio
+async def test_retry_application_enqueues_packet(
+    async_client, mock_supabase: MagicMock
+) -> None:
+    application_row = {
+        "id": "app-1",
+        "user_id": "user-abc",
+        "posting_id": "job-1",
+        "status": "generating",
+        "pipeline_run_id": None,
+        "error_details": None,
+        "submitted_at": None,
+        "created_at": "2026-08-20T00:00:00Z",
+        "updated_at": "2026-08-20T00:00:00Z",
+    }
+    posting_row = {
+        "id": "job-1",
+        "title": "Backend Engineer",
+        "company_name": "Acme",
+        "apply_url": "https://jobs.lever.co/acme/1",
+        "status": "active",
+    }
+    table = mock_supabase.table.return_value
+    table.execute = AsyncMock(
+        side_effect=[
+            MagicMock(data=[application_row]),
+            MagicMock(data=[posting_row]),
+            MagicMock(data=[application_row]),
+        ]
+    )
+    with patch("app.routers.applications.enqueue_job", new_callable=AsyncMock) as enqueue:
+        response = await async_client.post(
+            "/applications/app-1/retry",
+            headers={"Authorization": FAKE_TOKEN},
+        )
+    assert response.status_code == 200, response.text
+    enqueue.assert_awaited()
+
+
+@pytest.mark.asyncio
 async def test_inbox_requires_auth(async_client) -> None:
     response = await async_client.get("/applications/inbox")
     assert response.status_code == 401

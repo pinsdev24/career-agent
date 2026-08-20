@@ -31,8 +31,6 @@
   },
   "Sidebar": {
     "missions": "Missies",
-    "jobs": "Banen",
-    "applications": "Sollicitaties",
     "new_mission": "Nieuwe Missie",
     "profile": "Profiel",
     "settings": "Instellingen",
@@ -41,62 +39,53 @@
     "sign_out_confirm_title": "Weet u zeker dat u wilt uitloggen?",
     "sign_out_confirm_desc": "U moet opnieuw inloggen om toegang te krijgen tot uw dashboard.",
     "cancel": "Annuleren",
-    "confirm": "Ja, uitloggen"
-  },
-  "Jobs": {
-    "title": "Aanbevolen banen",
-    "subtitle": "Gepersonaliseerd op basis van je profiel en voorkeuren — alleen directe ATS-vacatures.",
-    "search_placeholder": "Zoek rollen, skills, bedrijven…",
-    "search": "Zoeken",
-    "loading": "Matches zoeken…",
-    "empty": "Nog geen banen in je feed.",
-    "empty_hint": "Upload een CV, stel voorkeuren in, en wacht tot de job engine boards synchroniseert.",
-    "load_more": "Meer laden",
-    "remote": "Remote",
-    "why_match": "Waarom dit matcht",
-    "apply": "Vacature openen",
-    "prepare_packet": "Sollicitatiedossier voorbereiden",
-    "packet_started": "Dossier in de wachtrij — open Sollicitaties om te reviewen.",
-    "save": "Opslaan",
-    "dismiss": "Niet interessant",
-    "open_in_careeragent": "Motivatiebrief met CareerAgent →",
-    "select_hint": "Selecteer een baan voor details en matchredenen.",
-    "error_generic": "Kon banen niet laden. Draait de job engine?"
-  },
-  "Applications": {
-    "title": "Sollicitaties",
-    "subtitle": "Pakketten die de agent heeft opgesteld. Jij reviewt, daarna dien je zelf in op de ATS.",
-    "empty": "Nog geen sollicitaties.",
-    "empty_hint": "Kies een baan in de feed en vraag een dossier aan.",
-    "inbox": "Inbox",
-    "inbox_empty": "Niets te reviewen.",
-    "status": "Status",
-    "review": "Dossier reviewen",
-    "approve": "Brief goedkeuren",
-    "rewrite": "Herschrijven met feedback",
-    "feedback_placeholder": "Wat moet er veranderen?",
-    "mark_submitted": "Ik heb gesolliciteerd",
-    "open_ats": "Sollicitatiepagina openen",
-    "copy_letter": "Brief kopiëren",
-    "generating": "Dossier wordt gegenereerd…",
-    "error_generic": "Kon sollicitaties niet laden."
+    "confirm": "Ja, uitloggen",
+    "jobs": "Banen",
+    "applications": "Sollicitaties"
   },
   "Landing": {
     "nav": {
-      "product": "Product",
       "features": "Functies",
       "how_it_works": "Hoe het werkt",
-      "testimonials": "Succesverhalen",
+      "product": "Product",
+      "control": "Jouw controle",
+      "faq": "FAQ",
+      "sign_in": "Inloggen",
+      "start": "Aan de slag",
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title_start": "Vind je droombaan",
-      "title_end": "24x sneller.",
-      "subtitle": "Stop met urenlang sollicitatiebrieven schrijven. Ariadne's AI-agents analyseren vacatures, matchen je vaardigheden en genereren gepersonaliseerde sollicitaties — in minuten, niet in dagen.",
-      "cta_primary": "Start gratis — geen kaart nodig",
-      "cta_secondary": "Hoe het werkt",
-      "trusted": "Vertrouwd door kandidaten bij"
+      "eyebrow": "Het carrièreplatform voor ambitieuze mensen",
+      "title_line1": "De agent",
+      "title_prefix": "om te",
+      "title_words": [
+        "landen",
+        "solliciteren",
+        "matchen",
+        "slagen"
+      ],
+      "subtitle": "Je toolkit om te stoppen met generieke brieven en te beginnen met gesprekken binnenhalen. Analyseer vacatures, match je skills, en verstuur sollicitaties die klinken als jij.",
+      "cta_primary": "Start gratis trial",
+      "cta_secondary": "Bekijk hoe het werkt"
     },
+    "marquee": [
+      {
+        "value": "24x",
+        "label": "snellere sollicitaties"
+      },
+      {
+        "value": "94%",
+        "label": "match-nauwkeurigheid"
+      },
+      {
+        "value": "5 min",
+        "label": "om een draft te reviewen"
+      },
+      {
+        "value": "3",
+        "label": "gesprekken in week één"
+      }
+    ],
     "stats": {
       "applications": "Sollicitaties gegenereerd",
       "applications_value": "2.400+",
@@ -107,136 +96,368 @@
       "satisfaction": "Tevredenheidsgraad",
       "satisfaction_value": "4.9/5"
     },
-    "how_it_works": {
-      "badge": "Hoe het werkt",
-      "title": "Van CV tot sollicitatie op maat in 3 stappen.",
-      "subtitle": "Geen sjablonen. Geen kopiëren en plakken. Upload je CV en laat onze AI-agents het zware werk doen.",
-      "steps": [
+    "features": {
+      "badge": "Mogelijkheden",
+      "title": "Alles wat je nodig hebt.",
+      "title_muted": "Niets wat je niet nodig hebt.",
+      "items": [
         {
-          "step": "01",
-          "title": "Upload je CV",
-          "desc": "Upload je CV eenmalig. Ariadne extraheert je vaardigheden, ervaring en carrièredoelen om een semantisch profiel op te bouwen dat steeds slimmer wordt."
+          "n": "01",
+          "title": "Semantische matching",
+          "desc": "Vergelijk je CV met de vacature op conceptueel niveau — niet op keywords. Een precieze fitscore en een duidelijke lijst hiaten."
         },
         {
-          "step": "02",
-          "title": "Plak een vacaturelink — of laat ons zoeken",
-          "desc": "Geef een vacature-URL op, of activeer Exploratiemodus. Onze Scout Agent doorzoekt het web en vindt de rollen die echt bij je profiel passen."
+          "n": "02",
+          "title": "Klinkt als jij",
+          "desc": "De Schrijfagent leert je toon bij elke review. Na twee sollicitaties schrijft hij zoals jij — scherper, strakker, overtuigender."
         },
         {
-          "step": "03",
-          "title": "Beoordeel, keur goed & solliciteer",
-          "desc": "Onze Schrijfagent stelt een hyper-gepersonaliseerde sollicitatiebrief op. Een Critic Agent controleert deze. Jij beoordeelt, past aan indien nodig, en verstuurt — alles in minder dan 5 minuten."
+          "n": "03",
+          "title": "Mens in de loop",
+          "desc": "Niets wordt achter je rug verstuurd. Elk concept gaat door jouw review: bewerken, herschrijven of goedkeuren."
+        },
+        {
+          "n": "04",
+          "title": "Exploratiemodus",
+          "desc": "Geen vacaturelink? Scout zoekt op het web naar rollen die écht bij je profiel passen, gerangschikt op semantische fit."
         }
       ]
     },
-    "features": {
-      "badge": "Waarom Ariadne",
-      "title": "Elke sollicitatie, ontworpen voor impact.",
-      "subtitle": "De meeste AI-tools plakken generieke tekst. Ariadne zet gespecialiseerde agents in die analyseren, schrijven en beoordelen — zodat elke brief raak is.",
-      "items": {
-        "gap": {
-          "title": "94% match-nauwkeurigheid",
-          "desc": "Semantische analyse vergelijkt je CV met de vacature op conceptueel niveau — niet op trefwoorden. Je krijgt een precieze fitscore en een duidelijke lijst van hiaten om aan te pakken."
+    "how_it_works": {
+      "badge": "Proces",
+      "title": "Drie stappen.",
+      "title_muted": "Oneindig veel gesprekken.",
+      "preview_title": "Agent Console",
+      "preview_status": "Live",
+      "preview_events": "{count} events",
+      "preview_run": "run_7f3a",
+      "preview_logs": [
+        [
+          {
+            "type": "info",
+            "time": "14:02:11",
+            "text": "Pipeline gestart."
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:13",
+            "text": "CV lezen — 2 pagina's"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:16",
+            "text": "Skills, rollen en intentie extraheren"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:02:19",
+            "text": "Stap voltooid: Profiel"
+          },
+          {
+            "type": "info",
+            "time": "14:02:20",
+            "text": "18 skills gemapt. Profiel klaar."
+          }
+        ],
+        [
+          {
+            "type": "info",
+            "time": "14:08:02",
+            "text": "Scout: zoeken op het open web"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:05",
+            "text": "Rollen rangschikken op semantische fit"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:09",
+            "text": "Matcher: hiaatanalyse"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:08:12",
+            "text": "Stap voltooid: Matcher"
+          },
+          {
+            "type": "info",
+            "time": "14:08:13",
+            "text": "Match 94%. Shortlist klaar."
+          }
+        ],
+        [
+          {
+            "type": "info",
+            "time": "14:14:31",
+            "text": "Writer: draft in jouw toon"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:14:34",
+            "text": "Critic: scoring over 5 dimensies"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:38",
+            "text": "Score 91/100 — nieuwe beste draft"
+          },
+          {
+            "type": "info",
+            "time": "14:14:39",
+            "text": "Gepauzeerd voor jouw review"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:40",
+            "text": "Brief klaar om goed te keuren."
+          }
+        ]
+      ],
+      "steps": [
+        {
+          "roman": "I",
+          "title": "Upload je CV",
+          "desc": "Eén keer droppen. Ariadne haalt skills, ervaring en doelen uit je CV tot een semantisch profiel dat slimmer wordt."
         },
-        "tone": {
-          "title": "Klinkt als jij, niet als AI",
-          "desc": "De Schrijfagent leert je persoonlijke toon bij elke beoordeling. Na 2 sollicitaties schrijft hij precies zoals jij — maar scherper, strakker en overtuigender."
+        {
+          "roman": "II",
+          "title": "Richt op een rol",
+          "desc": "Plak een URL, of laat Scout zoeken. Agents onderzoeken het bedrijf en mappen de hiaten die ertoe doen."
         },
-        "zap": {
-          "title": "Jij behoudt de controle",
-          "desc": "Geen black box. Elk concept gaat door jouw beoordeling voordat het wordt gefinaliseerd. Bewerk, vraag een herschrijving aan of keur goed — het laatste woord is altijd van jou."
+        {
+          "roman": "III",
+          "title": "Review en verstuur",
+          "desc": "Writer schrijft. Critic scoort. Jij keurt goed. Een brief op maat in minuten — de pen blijft van jou."
         }
-      }
+      ]
+    },
+    "product": {
+      "badge": "Binnenin",
+      "title": "Het werk,",
+      "title_muted": "niet de pitch.",
+      "subtitle": "Missions met matchscores. Drafts naast de gaps. Je ziet altijd waarom — en jij keurt altijd goed.",
+      "dashboard_label": "Missions",
+      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_caption": "Elke pipeline in één lijst — matchscore, status, volgende actie.",
+      "dashboard_alt": "Ariadne-dashboard met missions, matchscores en reviewstatus",
+      "review_label": "Review",
+      "review_url": "ariadne.app/review",
+      "review_caption": "Draft links. Gap-analyse rechts. Goedkeuren, herschrijven of bewerken.",
+      "review_alt": "Coverletter-review met gap-analyse, matching skills, en goedkeuren of herschrijven",
+      "insights": [
+        {
+          "k": "Match",
+          "v": "Semantische fit op elke rol, geen keyword-ruis."
+        },
+        {
+          "k": "Status",
+          "v": "Brief reviewen of completed — de volgende actie is duidelijk."
+        },
+        {
+          "k": "Controle",
+          "v": "Niets vertrekt zonder jouw herschrijving of goedkeuring."
+        }
+      ]
     },
     "scout": {
-      "badge": "Exploratiemodus",
-      "title": "Geen vacaturelink? Geen probleem.",
-      "subtitle": "Activeer Exploratiemodus en laat Ariadne's Scout Agent het web doorzoeken naar rollen die bij je profiel passen. Jij focust op sollicitatiegesprekken — wij doen het zoekwerk.",
-      "items": [
-        "AI-aangedreven vacatureontdekking op het hele web",
-        "Gerangschikt op semantische match met je CV",
-        "Nieuwe resultaten automatisch vernieuwd"
+      "badge": "Explore",
+      "title": "Scout als",
+      "title_muted": "standaard.",
+      "subtitle": "Geen link nodig. Scout doorzoekt het open web en rangschikt rollen op semantische match, zodat jij interviewt — niet jaagt.",
+      "stat_sources_value": "Web",
+      "stat_sources": "Live discovery",
+      "stat_rank_value": "94%",
+      "stat_rank": "Match-ranking",
+      "stat_refresh_value": "Auto",
+      "stat_refresh": "Verse resultaten",
+      "status": "Scout-netwerk",
+      "status_ok": "Alles operationeel",
+      "sources": [
+        {
+          "city": "LinkedIn",
+          "region": "Professional",
+          "ms": "96%"
+        },
+        {
+          "city": "Welcome to the Jungle",
+          "region": "Europa",
+          "ms": "91%"
+        },
+        {
+          "city": "Indeed",
+          "region": "Globaal",
+          "ms": "88%"
+        },
+        {
+          "city": "Company careers",
+          "region": "Direct",
+          "ms": "93%"
+        },
+        {
+          "city": "Boards",
+          "region": "Niche",
+          "ms": "87%"
+        },
+        {
+          "city": "Jouw URL",
+          "region": "Handmatig",
+          "ms": "100%"
+        }
+      ]
+    },
+    "metrics": {
+      "badge": "Live metrics",
+      "title": "Performance die",
+      "title_muted": "je kunt meten.",
+      "live": "Live",
+      "applications": "Sollicitaties gegenereerd",
+      "uptime": "Drafts die jij nog stuurt",
+      "latency": "Gemiddelde reviewtijd",
+      "countries": "Match-nauwkeurigheid"
+    },
+    "security": {
+      "badge": "Beveiliging",
+      "title": "Vertrouwen is",
+      "title_muted": "niet onderhandelbaar.",
+      "subtitle": "Je CV en brieven blijven van jou. Encryptie, row-level access en review-before-send zitten in elke laag — niet erachteraan geplakt.",
+      "badges": [
+        "Supabase Auth",
+        "RLS",
+        "TLS",
+        "Encrypted"
       ],
-      "cta": "Probeer Exploratiemodus"
+      "items": [
+        {
+          "title": "Encrypted at rest",
+          "desc": "Persoonsgegevens en documenten zijn versleuteld en worden nooit verkocht of gedeeld."
+        },
+        {
+          "title": "Row-level access",
+          "desc": "Elke request is geauthenticeerd. Je ziet alleen je eigen missies, drafts en profiel."
+        },
+        {
+          "title": "Jij keurt eerst goed",
+          "desc": "Niets wordt namens jou verstuurd. Human-in-the-loop is de default, geen optie."
+        },
+        {
+          "title": "Privé by design",
+          "desc": "Kleine surface: CV, vacaturecontext, en de brief die jij bewaart."
+        }
+      ]
+    },
+    "control": {
+      "badge": "Jouw controle",
+      "title": "Gebouwd mét jou.",
+      "title_muted": "Niet om je heen.",
+      "subtitle": "Agents doen research en de eerste draft. Jij houdt het oordeel — bewerk, herschrijf of keur goed voordat iets je bureau verlaat.",
+      "items": [
+        {
+          "title": "Toongeheugen",
+          "desc": "Feedback stapelt. Hoe meer je reviewt, hoe meer het klinkt als jij."
+        },
+        {
+          "title": "Gap-rapporten",
+          "desc": "Zie precies waar je matcht en waar niet — en kies hoe je het positioneert."
+        },
+        {
+          "title": "Critic-scores",
+          "desc": "Structuur, relevantie en toon gescoord voordat je de draft opent."
+        },
+        {
+          "title": "Herschrijflussen",
+          "desc": "Vraag een pass. De pipeline draait opnieuw. Houd de versie die klopt."
+        }
+      ]
     },
     "testimonials": {
-      "badge": "Verhalen van Kandidaten",
-      "title": "Echte mensen. Echte resultaten.",
-      "subtitle": "Sluit je aan bij professionals die hun sollicitatietijd met 24x hebben verkort.",
+      "badge": "Wat mensen zeggen",
+      "result_label": "Kernresultaat",
       "items": [
         {
-          "quote": "Ik heb mijn CV geüpload en Ariadne matchte me met 5 rollen die ik echt wilde. De sollicitatiebrieven waren beter dan alles wat ik zelf had geschreven.",
+          "quote": "Ik dropte mijn CV en Ariadne matchte me met 5 rollen die ik écht wilde. De brieven waren beter dan alles wat ik zelf had geschreven.",
           "author": "Sarah J.",
-          "role": "Product Manager bij Stripe"
+          "role": "Product Manager",
+          "result": "5 gematchte rollen"
         },
         {
-          "quote": "Na twee sollicitaties begon de agent precies zoals ik te schrijven — maar scherper. Het Tone of Voice Geheugen is een game-changer.",
+          "quote": "Na twee sollicitaties schreef de agent precies zoals ik — maar scherper. Het toongeheugen is een game-changer.",
           "author": "Michael T.",
-          "role": "Frontend Engineer bij Vercel"
+          "role": "Frontend Engineer",
+          "result": "Klinkt als ik"
         },
         {
-          "quote": "Vroeger besteedde ik 2 uur per sollicitatie. Nu kost het me 5 minuten om te beoordelen en goed te keuren. Ik had 3 gesprekken in mijn eerste week.",
+          "quote": "Ik was 2 uur kwijt per sollicitatie. Nu 5 minuten reviewen en goedkeuren. 3 gesprekken in mijn eerste week.",
           "author": "Elena R.",
-          "role": "Data Scientist bij Datadog"
+          "role": "Data Scientist",
+          "result": "3 gesprekken, week één"
         }
       ]
     },
     "faq": {
       "badge": "FAQ",
-      "title": "Veelgestelde vragen.",
+      "title": "Eenvoudige antwoorden.",
+      "title_muted": "Geen verrassingen.",
       "items": [
         {
           "q": "Is Ariadne echt gratis?",
-          "a": "Ja. Je kunt gratis sollicitaties genereren zonder creditcard. We bieden premium-abonnementen voor intensieve gebruikers en geavanceerde functies."
+          "a": "Ja. Je kunt gratis sollicitaties genereren zonder creditcard. Premium-tiers bestaan voor high-volume gebruik en advanced features."
         },
         {
           "q": "Werkt het voor elke sector?",
-          "a": "Absoluut. Ariadne's semantische matching werkt in tech, finance, gezondheidszorg, consulting, creatieve functies en meer. Het analyseert vaardigheden en context — geen sectorspecifieke sjablonen."
+          "a": "Ja. Semantische matching werkt in tech, finance, zorg, consulting, creatieve rollen en meer. Het analyseert skills en context — geen sectorsjablonen."
         },
         {
-          "q": "Klinken de sollicitatiebrieven generiek?",
-          "a": "Nee. Onze Schrijfagent leert je persoonlijke toon uit je feedback. Na 2-3 beoordelingen past hij zich aan je stem aan — met als resultaat brieven die klinken als jij, maar beter."
+          "q": "Klinken de brieven generiek?",
+          "a": "Nee. De Schrijfagent leert je toon uit je feedback. Na twee of drie reviews past hij zich aan je stem aan."
         },
         {
-          "q": "Hoe worden mijn gegevens behandeld?",
-          "a": "Je CV en persoonlijke gegevens worden versleuteld en nooit gedeeld met derden. We gebruiken enterprise-grade beveiliging met Supabase-authenticatie en toegangsbeleid op rijniveau."
+          "q": "Hoe worden mijn data behandeld?",
+          "a": "Je CV en persoonsgegevens zijn versleuteld en worden nooit gedeeld. We gebruiken Supabase-auth en row-level access."
         },
         {
-          "q": "Kan ik de gegenereerde brieven bewerken?",
-          "a": "Natuurlijk. Je hebt volledige controle. Elk concept gaat door jouw beoordeling — je kunt bewerken, een herschrijving aanvragen of goedkeuren voordat iets wordt gefinaliseerd."
+          "q": "Kan ik gegenereerde brieven bewerken?",
+          "a": "Natuurlijk. Elk concept gaat door jouw review — bewerk, vraag een herschrijving, of keur goed."
         }
       ]
     },
     "cta": {
-      "title": "Je volgende rol is één klik verwijderd.",
-      "subtitle": "Sluit je aan bij duizenden professionals die stopten met gokken en begonnen met het binnenhalen van gesprekken dankzij precision-crafted sollicitaties.",
-      "button": "Start vandaag gratis",
-      "footer": "Geen creditcard vereist · Gratis voor altijd bij basisgebruik"
+      "title": "Klaar om iets groots te landen?",
+      "subtitle": "Sluit je aan bij kandidaten die stopten met gokken en sollicitaties gingen versturen die écht klinken als zij.",
+      "button": "Start gratis",
+      "secondary": "Naar het dashboard",
+      "footer": "Geen creditcard vereist"
     },
     "footer": {
+      "tagline": "Het carrière-lab voor mensen die sollicitaties versturen, geen sjablonen.",
       "product": "Product",
       "product_features": "Functies",
       "product_explore": "Exploratiemodus",
-      "product_pricing": "Prijzen",
+      "product_how": "Hoe het werkt",
+      "product_inside": "Binnenin",
       "resources": "Bronnen",
       "resources_docs": "Documentatie",
-      "resources_blog": "Blog",
+      "resources_faq": "FAQ",
       "resources_changelog": "Changelog",
+      "company": "Bedrijf",
       "legal": "Juridisch",
-      "legal_privacy": "Privacybeleid",
-      "legal_terms": "Servicevoorwaarden",
-      "copyright": "© {year} Ariadne. Werkzoekenden wereldwijd verheffen."
+      "legal_privacy": "Privacy",
+      "legal_terms": "Voorwaarden",
+      "legal_security": "Beveiliging",
+      "copyright": "© {year} Ariadne. Alle rechten voorbehouden."
     }
   },
   "Dashboard": {
     "title": "Missies",
-    "subtitle": "Volg en beheer uw sollicitatie-pijplijnen.",
+    "greeting": "Welkom terug, {name}",
+    "subtitle": "Je jobsearch op één plek — matches, dossiers en missies.",
     "new_mission": "Nieuwe Missie",
     "loading": "Missies laden...",
     "empty": {
-      "title": "Nog geen missies",
-      "description": "Start een nieuwe missie om de agents van Ariadne in te zetten voor uw volgende sollicitatie."
+      "title": "Nog niets in beweging",
+      "description": "Begin bij aanbevolen vacatures. Kies een rol, maak een dossier, en dien zelf in op de ATS."
     },
+    "empty_from_jobs": "Dossiers staan onder Sollicitaties. Missies zijn de oudere URL/explore-pipelines.",
     "groups": {
       "today": "Vandaag",
       "yesterday": "Gisteren",
@@ -250,10 +471,22 @@
       "waiting_letter_review": "Review Brief",
       "writing": "Schrijven",
       "analyzing": "Analyseren",
-      "scouting": "Scouten"
+      "scouting": "Scouten",
+      "started": "Voorbereiden",
+      "matching": "Matchen",
+      "critiquing": "Kwaliteit"
     },
     "match": "Match",
-    "explore_mission": "Exploratiemissie"
+    "explore_mission": "Exploratiemissie",
+    "stat_inbox": "Te reviewen",
+    "stat_jobs": "Topmatches",
+    "stat_missions": "Missies",
+    "top_matches": "Topmatches",
+    "see_all_jobs": "Alle vacatures",
+    "needs_attention": "Jouw beurt",
+    "recent_missions": "Recente missies",
+    "browse_jobs": "Vacatures bekijken",
+    "review_packet": "Dossier reviewen"
   },
   "Profile": {
     "title": "Profiel",
@@ -298,64 +531,171 @@
   },
   "NewMission": {
     "title": "Nieuwe Missie",
-    "subtitle": "Start een nieuwe sollicitatiepijplijn.",
+    "subtitle": "Start vanuit de jobfeed, of plak een vacature-URL als je die al hebt.",
+    "recommended": "Aanbevolen",
+    "browse": {
+      "label": "Bekijk aanbevolen vacatures",
+      "desc": "Zie rollen die matchen met je CV, en maak in één klik een dossier."
+    },
     "modes": {
       "url": {
-        "label": "Directe URL",
-        "desc": "Plak een vacaturelink"
+        "label": "Plak een vacature-URL",
+        "desc": "Greenhouse, Lever, Ashby of een careers-pagina"
       },
       "explore": {
-        "label": "Verkennen",
-        "desc": "Laat agents vacatures vinden"
+        "label": "Verken voor mij",
+        "desc": "Scout het web op basis van je profiel"
       }
     },
-    "url_label": "Vacature URL",
-    "url_placeholder": "https://bedrijf.com/carriere/vacature",
-    "explore_info": "Het systeem gebruikt uw profielgegevens om actief bijpassende aanbiedingen te vinden. Zorg ervoor dat uw profiel up-to-date is.",
-    "starting": "Starten...",
-    "start_btn": "Start Pijplijn",
-    "error_url": "Voer een vacature-URL in."
+    "url_label": "Vacature-URL",
+    "url_placeholder": "https://boards.greenhouse.io/bedrijf/jobs/…",
+    "explore_info": "Verkennen zoekt op het open web vanuit je CV. Voor dagelijks gebruik is de Jobs-feed sneller en nauwkeuriger.",
+    "starting": "Starten…",
+    "start_btn": "Pijplijn starten",
+    "error_url": "Plak een vacature-URL om verder te gaan.",
+    "start_failed": "Pijplijn starten mislukt."
   },
   "MissionDetail": {
-    "active_pipeline": "Actieve Pijplijn",
+    "active_pipeline": "Actieve missie",
     "delete_title": "Deze run verwijderen?",
     "delete_desc": "Dit verwijdert permanent alle gegevens. Deze actie kan niet ongedaan worden gemaakt.",
     "delete_btn": "Verwijderen",
     "cancel": "Annuleren",
-    "no_offers": "Geen aanbiedingen gevonden",
-    "select_offer": "Selecteer een aanbod",
+    "no_offers": "Geen vacatures gevonden",
+    "select_offer": "Kies een rol om verder te gaan",
     "no_offers_desc": "Geen bijpassende rollen gevonden. Probeer uw profielvoorkeuren aan te passen.",
-    "select_offer_desc": "Kies de meest relevante kans om door te gaan.",
-    "confirm_selection": "Bevestig selectie",
-    "review_draft": "Concept beoordelen",
-    "review_desc": "De AI-criticus heeft uw brief beoordeeld. Finaliseer of vraag om wijzigingen.",
-    "processing": "Verwerken...",
+    "select_offer_desc": "Kies de kans die goed voelt. Jij blijft bepalen wat we daarna schrijven.",
+    "confirm_selection": "Doorgaan met deze rol",
+    "review_draft": "Bekijk je brief",
+    "review_desc": "Lees hem zoals een recruiter zou doen. Bewerk, vraag een herschrijving, of keur goed.",
+    "processing": "Bezig…",
     "ready_to_send": "Uw sollicitatiebrief is klaar om te verzenden.",
     "final_letter": "Definitieve brief",
-    "applied": "Toegepast!",
+    "applied": "Gesolliciteerd!",
     "i_applied": "Ik heb gesolliciteerd",
     "send": "Verzenden",
     "copied": "Gekopieerd",
     "copy": "Kopiëren",
     "target_role": "Doelrol",
-    "failed_title": "Pijplijn mislukt",
-    "failed_desc": "Er is een fout opgetreden tijdens de verwerking.",
+    "failed_title": "Deze missie is niet afgerond",
+    "failed_desc": "Er ging iets mis tijdens het werken aan deze sollicitatie.",
     "error_details": "Foutdetails",
-    "abort": "Afbreken",
+    "abort": "Missie stoppen",
+    "hint": {
+      "started": "Deze missie wordt voorbereid",
+      "scouting": "Daarna kies jij een rol",
+      "waiting_offer_selection": "Daarna meten we de fit",
+      "matching": "Daarna schrijven we de brief",
+      "writing": "Daarna een kwaliteitscheck",
+      "critiquing": "Daarna is het jouw review",
+      "waiting_letter_review": "Daarna is hij klaar om te versturen",
+      "completed": "Kopieer hem zelf in het formulier van de werkgever"
+    },
+    "insights": {
+      "brief": "Voor je goedkeurt",
+      "brief_done": "Hoe deze sollicitatie ervoor staat",
+      "fit": "Rolgefit",
+      "quality": "Briefkwaliteit",
+      "fit_high": "Sterke overlap — de brief kan specifiek zijn.",
+      "fit_mid": "Een stretch op papier. Houd de brief eerlijk over wat jij meebrengt.",
+      "fit_low": "Een echte stretch. Overdrijf de gaps hieronder niet.",
+      "fit_none": "De fit verschijnt na de analyse.",
+      "quality_high": "Klaar om te versturen als het nog als jij klinkt.",
+      "quality_mid": "Stevig concept — strak trekken wat generiek aanvoelt.",
+      "quality_low": "Vraag om een herschrijving voordat je goedkeurt.",
+      "quality_none": "Kwaliteitsnotities verschijnen na de review.",
+      "on_the_draft": "Over het concept",
+      "matching": "Zet dit voorop",
+      "gaps": "Niet overdrijven",
+      "gaps_hint": "De brief mag niet doen alsof je dit hebt.",
+      "none_matching": "Niets uitgelicht",
+      "no_gaps": "Geen grote gaps",
+      "letter_breakdown": "Brief in detail"
+    },
+    "dimensions": {
+      "relevance": "Relevantie",
+      "tone": "Toon",
+      "structure": "Structuur",
+      "specificity": "Specificiteit",
+      "persuasiveness": "Overtuigingskracht"
+    },
     "tabs": {
-      "gap": "Kloof",
-      "critic": "Criticus"
+      "gap": "Fit",
+      "critic": "Kwaliteit"
+    },
+    "steps": {
+      "started": "Start",
+      "scouting": "Zoeken",
+      "waiting_offer_selection": "Jouw keuze",
+      "matching": "Fit",
+      "writing": "Brief",
+      "critiquing": "Kwaliteit",
+      "waiting_letter_review": "Review",
+      "completed": "Versturen"
+    },
+    "stage": {
+      "started": {
+        "title": "Voorbereiden",
+        "desc": "Je profiel en de briefing voor deze missie worden geladen."
+      },
+      "scouting": {
+        "title": "Rollen zoeken",
+        "desc": "We zoeken vacatures die bij je ervaring passen — niet alleen op trefwoorden."
+      },
+      "matching": {
+        "title": "De fit meten",
+        "desc": "Deze rol wordt vergeleken met je CV, zodat de brief met het belangrijkste opent."
+      },
+      "writing": {
+        "title": "Je brief schrijven",
+        "desc": "Een concept in jouw stem, met de details die deze rol écht vraagt."
+      },
+      "critiquing": {
+        "title": "Kwaliteitscheck",
+        "desc": "Het concept wordt gelezen zoals een recruiter zou doen — toon, relevantie, impact."
+      }
+    },
+    "activity": {
+      "title": "Wat er gebeurt",
+      "feed": "Updates",
+      "live": "Live",
+      "waiting": "Verbinden…",
+      "empty": "De agent maakt zich klaar.",
+      "unavailable": "Live updates laden lukte niet. Vernieuw zo dadelijk.",
+      "working": "Nog bezig met deze stap",
+      "working_on": "Bezig met {company}",
+      "initialized": "Alles wordt klaargezet",
+      "searching": "Zoeken naar rollen die bij je passen",
+      "expanding": "De zoektocht verbreden",
+      "scoring": "De sterkste matches rangschikken",
+      "found_offers": "Rollen gevonden die de moeite waard zijn",
+      "reading_posting": "De vacature lezen",
+      "matching": "Deze rol vergelijken met je CV",
+      "writing": "Een brief in jouw stem opstellen",
+      "critiquing": "De brief nalezen zoals een recruiter",
+      "paused": "Wachten op jou",
+      "cancelled": "Gestopt",
+      "failed": "Er ging iets mis",
+      "timeout": "Dit duurt te lang — probeer opnieuw",
+      "done_scout": "Zoeken afgerond",
+      "done_read": "Vacature gelezen",
+      "done_match": "Fit-analyse afgerond",
+      "done_write": "Concept afgerond",
+      "done_critique": "Kwaliteitscheck afgerond",
+      "done_route": "Volgende stap gekozen",
+      "done_memory": "Wat we over je weten bijgewerkt"
     }
   },
   "LetterEditor": {
-    "title": "Concept Editor",
-    "chars": "{count} tekens",
-    "placeholder": "Schrijven...",
-    "feedback_placeholder": "bijv. nadruk leggen op leiderschapservaring...",
-    "helper": "Bewerk de brief hierboven, keur hem dan goed of vraag om een herschrijving.",
+    "title": "Sollicitatiebrief",
+    "words": "{count} woorden",
+    "revision": "Revisie {count}",
+    "placeholder": "Het concept verschijnt hier.",
+    "notes_label": "Een herschrijving?",
+    "feedback_placeholder": "bijv. begin met het RAG-werk, claim geen 5 jaar production ML…",
+    "helper": "Keur goed als het als jij klinkt. Notities gaan naar de writer — nooit naar de werkgever.",
     "rewrite": "Herschrijven",
-    "send": "Verzenden",
-    "approve": "Goedkeuren"
+    "approve": "Brief goedkeuren"
   },
   "Settings": {
     "title": "Instellingen",
@@ -408,5 +748,66 @@
     "error": "Er is een fout opgetreden",
     "success": "Succes",
     "view": "Bekijk"
+  },
+  "Jobs": {
+    "title": "Aanbevolen banen",
+    "subtitle": "Gematcht op je CV en voorkeuren — directe ATS-vacatures, geen jobboard-spam.",
+    "search_placeholder": "Zoek rollen, skills, bedrijven…",
+    "search": "Zoeken",
+    "loading": "Matches zoeken…",
+    "empty": "Nog geen banen in je feed",
+    "empty_hint": "Upload een CV en stel voorkeuren in zodat we Greenhouse, Lever, Ashby en Workable kunnen ranken.",
+    "empty_cta": "Profiel bijwerken",
+    "load_more": "Meer laden",
+    "remote": "Remote",
+    "why_match": "Waarom dit matcht",
+    "apply": "Openen",
+    "prepare_packet": "Sollicitatiedossier voorbereiden",
+    "packet_started": "Dossier in de wachtrij — Sollicitaties wordt geopend.",
+    "save": "Opslaan",
+    "dismiss": "Overslaan",
+    "open_in_careeragent": "Liever een URL-missie starten →",
+    "select_hint": "Selecteer een rol voor matchredenen en de vacature.",
+    "error_generic": "Kon banen niet laden. Draait de job engine?",
+    "saved": "Opgeslagen in je feed.",
+    "dismissed": "Verwijderd uit je feed.",
+    "api_unreachable": "CareerAgent is niet bereikbaar. Draait de API?"
+  },
+  "Applications": {
+    "title": "Sollicitaties",
+    "subtitle": "Pakketten die de agent heeft opgesteld. Jij reviewt, daarna dien je zelf in op de ATS.",
+    "empty": "Nog geen sollicitaties",
+    "empty_hint": "Kies een baan in de feed en vraag een dossier aan. Jij houdt de submit-klik.",
+    "inbox": "Inbox",
+    "inbox_empty": "Niets te reviewen.",
+    "needs_you": "Jouw beurt",
+    "browse_jobs": "Vacatures bekijken",
+    "filter_all": "Alles",
+    "filter_needs_you": "Jouw beurt",
+    "filter_empty": "Niets in deze filter.",
+    "untitled": "Naamloze rol",
+    "status": "Status",
+    "status_draft": "Concept",
+    "status_generating": "Schrijven",
+    "status_packet_ready": "Review",
+    "status_approved": "Goedgekeurd",
+    "status_submitted": "Ingediend",
+    "status_interviewing": "Interview",
+    "status_rejected": "Afgewezen",
+    "status_withdrawn": "Ingetrokken",
+    "review": "Dossier reviewen",
+    "approve": "Brief goedkeuren",
+    "rewrite": "Herschrijven met feedback",
+    "feedback_placeholder": "Wat moet er veranderen?",
+    "mark_submitted": "Ik heb gesolliciteerd",
+    "open_ats": "Sollicitatiepagina openen",
+    "copy_letter": "Brief kopiëren",
+    "copied": "Gekopieerd",
+    "letter": "Motivatiebrief",
+    "letter_placeholder": "De brief verschijnt hier.",
+    "generating": "Dossier wordt gegenereerd…",
+    "generating_hint": "Matcher → brief → criticus. Dit duurt meestal 30–90 seconden.",
+    "retry": "Dossier opnieuw starten",
+    "error_generic": "Kon sollicitaties niet laden."
   }
 }

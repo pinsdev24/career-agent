@@ -113,6 +113,27 @@ class TestPipelineEndpoints:
         )
         assert response.status_code == 404
 
+    @pytest.mark.asyncio
+    async def test_get_pipeline_logs_returns_events(self, async_client) -> None:
+        with (
+            patch("app.routers.pipeline.get_pipeline_run", new_callable=AsyncMock) as get_run,
+            patch(
+                "app.routers.pipeline.log_emitter.events", new_callable=AsyncMock
+            ) as history,
+        ):
+            get_run.return_value = {"id": "run-1"}
+            history.return_value = [
+                {"type": "info", "message": "Pipeline initialized."}
+            ]
+            response = await async_client.get(
+                "/pipeline/run-1/logs",
+                headers={"Authorization": FAKE_TOKEN},
+            )
+        assert response.status_code == 200
+        assert response.json() == {
+            "events": [{"type": "info", "message": "Pipeline initialized."}]
+        }
+
 
 # ---------------------------------------------------------------------------
 # HITL endpoints

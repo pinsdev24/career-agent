@@ -1,4 +1,5 @@
 import logging
+import re
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
@@ -6,6 +7,7 @@ import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from postgrest.exceptions import APIError as PostgrestAPIError
 
 from app.config import get_settings
 from app.dependencies import create_supabase_client
@@ -27,6 +29,23 @@ def _cors_origins() -> list[str]:
         "http://127.0.0.1:3000",
     }
     return sorted(o for o in origins if o)
+
+
+_LOCAL_ORIGIN = r"https?://(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?"
+_LOCAL_ORIGIN_RE = re.compile(_LOCAL_ORIGIN)
+
+
+def _cors_headers_for(request: Request) -> dict[str, str]:
+    origin = request.headers.get("origin")
+    if not origin:
+        return {}
+    if origin in _cors_origins() or _LOCAL_ORIGIN_RE.fullmatch(origin):
+        return {
+            "Access-Control-Allow-Origin": origin,
+            "Access-Control-Allow-Credentials": "true",
+            "Vary": "Origin",
+        }
+    return {}
 
 
 @asynccontextmanager
@@ -73,6 +92,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins(),
+    allow_origin_regex=_LOCAL_ORIGIN,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -113,16 +133,35 @@ async def career_agent_error_handler(
 ) -> JSONResponse:
     """Handle all application-specific exceptions."""
     logger.error("CareerAgentError: %s (status=%d)", exc.message, exc.status_code)
-    origin = request.headers.get("origin")
-    headers: dict[str, str] = {}
-    if origin and origin in _cors_origins():
-        headers["Access-Control-Allow-Origin"] = origin
-        headers["Access-Control-Allow-Credentials"] = "true"
-        headers["Vary"] = "Origin"
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.message},
-        headers=headers,
+        headers=_cors_headers_for(request),
+    )
+
+
+@app.exception_handler(PostgrestAPIError)
+async def postgrest_error_handler(
+    request: Request,
+    exc: PostgrestAPIError,
+) -> JSONResponse:
+    """Turn missing-schema / PostgREST crashes into a readable API error."""
+    code = getattr(exc, "code", "") or ""
+    message = getattr(exc, "message", None) or str(exc)
+    logger.error("PostgREST error code=%s message=%s", code, message)
+    if code == "PGRST205":
+        detail = (
+            "Required database tables are missing. "
+            "Apply backend/supabase/migrations/005_job_os_applications.sql."
+        )
+        status_code = 503
+    else:
+        detail = "Database request failed"
+        status_code = 502
+    return JSONResponse(
+        status_code=status_code,
+        content={"detail": detail},
+        headers=_cors_headers_for(request),
     )
 
 

@@ -3,245 +3,286 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { PipelineRun } from "@/lib/types";
+import type { Application, PipelineRun, WorkItem } from "@/lib/types";
+import type { JobPosting } from "@/lib/job-engine-types";
+import { API_URL } from "@/lib/api-base";
+import { listApplications, listInbox } from "@/lib/api";
+import { getRecommendedJobs } from "@/lib/job-engine";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { CompanyLogo } from "@/components/company-logo";
+import { MatchScore } from "@/components/match-score";
+import { StatusPill } from "@/components/status-pill";
+import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatRelativeTime } from "@/lib/company";
 import {
   Plus,
-  Loader2,
   ArrowUpRight,
-  Target,
-  FileText,
+  Inbox,
+  Briefcase,
   Rocket,
-  Clock,
-  CheckCircle2,
-  XCircle,
+  MapPin,
 } from "lucide-react";
-
-function StatusBadge({ status }: { status: string }) {
-  const t = useTranslations("Dashboard.status");
-  
-  const config: Record<string, { bg: string; text: string; dot: string; pulse?: boolean }> = {
-    completed: { bg: "bg-emerald-50 dark:bg-emerald-900/30", text: "text-emerald-700 dark:text-emerald-400", dot: "bg-emerald-500 dark:bg-emerald-400" },
-    failed: { bg: "bg-red-50 dark:bg-red-900/30", text: "text-red-600 dark:text-red-400", dot: "bg-red-500 dark:bg-red-400" },
-    waiting_offer_selection: { bg: "bg-amber-50 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-400", dot: "bg-amber-500 dark:bg-amber-400", pulse: true },
-    waiting_letter_review: { bg: "bg-amber-50 dark:bg-amber-900/30", text: "text-amber-700 dark:text-amber-400", dot: "bg-amber-500 dark:bg-amber-400", pulse: true },
-  };
-  const fallback = { bg: "bg-[#F0F0F0] dark:bg-[#222]", text: "text-[#555] dark:text-[#aaa]", dot: "bg-[#555] dark:bg-[#aaa]", pulse: true };
-  const c = config[status] || fallback;
-
-  // Translate labels from Dashboard.status
-  const label = t.has(status) ? t(status) : status;
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${c.bg} ${c.text}`}>
-      <span className="relative flex h-1.5 w-1.5">
-        {c.pulse && <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${c.dot} opacity-60`} />}
-        <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${c.dot}`} />
-      </span>
-      {label}
-    </span>
-  );
-}
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
   const [runs, setRuns] = useState<PipelineRun[]>([]);
+  const [apps, setApps] = useState<Application[]>([]);
+  const [inbox, setInbox] = useState<WorkItem[]>([]);
+  const [jobs, setJobs] = useState<JobPosting[]>([]);
   const [loading, setLoading] = useState(true);
+  const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
-    async function loadRuns() {
+    async function load() {
       try {
         const supabase = createClient();
         const {
           data: { session },
         } = await supabase.auth.getSession();
-
         if (!session) return;
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/pipeline/runs`,
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          }
-        );
+        const meta = session.user.user_metadata || {};
+        const full = String(meta.full_name || meta.name || "");
+        setFirstName(full.split(" ")[0] || "");
 
-        if (res.ok) {
-          const data = await res.json();
+        const [runsRes, applicationRows, inboxRows, jobRes] = await Promise.all([
+          fetch(`${API_URL}/pipeline/runs`, {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          }),
+          listApplications().catch(() => [] as Application[]),
+          listInbox().catch(() => [] as WorkItem[]),
+          getRecommendedJobs(null, 4).catch(() => ({ items: [] as JobPosting[] })),
+        ]);
+
+        if (runsRes.ok) {
+          const data = await runsRes.json();
           setRuns(Array.isArray(data) ? data : []);
         }
+        setApps(applicationRows);
+        setInbox(inboxRows);
+        setJobs(jobRes.items.slice(0, 4));
       } catch {
+        // keep empty states
       } finally {
         setLoading(false);
       }
     }
-    loadRuns();
+    void load();
   }, []);
 
-  const groupRunsByDate = (runs: PipelineRun[]) => {
-    const groups: { [key: string]: PipelineRun[] } = {
-      [t("groups.today")]: [],
-      [t("groups.yesterday")]: [],
-      [t("groups.this_week")]: [],
-      [t("groups.earlier")]: [],
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const lastWeek = new Date(today);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-
-    const sortedRuns = [...runs].sort(
-      (a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-    );
-
-    sortedRuns.forEach((run) => {
-      if (!run.created_at) {
-        groups[t("groups.earlier")].push(run);
-        return;
-      }
-      const runDate = new Date(run.created_at);
-      if (runDate >= today) groups[t("groups.today")].push(run);
-      else if (runDate >= yesterday) groups[t("groups.yesterday")].push(run);
-      else if (runDate >= lastWeek) groups[t("groups.this_week")].push(run);
-      else groups[t("groups.earlier")].push(run);
-    });
-
-    return Object.entries(groups).filter(([_, groupRuns]) => groupRuns.length > 0);
-  };
-
-  const groupedRuns = groupRunsByDate(runs);
+  const waitingRuns = runs.filter((run) =>
+    ["waiting_offer_selection", "waiting_letter_review"].includes(run.status)
+  ).length;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-[#1a1a1a] dark:text-white tracking-tight">{t("title")}</h1>
-          <p className="text-[13px] text-[#999] dark:text-[#888] mt-0.5">
-            {t("subtitle")}
-          </p>
-        </div>
-        <Link href="/pipeline/new">
-          <Button className="rounded-lg bg-[#1a1a1a] dark:bg-white text-white dark:text-black hover:bg-[#333] dark:hover:bg-[#e5e5e5] h-9 px-4 text-[13px] font-medium flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]">
-            <Plus className="h-4 w-4" />
-            {t("new_mission")}
-          </Button>
-        </Link>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title={firstName ? t("greeting", { name: firstName }) : t("title")}
+        subtitle={t("subtitle")}
+        actions={
+          <Link href="/pipeline/new">
+            <Button className="h-9 rounded-lg px-4 text-[13px]">
+              <Plus className="h-4 w-4" />
+              {t("new_mission")}
+            </Button>
+          </Link>
+        }
+      />
 
-      {/* Content */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 space-y-3">
-          <Loader2 className="h-5 w-5 animate-spin text-[#999] dark:text-[#aaa]" />
-          <span className="text-[13px] text-[#999] dark:text-[#aaa]">{t("loading")}</span>
-        </div>
-      ) : runs.length === 0 ? (
-        <div className="rounded-xl border border-[#EBEBEB] dark:border-[#333] bg-white dark:bg-[#111] p-16 text-center">
-          <div className="max-w-sm mx-auto">
-            <div className="w-12 h-12 rounded-xl bg-[#F5F5F5] dark:bg-[#222] flex items-center justify-center mx-auto mb-4">
-              <Rocket className="h-5 w-5 text-[#999] dark:text-[#aaa]" />
-            </div>
-            <h2 className="text-[15px] font-semibold text-[#1a1a1a] dark:text-white mb-2">{t("empty.title")}</h2>
-            <p className="text-[13px] text-[#999] dark:text-[#888] mb-6 leading-relaxed">
-              {t("empty.description")}
-            </p>
-            <Link href="/pipeline/new">
-              <Button className="rounded-lg bg-[#1a1a1a] dark:bg-white text-white dark:text-black hover:bg-[#333] dark:hover:bg-[#e5e5e5] h-9 px-5 text-[13px] font-medium gap-2">
-                <Plus className="h-4 w-4" />
-                {t("new_mission")}
-              </Button>
-            </Link>
-          </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
         </div>
       ) : (
-        <div className="space-y-6">
-          {groupedRuns.map(([groupName, groupRuns]) => (
-            <div key={groupName} className="space-y-1.5">
-              <h2 className="text-[11px] font-semibold text-[#999] dark:text-[#aaa] uppercase tracking-wider px-1 mb-2">
-                {groupName}
-              </h2>
-
-              <div className="rounded-xl border border-[#EBEBEB] dark:border-[#333] bg-white dark:bg-[#111] overflow-hidden divide-y divide-[#F5F5F5] dark:divide-[#222]">
-                {groupRuns.map((run) => (
-                  <Link key={run.id} href={`/pipeline/${run.id}`} className="group block">
-                    <div className="flex items-center gap-4 px-4 py-3.5 hover:bg-[#FAFAFA] dark:hover:bg-[#1a1a1a] transition-colors duration-150">
-                      {/* Icon */}
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
-                          run.status === "completed"
-                            ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
-                            : run.status === "failed"
-                            ? "bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400"
-                            : "bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#888]"
-                        }`}>
-                        {run.status === "completed" ? (
-                          <CheckCircle2 className="h-4 w-4" />
-                        ) : run.status === "failed" ? (
-                          <XCircle className="h-4 w-4" />
-                        ) : run.entry_mode === "explore" ? (
-                          <Target className="h-4 w-4" />
-                        ) : (
-                          <FileText className="h-4 w-4" />
-                        )}
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-[13px] font-medium text-[#1a1a1a] dark:text-white truncate group-hover:text-[#000] dark:group-hover:text-[#ccc] transition-colors">
-                            {run.selected_offer?.title || run.offer_url || t("explore_mission")}
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          {run.selected_offer?.company && (
-                            <span className="text-[12px] text-[#999] dark:text-[#aaa] truncate">
-                              {run.selected_offer.company}
-                            </span>
-                          )}
-                          {run.created_at && (
-                            <>
-                              {run.selected_offer?.company && <span className="text-[#ddd] dark:text-[#444]">·</span>}
-                              <span className="text-[12px] text-[#bbb] dark:text-[#555] flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {new Date(run.created_at).toLocaleDateString(undefined, {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Score */}
-                      {run.gap_report && (
-                        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-                          <span className="text-[12px] text-[#999] dark:text-[#888]">{t("match")}</span>
-                          <span className={`text-[13px] font-semibold tabular-nums ${run.gap_report.match_score >= 80 ? "text-emerald-600 dark:text-emerald-400" : run.gap_report.match_score >= 60 ? "text-amber-600 dark:text-amber-400" : "text-red-500 dark:text-red-400" }`}>
-                            {run.gap_report.match_score}%
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Status */}
-                      <div className="shrink-0">
-                        <StatusBadge status={run.status} />
-                      </div>
-
-                      {/* Arrow */}
-                      <ArrowUpRight className="h-4 w-4 text-[#ddd] group-hover:text-[#999] dark:text-[#888] shrink-0 transition-colors" />
-                    </div>
-                  </Link>
-                ))}
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            {
+              href: "/applications",
+              label: t("stat_inbox"),
+              value: inbox.length,
+              icon: Inbox,
+            },
+            {
+              href: "/jobs",
+              label: t("stat_jobs"),
+              value: jobs.length ? `${jobs.length}+` : "—",
+              icon: Briefcase,
+            },
+            {
+              href: "/dashboard",
+              label: t("stat_missions"),
+              value: waitingRuns || runs.length,
+              icon: Rocket,
+            },
+          ].map((stat) => (
+            <Link
+              key={stat.label}
+              href={stat.href}
+              className="rounded-2xl border border-[#EBEBEB] bg-white p-4 transition-colors hover:border-[#ccc] dark:border-[#333] dark:bg-[#111]"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-[12px] font-medium text-[#888]">{stat.label}</p>
+                <stat.icon className="h-4 w-4 text-[#bbb]" />
               </div>
-            </div>
+              <p className="mt-2 text-[26px] font-semibold tracking-tight">{stat.value}</p>
+            </Link>
           ))}
         </div>
       )}
+
+      {!loading && jobs.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+              {t("top_matches")}
+            </h2>
+            <Link
+              href="/jobs"
+              className="text-[12px] font-medium text-[#666] hover:text-[#1a1a1a] dark:hover:text-white"
+            >
+              {t("see_all_jobs")}
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {jobs.map((job) => (
+              <Link
+                key={job.id}
+                href="/jobs"
+                className="rounded-2xl border border-[#EBEBEB] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:border-[#333] dark:bg-[#111]"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <CompanyLogo
+                    name={job.company_name}
+                    slug={job.company_slug}
+                    url={job.apply_url}
+                    size={40}
+                  />
+                  <MatchScore score={job.score ?? job.score_breakdown?.total} compact />
+                </div>
+                <h3 className="mt-3 line-clamp-2 text-[14px] font-semibold leading-snug">
+                  {job.title}
+                </h3>
+                <p className="mt-1 truncate text-[12px] text-[#777]">{job.company_name}</p>
+                {job.location && (
+                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-[#888]">
+                    <MapPin className="h-3 w-3" />
+                    {job.location}
+                  </p>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {!loading && inbox.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+            {t("needs_attention")}
+          </h2>
+          <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
+            {inbox.slice(0, 4).map((item, index) => (
+              <Link
+                key={item.id}
+                href={
+                  item.application_id
+                    ? `/applications/${item.application_id}`
+                    : "/applications"
+                }
+                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] dark:hover:bg-[#161616] ${
+                  index !== 0 ? "border-t border-[#F3F3F3] dark:border-[#222]" : ""
+                }`}
+              >
+                <CompanyLogo
+                  name={String(item.payload?.company || "Company")}
+                  url={String(item.payload?.apply_url || "")}
+                  size={36}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium">
+                    {(item.payload?.title as string) || t("review_packet")}
+                  </p>
+                  <p className="truncate text-[12px] text-[#777]">
+                    {(item.payload?.company as string) || ""}
+                  </p>
+                </div>
+                <StatusPill status="packet_ready" label={t("review_packet")} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="space-y-3">
+        <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+          {t("recent_missions")}
+        </h2>
+        {loading ? (
+          <Skeleton className="h-48 w-full rounded-2xl" />
+        ) : runs.length === 0 && apps.length === 0 ? (
+          <EmptyState
+            icon={Rocket}
+            title={t("empty.title")}
+            description={t("empty.description")}
+            actionHref="/jobs"
+            actionLabel={t("browse_jobs")}
+          />
+        ) : runs.length === 0 ? (
+          <EmptyState
+            icon={Rocket}
+            title={t("empty.title")}
+            description={t("empty_from_jobs")}
+            actionHref="/jobs"
+            actionLabel={t("browse_jobs")}
+          />
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
+            {runs.slice(0, 8).map((run, index) => {
+              const label = t.has(`status.${run.status}`)
+                ? t(`status.${run.status}`)
+                : run.status.replaceAll("_", " ");
+              return (
+                <Link
+                  key={run.id}
+                  href={`/pipeline/${run.id}`}
+                  className={`group flex items-center gap-3.5 px-4 py-3.5 hover:bg-[#FAFAFA] dark:hover:bg-[#161616] ${
+                    index !== 0 ? "border-t border-[#F3F3F3] dark:border-[#222]" : ""
+                  }`}
+                >
+                  <CompanyLogo
+                    name={run.selected_offer?.company || t("explore_mission")}
+                    url={run.selected_offer?.url || run.offer_url}
+                    size={40}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-[13px] font-medium">
+                      {run.selected_offer?.title ||
+                        run.offer_url ||
+                        t("explore_mission")}
+                    </h3>
+                    <p className="mt-0.5 truncate text-[12px] text-[#777]">
+                      {run.selected_offer?.company}
+                      {run.created_at
+                        ? ` · ${formatRelativeTime(run.created_at)}`
+                        : ""}
+                    </p>
+                  </div>
+                  {run.gap_report && (
+                    <MatchScore score={run.gap_report.match_score} compact />
+                  )}
+                  <StatusPill status={run.status} label={label} />
+                  <ArrowUpRight className="h-4 w-4 text-[#ddd] transition-colors group-hover:text-[#888]" />
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }

@@ -30,6 +30,8 @@ services:
   careeragent-worker:
     build: ./backend
     command: arq app.workers.settings.WorkerSettings
+    healthcheck:
+      disable: true
     env_file:
       - ./backend/.env
     environment:
@@ -61,6 +63,8 @@ services:
   job-engine-worker:
     build: ./job-engine
     command: arq app.workers.settings.WorkerSettings
+    healthcheck:
+      disable: true
     env_file:
       - ./job-engine/.env
     environment:

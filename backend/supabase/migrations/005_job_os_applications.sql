@@ -36,14 +36,17 @@ CREATE INDEX IF NOT EXISTS idx_cv_versions_user
 
 ALTER TABLE cv_versions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own cv versions" ON cv_versions;
 CREATE POLICY "Users can view own cv versions"
     ON cv_versions FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own cv versions" ON cv_versions;
 CREATE POLICY "Users can insert own cv versions"
     ON cv_versions FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on cv_versions" ON cv_versions;
 CREATE POLICY "Service role full access on cv_versions"
     ON cv_versions FOR ALL
     USING (auth.role() = 'service_role');
@@ -63,16 +66,20 @@ END $$;
 -- applications — first-class application lifecycle
 -- ============================================================
 
-CREATE TYPE application_status AS ENUM (
-    'draft',
-    'generating',
-    'packet_ready',
-    'approved',
-    'submitted',
-    'interviewing',
-    'rejected',
-    'withdrawn'
-);
+DO $$ BEGIN
+    CREATE TYPE application_status AS ENUM (
+        'draft',
+        'generating',
+        'packet_ready',
+        'approved',
+        'submitted',
+        'interviewing',
+        'rejected',
+        'withdrawn'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS applications (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -92,18 +99,22 @@ CREATE INDEX IF NOT EXISTS idx_applications_user_status
 
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own applications" ON applications;
 CREATE POLICY "Users can view own applications"
     ON applications FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own applications" ON applications;
 CREATE POLICY "Users can insert own applications"
     ON applications FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own applications" ON applications;
 CREATE POLICY "Users can update own applications"
     ON applications FOR UPDATE
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on applications" ON applications;
 CREATE POLICY "Service role full access on applications"
     ON applications FOR ALL
     USING (auth.role() = 'service_role');
@@ -133,6 +144,7 @@ CREATE INDEX IF NOT EXISTS idx_application_packets_app
 
 ALTER TABLE application_packets ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own packets" ON application_packets;
 CREATE POLICY "Users can view own packets"
     ON application_packets FOR SELECT
     USING (
@@ -142,6 +154,7 @@ CREATE POLICY "Users can view own packets"
         )
     );
 
+DROP POLICY IF EXISTS "Service role full access on application_packets" ON application_packets;
 CREATE POLICY "Service role full access on application_packets"
     ON application_packets FOR ALL
     USING (auth.role() = 'service_role');
@@ -150,16 +163,24 @@ CREATE POLICY "Service role full access on application_packets"
 -- work_items — HITL inbox (graph is a worker, not the UX)
 -- ============================================================
 
-CREATE TYPE work_item_type AS ENUM (
-    'review_packet',
-    'confirm_submitted'
-);
+DO $$ BEGIN
+    CREATE TYPE work_item_type AS ENUM (
+        'review_packet',
+        'confirm_submitted'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
 
-CREATE TYPE work_item_status AS ENUM (
-    'open',
-    'done',
-    'cancelled'
-);
+DO $$ BEGIN
+    CREATE TYPE work_item_status AS ENUM (
+        'open',
+        'done',
+        'cancelled'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS work_items (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -177,14 +198,17 @@ CREATE INDEX IF NOT EXISTS idx_work_items_inbox
 
 ALTER TABLE work_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own work items" ON work_items;
 CREATE POLICY "Users can view own work items"
     ON work_items FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own work items" ON work_items;
 CREATE POLICY "Users can update own work items"
     ON work_items FOR UPDATE
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on work_items" ON work_items;
 CREATE POLICY "Service role full access on work_items"
     ON work_items FOR ALL
     USING (auth.role() = 'service_role');
@@ -207,10 +231,12 @@ CREATE INDEX IF NOT EXISTS idx_usage_events_user_created
 
 ALTER TABLE usage_events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own usage" ON usage_events;
 CREATE POLICY "Users can view own usage"
     ON usage_events FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Service role full access on usage_events" ON usage_events;
 CREATE POLICY "Service role full access on usage_events"
     ON usage_events FOR ALL
     USING (auth.role() = 'service_role');
@@ -223,6 +249,7 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('cvs', 'cvs', false)
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Users can upload own CVs" ON storage.objects;
 CREATE POLICY "Users can upload own CVs"
     ON storage.objects FOR INSERT
     TO authenticated
@@ -231,6 +258,7 @@ CREATE POLICY "Users can upload own CVs"
         AND (storage.foldername(name))[1] = auth.uid()::text
     );
 
+DROP POLICY IF EXISTS "Users can read own CVs" ON storage.objects;
 CREATE POLICY "Users can read own CVs"
     ON storage.objects FOR SELECT
     TO authenticated
@@ -239,6 +267,7 @@ CREATE POLICY "Users can read own CVs"
         AND (storage.foldername(name))[1] = auth.uid()::text
     );
 
+DROP POLICY IF EXISTS "Users can update own CVs" ON storage.objects;
 CREATE POLICY "Users can update own CVs"
     ON storage.objects FOR UPDATE
     TO authenticated

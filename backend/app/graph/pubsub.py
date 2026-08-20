@@ -17,7 +17,7 @@ _HISTORY_TTL_SECONDS = 60 * 60 * 24
 class LogEmitter:
     def __init__(self) -> None:
         self.subscribers: dict[str, list[asyncio.Queue]] = {}
-        self.history: dict[str, list[dict]] = {}
+        self._buffer: dict[str, list[dict]] = {}
         self._redis: redis.Redis | None = None
 
     def configure_redis(self, client: redis.Redis | None) -> None:
@@ -26,8 +26,8 @@ class LogEmitter:
     def subscribe(self, run_id: str) -> asyncio.Queue:
         if run_id not in self.subscribers:
             self.subscribers[run_id] = []
-        if run_id not in self.history:
-            self.history[run_id] = []
+        if run_id not in self._buffer:
+            self._buffer[run_id] = []
         q: asyncio.Queue = asyncio.Queue()
         self.subscribers[run_id].append(q)
         return q
@@ -39,9 +39,9 @@ class LogEmitter:
     async def emit(self, run_id: str, message: dict) -> None:
         if not run_id:
             return
-        if run_id not in self.history:
-            self.history[run_id] = []
-        self.history[run_id].append(message)
+        if run_id not in self._buffer:
+            self._buffer[run_id] = []
+        self._buffer[run_id].append(message)
 
         if self._redis is not None:
             payload = json.dumps(message)
@@ -57,14 +57,30 @@ class LogEmitter:
             for q in self.subscribers[run_id]:
                 await q.put(message)
 
+    async def events(self, run_id: str) -> list[dict]:
+        return await self._history(run_id)
+
     async def _history(self, run_id: str) -> list[dict]:
         if self._redis is not None:
             try:
                 raw = await self._redis.lrange(f"logs:{run_id}", 0, -1)
-                return [json.loads(item) for item in raw]
+                events: list[dict] = []
+                for item in raw:
+                    if isinstance(item, dict):
+                        events.append(item)
+                        continue
+                    if isinstance(item, bytes):
+                        item = item.decode("utf-8")
+                    try:
+                        parsed = json.loads(item)
+                    except (TypeError, json.JSONDecodeError):
+                        continue
+                    if isinstance(parsed, dict):
+                        events.append(parsed)
+                return events
             except Exception as exc:
                 logger.warning("redis log history failed run=%s: %s", run_id, exc)
-        return list(self.history.get(run_id, []))
+        return list(self._buffer.get(run_id, []))
 
     async def stream(self, run_id: str) -> AsyncGenerator[str, None]:
         q = self.subscribe(run_id)
@@ -72,6 +88,9 @@ class LogEmitter:
         try:
             for msg in await self._history(run_id):
                 yield f"data: {json.dumps(msg)}\n\n"
+
+            # Comments flush proxies that otherwise buffer until the stream ends.
+            yield ": connected\n\n"
 
             if self._redis is not None:
                 pubsub = self._redis.pubsub()
@@ -86,10 +105,14 @@ class LogEmitter:
                             data = data.decode("utf-8")
                         yield f"data: {data}\n\n"
                     else:
-                        await asyncio.sleep(0.05)
+                        yield ": keepalive\n\n"
             else:
                 while True:
-                    msg = await q.get()
+                    try:
+                        msg = await asyncio.wait_for(q.get(), timeout=15.0)
+                    except TimeoutError:
+                        yield ": keepalive\n\n"
+                        continue
                     yield f"data: {json.dumps(msg)}\n\n"
                     q.task_done()
         except asyncio.CancelledError:

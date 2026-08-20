@@ -5,19 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { startPipeline } from "@/lib/api";
+import { formatUnknownError } from "@/lib/api-base";
 import type { EntryMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/page-header";
 import {
   Link2,
   Search,
   Rocket,
   Loader2,
-  Lightbulb,
   Globe,
   ArrowRight,
   Check,
+  Briefcase,
 } from "lucide-react";
 
 export default function NewPipelinePage() {
@@ -39,14 +40,11 @@ export default function NewPipelinePage() {
 
   const handleStart = async () => {
     setError(null);
-
     if (mode === "url" && !url.trim()) {
       setError(t("error_url"));
       return;
     }
-
     setLoading(true);
-
     try {
       const result = await startPipeline(
         mode,
@@ -54,29 +52,51 @@ export default function NewPipelinePage() {
       );
       router.push(`/pipeline/${result.id}`);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Failed to start pipeline"
-      );
+      setError(formatUnknownError(err, t("start_failed")));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold text-[#1a1a1a] dark:text-white tracking-tight">{t("title")}</h1>
-        <p className="text-[13px] text-[#999] dark:text-[#888] mt-0.5">
-          {t("subtitle")}
-        </p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
 
-      {/* Mode selector */}
-      <div className="grid grid-cols-2 gap-3">
+      <Link
+        href="/jobs"
+        className="flex items-start gap-4 rounded-2xl border border-[#1a1a1a] bg-white p-5 shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-transform hover:-translate-y-0.5 dark:border-white dark:bg-[#111]"
+      >
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a1a1a] text-white dark:bg-white dark:text-[#111]">
+          <Briefcase className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-[15px] font-semibold">{t("browse.label")}</h2>
+            <span className="rounded-full bg-[#F5F5F5] px-2 py-0.5 text-[11px] font-medium text-[#666] dark:bg-[#222] dark:text-[#aaa]">
+              {t("recommended")}
+            </span>
+          </div>
+          <p className="mt-1 text-[13px] leading-relaxed text-[#666] dark:text-[#aaa]">
+            {t("browse.desc")}
+          </p>
+        </div>
+        <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#bbb]" />
+      </Link>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {[
-          { value: "url" as EntryMode, label: t("modes.url.label"), desc: t("modes.url.desc"), icon: Link2 },
-          { value: "explore" as EntryMode, label: t("modes.explore.label"), desc: t("modes.explore.desc"), icon: Search },
+          {
+            value: "url" as EntryMode,
+            label: t("modes.url.label"),
+            desc: t("modes.url.desc"),
+            icon: Link2,
+          },
+          {
+            value: "explore" as EntryMode,
+            label: t("modes.explore.label"),
+            desc: t("modes.explore.desc"),
+            icon: Search,
+          },
         ].map((item) => {
           const isSelected = mode === item.value;
           const Icon = item.icon;
@@ -85,22 +105,30 @@ export default function NewPipelinePage() {
               key={item.value}
               type="button"
               onClick={() => setMode(item.value)}
-              className={`relative rounded-xl border p-4 text-left transition-all duration-200 ${ isSelected ? "border-[#1a1a1a] dark:border-white bg-white dark:bg-[#222] shadow-sm ring-1 ring-[#1a1a1a]/5 dark:ring-white/10" : "border-[#EBEBEB] dark:border-[#333] bg-white dark:bg-[#111] hover:border-[#ccc] dark:hover:border-[#555]" }`}
+              className={`relative rounded-2xl border p-4 text-left transition-all ${
+                isSelected
+                  ? "border-[#1a1a1a] bg-white ring-1 ring-[#1a1a1a]/10 dark:border-white dark:bg-[#161616]"
+                  : "border-[#EBEBEB] bg-white hover:border-[#ccc] dark:border-[#333] dark:bg-[#111]"
+              }`}
             >
               <div className="flex items-start gap-3">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-lg shrink-0 transition-colors ${ isSelected ? "bg-[#1a1a1a] dark:bg-white text-white dark:text-black" : "bg-[#F5F5F5] dark:bg-[#222] text-[#999] dark:text-[#888]" }`}>
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                    isSelected
+                      ? "bg-[#1a1a1a] text-white dark:bg-white dark:text-black"
+                      : "bg-[#F5F5F5] text-[#888] dark:bg-[#222]"
+                  }`}
+                >
                   <Icon className="h-4 w-4" />
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">{item.label}</h3>
-                  <p className="text-[12px] text-[#999] dark:text-[#888] mt-0.5">{item.desc}</p>
+                <div>
+                  <h3 className="text-[13px] font-medium">{item.label}</h3>
+                  <p className="mt-0.5 text-[12px] text-[#888]">{item.desc}</p>
                 </div>
               </div>
               {isSelected && (
-                <div className="absolute top-3 right-3">
-                  <div className="h-5 w-5 rounded-full bg-[#1a1a1a] dark:bg-white flex items-center justify-center">
-                    <Check className="h-3 w-3 text-white dark:text-black" />
-                  </div>
+                <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#1a1a1a] dark:bg-white">
+                  <Check className="h-3 w-3 text-white dark:text-black" />
                 </div>
               )}
             </button>
@@ -108,48 +136,41 @@ export default function NewPipelinePage() {
         })}
       </div>
 
-      {/* URL input */}
       {mode === "url" && (
-        <div className="rounded-xl border border-[#EBEBEB] dark:border-[#333] bg-white dark:bg-[#111] p-5 space-y-3">
-          <Label htmlFor="url" className="text-[12px] font-medium text-[#666] dark:text-[#aaa]">
+        <div className="space-y-3 rounded-2xl border border-[#EBEBEB] bg-white p-5 dark:border-[#333] dark:bg-[#111]">
+          <label htmlFor="url" className="text-[12px] font-medium text-[#666]">
             {t("url_label")}
-          </Label>
+          </label>
           <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#ccc]" />
+            <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#ccc]" />
             <Input
               id="url"
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder={t("url_placeholder")}
-              className="h-10 rounded-lg font-mono text-[13px] border-[#EBEBEB] dark:border-[#333] focus-visible:ring-[#1a1a1a] bg-[#FAFAFA] dark:bg-[#111] pl-10 pr-4"
+              className="h-11 rounded-xl bg-[#FAFAFA] pl-10 font-mono text-[13px] dark:bg-[#0d0d0d]"
             />
           </div>
         </div>
       )}
 
       {mode === "explore" && (
-        <div className="rounded-xl border border-[#EBEBEB] dark:border-amber-900/30 bg-[#FFFBEB]/50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
-          <Lightbulb className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
-          <div>
-            <p className="text-[13px] text-[#666] dark:text-[#aaa] leading-relaxed">
-              {t("explore_info")}
-            </p>
-          </div>
+        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/70 px-4 py-4 text-[13px] leading-relaxed text-[#666] dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-[#bbb]">
+          {t("explore_info")}
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 px-4 py-3 text-[13px] text-red-600 dark:text-red-400">
-          <span className="shrink-0">⚠️</span>
-          <span className="font-medium">{error}</span>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
+          {error}
         </div>
       )}
 
       <Button
         onClick={handleStart}
         disabled={loading}
-        className="rounded-lg bg-[#1a1a1a] dark:bg-white text-white dark:text-black hover:bg-[#333] dark:hover:bg-[#e5e5e5] h-10 px-6 text-[13px] font-medium flex items-center gap-2 shadow-sm transition-all active:scale-[0.98]"
+        className="h-11 rounded-xl px-6 text-[13px]"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -157,7 +178,7 @@ export default function NewPipelinePage() {
           <Rocket className="h-4 w-4" />
         )}
         {loading ? t("starting") : t("start_btn")}
-        {!loading && <ArrowRight className="h-3.5 w-3.5 ml-0.5" />}
+        {!loading && <ArrowRight className="h-3.5 w-3.5" />}
       </Button>
     </div>
   );

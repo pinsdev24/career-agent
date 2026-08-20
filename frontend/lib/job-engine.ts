@@ -1,10 +1,8 @@
 /** Client for the Job Engine microservice. */
 
 import { createClient } from "@/lib/supabase/client";
+import { JOB_ENGINE_URL, formatErrorDetail } from "@/lib/api-base";
 import type { JobListResponse, JobPosting, JobSignalType } from "@/lib/job-engine-types";
-
-const JOB_ENGINE_URL =
-  process.env.NEXT_PUBLIC_JOB_ENGINE_URL || "http://localhost:8001";
 
 class JobEngineError extends Error {
   status: number;
@@ -38,13 +36,23 @@ async function authHeaders(): Promise<HeadersInit> {
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const headers = await authHeaders();
-  const res = await fetch(`${JOB_ENGINE_URL}${path}`, {
-    ...options,
-    headers: { ...headers, ...options?.headers },
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${JOB_ENGINE_URL}${path}`, {
+      ...options,
+      headers: { ...headers, ...options?.headers },
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error && err.message ? err.message : "Failed to fetch";
+    throw new JobEngineError(0, message);
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new JobEngineError(res.status, body.detail || "Job engine error");
+    throw new JobEngineError(
+      res.status,
+      formatErrorDetail(body.detail, "Job engine error")
+    );
   }
   return res.json();
 }

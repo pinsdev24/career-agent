@@ -165,6 +165,21 @@ export const PIPELINE_STEPS: PipelineStatus[] = [
   "completed",
 ];
 
+export const PIPELINE_ACTIVE_STEPS: PipelineStatus[] = [
+  "started",
+  "scouting",
+  "matching",
+  "writing",
+  "critiquing",
+];
+
+export interface AgentLogEvent {
+  type: "info" | "agent_action" | "node_finish" | "error" | string;
+  node?: string;
+  message: string;
+  code?: string;
+}
+
 export type ApplicationStatus =
   | "draft"
   | "generating"

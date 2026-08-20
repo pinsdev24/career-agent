@@ -31,8 +31,6 @@
   },
   "Sidebar": {
     "missions": "Missions",
-    "jobs": "Jobs",
-    "applications": "Applications",
     "new_mission": "New Mission",
     "profile": "Profile",
     "settings": "Settings",
@@ -41,149 +39,365 @@
     "sign_out_confirm_title": "Are you sure you want to sign out?",
     "sign_out_confirm_desc": "You will need to log in again to access your dashboard.",
     "cancel": "Cancel",
-    "confirm": "Yes, sign out"
-  },
-  "Jobs": {
-    "title": "Recommended jobs",
-    "subtitle": "Personalized from your profile and search preferences — direct ATS listings only.",
-    "search_placeholder": "Search roles, skills, companies…",
-    "search": "Search",
-    "loading": "Finding matches…",
-    "empty": "No jobs in your feed yet.",
-    "empty_hint": "Upload a CV and set preferences, then wait for the job engine to sync boards.",
-    "load_more": "Load more",
-    "remote": "Remote",
-    "why_match": "Why this matches",
-    "apply": "Open posting",
-    "prepare_packet": "Prepare application packet",
-    "packet_started": "Packet queued — open Applications to review.",
-    "save": "Save",
-    "dismiss": "Not interested",
-    "open_in_careeragent": "Draft cover letter with CareerAgent →",
-    "select_hint": "Select a job to see details and match reasons.",
-    "error_generic": "Could not load jobs. Is the job engine running?"
-  },
-  "Applications": {
-    "title": "Applications",
-    "subtitle": "Packets the agent drafted. You review, then submit on the ATS yourself.",
-    "empty": "No applications yet.",
-    "empty_hint": "Pick a job from the feed and request a packet.",
-    "inbox": "Inbox",
-    "inbox_empty": "Nothing to review.",
-    "status": "Status",
-    "review": "Review packet",
-    "approve": "Approve letter",
-    "rewrite": "Rewrite with feedback",
-    "feedback_placeholder": "What should change?",
-    "mark_submitted": "I submitted this",
-    "open_ats": "Open application page",
-    "copy_letter": "Copy letter",
-    "generating": "Generating packet…",
-    "error_generic": "Could not load applications."
+    "confirm": "Yes, sign out",
+    "jobs": "Jobs",
+    "applications": "Applications"
   },
   "Landing": {
     "nav": {
-      "product": "Product",
       "features": "Features",
-      "how_it_works": "How It Works",
-      "testimonials": "Success Stories",
+      "how_it_works": "How it works",
+      "product": "Product",
+      "control": "Your control",
+      "faq": "FAQ",
+      "sign_in": "Sign in",
+      "start": "Start applying",
       "dashboard": "Dashboard"
     },
     "hero": {
-      "title_start": "Land Your Dream Job",
-      "title_end": "24x Faster.",
-      "subtitle": "Stop spending hours crafting cover letters. Ariadne's AI agents analyze job offers, match your skills, and generate personalized applications — in minutes, not days.",
-      "cta_primary": "Start Free — No Card Required",
-      "cta_secondary": "See how it works",
-      "trusted": "Trusted by candidates at"
+      "eyebrow": "The career platform for ambitious people",
+      "title_line1": "The agent",
+      "title_prefix": "to",
+      "title_words": [
+        "land",
+        "apply",
+        "match",
+        "hire"
+      ],
+      "subtitle": "Your toolkit to stop sending generic letters and start landing interviews. Securely analyze offers, match your skills, and ship applications that sound like you.",
+      "cta_primary": "Start free trial",
+      "cta_secondary": "See how it works"
     },
+    "marquee": [
+      {
+        "value": "24x",
+        "label": "faster applications"
+      },
+      {
+        "value": "94%",
+        "label": "match accuracy"
+      },
+      {
+        "value": "5 min",
+        "label": "to review a draft"
+      },
+      {
+        "value": "3",
+        "label": "interviews in week one"
+      }
+    ],
     "stats": {
-      "applications": "Applications Generated",
+      "applications": "Applications generated",
       "applications_value": "2,400+",
-      "time_saved": "Avg. Time Saved",
+      "time_saved": "Avg. time saved",
       "time_saved_value": "24x",
-      "match_rate": "Match Accuracy",
+      "match_rate": "Match accuracy",
       "match_rate_value": "94%",
-      "satisfaction": "Satisfaction Rate",
+      "satisfaction": "Satisfaction rate",
       "satisfaction_value": "4.9/5"
     },
-    "how_it_works": {
-      "badge": "How It Works",
-      "title": "From CV to tailored application in 3 steps.",
-      "subtitle": "No templates. No copy-paste. Just drop your CV and let our AI agents do the heavy lifting.",
-      "steps": [
+    "features": {
+      "badge": "Capabilities",
+      "title": "Everything you need.",
+      "title_muted": "Nothing you don't.",
+      "items": [
         {
-          "step": "01",
-          "title": "Upload Your CV",
-          "desc": "Drop your resume once. Ariadne extracts your skills, experience, and career goals to build a semantic profile that gets smarter over time."
+          "n": "01",
+          "title": "Semantic matching",
+          "desc": "Compare your CV to the job at a conceptual level — not keywords. Get a precise fit score and a clear list of gaps to close."
         },
         {
-          "step": "02",
-          "title": "Paste a Job Link — or Let Us Find One",
-          "desc": "Provide a job posting URL, or activate Explore Mode. Our Scout Agent browses the web and surfaces the roles that actually match your profile."
+          "n": "02",
+          "title": "Sounds like you",
+          "desc": "The Writer Agent learns your tone from every review. After two applications, it writes like you — sharper, tighter, more compelling."
         },
         {
-          "step": "03",
-          "title": "Review, Approve & Apply",
-          "desc": "Our Writer Agent drafts a hyper-personalized cover letter. A Critic Agent audits it. You review, tweak if needed, and send — all in under 5 minutes."
+          "n": "03",
+          "title": "Human in the loop",
+          "desc": "No black-box send. Every draft goes through your review before anything is finalized. Edit, rewrite, or approve."
+        },
+        {
+          "n": "04",
+          "title": "Explore mode",
+          "desc": "No job link? Scout searches the web for roles that actually match your profile, ranked by semantic fit."
         }
       ]
     },
-    "features": {
-      "badge": "Why Ariadne",
-      "title": "Every application, engineered for impact.",
-      "subtitle": "Most AI tools paste generic text. Ariadne deploys specialized agents that analyze, write, and critique — so every letter lands.",
-      "items": {
-        "gap": {
-          "title": "94% Match Accuracy",
-          "desc": "Semantic analysis compares your CV against the job description at a conceptual level — not keywords. You get a precise fit score and a clear list of gaps to address."
+    "how_it_works": {
+      "badge": "Process",
+      "title": "Three steps.",
+      "title_muted": "Infinite interviews.",
+      "preview_title": "Agent Console",
+      "preview_status": "Live",
+      "preview_events": "{count} events",
+      "preview_run": "run_7f3a",
+      "preview_logs": [
+        [
+          {
+            "type": "info",
+            "time": "14:02:11",
+            "text": "Pipeline initialized."
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:13",
+            "text": "Reading resume — 2 pages"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:16",
+            "text": "Extracting skills, roles, and intent"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:02:19",
+            "text": "Completed step: Profile"
+          },
+          {
+            "type": "info",
+            "time": "14:02:20",
+            "text": "18 skills mapped. Profile ready."
+          }
+        ],
+        [
+          {
+            "type": "info",
+            "time": "14:08:02",
+            "text": "Scout: searching the open web"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:05",
+            "text": "Ranking roles by semantic fit"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:09",
+            "text": "Matcher computing gap analysis"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:08:12",
+            "text": "Completed step: Matcher"
+          },
+          {
+            "type": "info",
+            "time": "14:08:13",
+            "text": "Match 94%. Shortlist ready."
+          }
+        ],
+        [
+          {
+            "type": "info",
+            "time": "14:14:31",
+            "text": "Writer: drafting in your tone"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:14:34",
+            "text": "Critic scoring across 5 dimensions"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:38",
+            "text": "Score 91/100 — new best draft"
+          },
+          {
+            "type": "info",
+            "time": "14:14:39",
+            "text": "Paused for your review"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:40",
+            "text": "Letter ready to approve."
+          }
+        ]
+      ],
+      "steps": [
+        {
+          "roman": "I",
+          "title": "Upload your CV",
+          "desc": "Drop your resume once. Ariadne extracts skills, experience, and goals into a semantic profile that gets smarter over time."
         },
-        "tone": {
-          "title": "Sounds Like You, Not AI",
-          "desc": "The Writer Agent learns your personal tone from every review. After 2 applications, it writes exactly like you — but sharper, tighter, and more compelling."
+        {
+          "roman": "II",
+          "title": "Point at a role",
+          "desc": "Paste a job URL, or let Scout find matches. Agents research the company and map the gaps that actually matter."
         },
-        "zap": {
-          "title": "You Stay in Control",
-          "desc": "No black-box magic. Every draft goes through your review before anything is finalized. Edit, rewrite, or approve — the final word is always yours."
+        {
+          "roman": "III",
+          "title": "Review and send",
+          "desc": "Writer drafts. Critic scores. You approve. A tailored letter in minutes — with you still holding the pen."
         }
-      }
+      ]
+    },
+    "product": {
+      "badge": "Inside",
+      "title": "The work,",
+      "title_muted": "not the pitch.",
+      "subtitle": "Missions with match scores. Drafts beside the gaps. You always see why — and you always approve.",
+      "dashboard_label": "Missions",
+      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_caption": "Every pipeline in one list — match score, status, next action.",
+      "dashboard_alt": "Ariadne dashboard showing missions with match scores and review status",
+      "review_label": "Review",
+      "review_url": "ariadne.app/review",
+      "review_caption": "Draft on the left. Gap analysis on the right. Approve, rewrite, or edit.",
+      "review_alt": "Cover letter review with gap analysis, matching skills, and approve or rewrite controls",
+      "insights": [
+        {
+          "k": "Match",
+          "v": "Semantic fit on every role, not keyword noise."
+        },
+        {
+          "k": "Status",
+          "v": "Review letter or completed — the next action is obvious."
+        },
+        {
+          "k": "Control",
+          "v": "Nothing leaves without your rewrite or approval."
+        }
+      ]
     },
     "scout": {
-      "badge": "Explore Mode",
-      "title": "No job link? No problem.",
-      "subtitle": "Activate Explore Mode and let Ariadne's Scout Agent search the web for roles that match your profile. You focus on interviews — we handle the hunting.",
-      "items": [
-        "AI-powered job discovery across the web",
-        "Ranked by semantic match to your CV",
-        "New results refreshed automatically"
+      "badge": "Explore",
+      "title": "Scout by",
+      "title_muted": "default.",
+      "subtitle": "No job link required. Scout searches the open web and ranks roles by semantic match, so you spend time interviewing — not hunting.",
+      "stat_sources_value": "Web",
+      "stat_sources": "Live discovery",
+      "stat_rank_value": "94%",
+      "stat_rank": "Match ranking",
+      "stat_refresh_value": "Auto",
+      "stat_refresh": "Fresh results",
+      "status": "Scout network",
+      "status_ok": "All operational",
+      "sources": [
+        {
+          "city": "LinkedIn",
+          "region": "Professional",
+          "ms": "96%"
+        },
+        {
+          "city": "Welcome to the Jungle",
+          "region": "Europe",
+          "ms": "91%"
+        },
+        {
+          "city": "Indeed",
+          "region": "Global",
+          "ms": "88%"
+        },
+        {
+          "city": "Company careers",
+          "region": "Direct",
+          "ms": "93%"
+        },
+        {
+          "city": "Boards",
+          "region": "Niche",
+          "ms": "87%"
+        },
+        {
+          "city": "Your URL",
+          "region": "Manual",
+          "ms": "100%"
+        }
+      ]
+    },
+    "metrics": {
+      "badge": "Live metrics",
+      "title": "Performance you",
+      "title_muted": "can measure.",
+      "live": "Live",
+      "applications": "Applications generated",
+      "uptime": "Drafts you still control",
+      "latency": "Average review time",
+      "countries": "Match accuracy"
+    },
+    "security": {
+      "badge": "Security",
+      "title": "Trust is",
+      "title_muted": "non-negotiable.",
+      "subtitle": "Your CV and letters stay yours. Encryption, row-level access, and review-before-send are built into every layer — not bolted on.",
+      "badges": [
+        "Supabase Auth",
+        "RLS",
+        "TLS",
+        "Encrypted"
       ],
-      "cta": "Try Explore Mode"
+      "items": [
+        {
+          "title": "Encrypted at rest",
+          "desc": "Personal data and documents are encrypted and never sold or shared with third parties."
+        },
+        {
+          "title": "Row-level access",
+          "desc": "Every request is authenticated. You only ever see your own missions, drafts, and profile."
+        },
+        {
+          "title": "You approve first",
+          "desc": "Nothing is sent on your behalf. Human-in-the-loop is the default, not an option."
+        },
+        {
+          "title": "Private by design",
+          "desc": "We keep the surface small: resume, job context, and the letter you choose to keep."
+        }
+      ]
+    },
+    "control": {
+      "badge": "Your control",
+      "title": "Built with you.",
+      "title_muted": "Not around you.",
+      "subtitle": "Agents do the research and the first draft. You keep the judgment — edit, rewrite, or approve before anything leaves your desk.",
+      "items": [
+        {
+          "title": "Tone memory",
+          "desc": "Feedback compounds. The more you review, the more it sounds like you."
+        },
+        {
+          "title": "Gap reports",
+          "desc": "See exactly where you match and where you don't — then decide how to position it."
+        },
+        {
+          "title": "Critic scores",
+          "desc": "Structure, relevance, and tone scored before you even open the draft."
+        },
+        {
+          "title": "Rewrite loops",
+          "desc": "Ask for a pass. Watch the pipeline rerun. Keep the version that feels right."
+        }
+      ]
     },
     "testimonials": {
-      "badge": "Candidate Stories",
-      "title": "Real people. Real results.",
-      "subtitle": "Join professionals who cut their application time by 24x.",
+      "badge": "What people say",
+      "result_label": "Key result",
       "items": [
         {
           "quote": "I dropped my CV and Ariadne matched me with 5 roles I actually wanted. The cover letters were better than anything I'd written myself.",
           "author": "Sarah J.",
-          "role": "Product Manager at Stripe"
+          "role": "Product Manager",
+          "result": "5 matched roles"
         },
         {
-          "quote": "After two applications, the agent started writing exactly like me — but sharper. The Tone of Voice Memory is a game-changer.",
+          "quote": "After two applications, the agent started writing exactly like me — but sharper. The tone of voice memory is a game-changer.",
           "author": "Michael T.",
-          "role": "Frontend Engineer at Vercel"
+          "role": "Frontend Engineer",
+          "result": "Sounds like me"
         },
         {
           "quote": "I used to spend 2 hours per application. Now it takes me 5 minutes to review and approve. I landed 3 interviews in my first week.",
           "author": "Elena R.",
-          "role": "Data Scientist at Datadog"
+          "role": "Data Scientist",
+          "result": "3 interviews, week one"
         }
       ]
     },
     "faq": {
       "badge": "FAQ",
-      "title": "Frequently asked questions.",
+      "title": "Simple answers.",
+      "title_muted": "No surprises.",
       "items": [
         {
           "q": "Is Ariadne really free?",
@@ -191,52 +405,59 @@
         },
         {
           "q": "Does it work for any industry?",
-          "a": "Absolutely. Ariadne's semantic matching works across tech, finance, healthcare, consulting, creative roles, and more. It analyzes skills and context — not industry-specific templates."
+          "a": "Absolutely. Semantic matching works across tech, finance, healthcare, consulting, creative roles, and more. It analyzes skills and context — not industry templates."
         },
         {
           "q": "Will the cover letters sound generic?",
-          "a": "No. Our Writer Agent learns your personal tone from your feedback. After 2-3 reviews, it adapts to your voice — resulting in letters that sound like you, but better."
+          "a": "No. The Writer Agent learns your tone from your feedback. After two or three reviews, it adapts to your voice."
         },
         {
           "q": "How is my data handled?",
-          "a": "Your CV and personal data are encrypted and never shared with third parties. We use enterprise-grade security with Supabase authentication and row-level access policies."
+          "a": "Your CV and personal data are encrypted and never shared with third parties. We use Supabase authentication and row-level access policies."
         },
         {
           "q": "Can I edit the generated letters?",
-          "a": "Of course. You have full control. Every draft goes through your review — you can edit, request a rewrite, or approve before anything is finalized."
+          "a": "Of course. Every draft goes through your review — edit, request a rewrite, or approve before anything is finalized."
         }
       ]
     },
     "cta": {
-      "title": "Your next role is one click away.",
-      "subtitle": "Join thousands of professionals who stopped guessing and started landing interviews with precision-crafted applications.",
-      "button": "Start Free Today",
-      "footer": "No credit card required · Free forever for basic use"
+      "title": "Ready to land something great?",
+      "subtitle": "Join candidates who stopped guessing and started shipping applications that actually sound like them.",
+      "button": "Start applying free",
+      "secondary": "Go to dashboard",
+      "footer": "No credit card required"
     },
     "footer": {
+      "tagline": "The career lab for people who ship applications, not templates.",
       "product": "Product",
       "product_features": "Features",
       "product_explore": "Explore Mode",
-      "product_pricing": "Pricing",
+      "product_how": "How it works",
+      "product_inside": "Inside",
       "resources": "Resources",
       "resources_docs": "Documentation",
-      "resources_blog": "Blog",
+      "resources_faq": "FAQ",
       "resources_changelog": "Changelog",
+      "company": "Company",
       "legal": "Legal",
-      "legal_privacy": "Privacy Policy",
-      "legal_terms": "Terms of Service",
-      "copyright": "© {year} Ariadne. Elevating job seekers globally."
+      "legal_privacy": "Privacy",
+      "legal_terms": "Terms",
+      "legal_security": "Security",
+      "copyright": "© {year} Ariadne. All rights reserved."
     }
   },
   "Dashboard": {
     "title": "Missions",
-    "subtitle": "Track and manage your application pipelines.",
+    "greeting": "Welcome back, {name}",
+    "subtitle": "Your job search, in one place — matches, packets, and missions.",
     "new_mission": "New Mission",
     "loading": "Loading missions...",
     "empty": {
-      "title": "No missions yet",
-      "description": "Start a new mission to deploy Ariadne's agents on your next job application."
+      "title": "Nothing in motion yet",
+      "description": "Start from recommended jobs. Pick a role, generate a packet, then submit on the ATS yourself."
     },
+    "empty_from_jobs": "Packets live under Applications. Missions are the older URL/explore pipelines.",
     "groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -250,10 +471,22 @@
       "waiting_letter_review": "Review Letter",
       "writing": "Writing",
       "analyzing": "Analyzing",
-      "scouting": "Scouting"
+      "scouting": "Scouting",
+      "started": "Getting ready",
+      "matching": "Matching",
+      "critiquing": "Quality check"
     },
     "match": "Match",
-    "explore_mission": "Explore Mission"
+    "explore_mission": "Explore Mission",
+    "stat_inbox": "Needs review",
+    "stat_jobs": "Top matches",
+    "stat_missions": "Missions",
+    "top_matches": "Top matches",
+    "see_all_jobs": "See all jobs",
+    "needs_attention": "Needs you",
+    "recent_missions": "Recent missions",
+    "browse_jobs": "Browse jobs",
+    "review_packet": "Review packet"
   },
   "Profile": {
     "title": "Profile",
@@ -298,64 +531,171 @@
   },
   "NewMission": {
     "title": "New Mission",
-    "subtitle": "Start a new job application pipeline.",
+    "subtitle": "Start from the job feed, or paste a posting if you already have a URL.",
+    "recommended": "Recommended",
+    "browse": {
+      "label": "Browse recommended jobs",
+      "desc": "See roles matched to your CV, then generate an application packet in one click."
+    },
     "modes": {
       "url": {
-        "label": "Direct URL",
-        "desc": "Paste a job posting link"
+        "label": "Paste a posting URL",
+        "desc": "Greenhouse, Lever, Ashby, or a careers page"
       },
       "explore": {
-        "label": "Explore",
-        "desc": "Let agents find offers"
+        "label": "Explore for me",
+        "desc": "Scout the web from your profile"
       }
     },
-    "url_label": "Job Posting URL",
-    "url_placeholder": "https://company.com/careers/job-posting",
-    "explore_info": "The system will use your profile data to actively find matching offers. Make sure your profile is up to date before starting.",
-    "starting": "Starting...",
-    "start_btn": "Start Pipeline",
-    "error_url": "Please enter a job URL."
+    "url_label": "Job posting URL",
+    "url_placeholder": "https://boards.greenhouse.io/company/jobs/…",
+    "explore_info": "Explore searches the open web from your CV and preferences. For daily use, the Jobs feed is faster and more accurate.",
+    "starting": "Starting…",
+    "start_btn": "Start pipeline",
+    "error_url": "Paste a job URL to continue.",
+    "start_failed": "Could not start the pipeline."
   },
   "MissionDetail": {
-    "active_pipeline": "Active Pipeline",
+    "active_pipeline": "Active mission",
     "delete_title": "Delete this run?",
     "delete_desc": "This will permanently delete all data associated with this pipeline run. This action cannot be undone.",
     "delete_btn": "Delete",
     "cancel": "Cancel",
-    "no_offers": "No Offers Found",
-    "select_offer": "Select an Offer",
+    "no_offers": "No offers found",
+    "select_offer": "Pick a role to continue",
     "no_offers_desc": "No matching roles were found. Try adjusting your profile preferences.",
-    "select_offer_desc": "Choose the most relevant opportunity to continue.",
-    "confirm_selection": "Confirm Selection",
-    "review_draft": "Review Draft",
-    "review_desc": "The AI critic has reviewed your letter. Finalize or request changes.",
-    "processing": "Processing...",
+    "select_offer_desc": "Choose the opportunity that feels right. You stay in control of what we write next.",
+    "confirm_selection": "Continue with this role",
+    "review_draft": "Review your letter",
+    "review_desc": "Read it like a hiring manager would. Edit freely, ask for a rewrite, or approve.",
+    "processing": "Working…",
     "ready_to_send": "Your cover letter is ready to send.",
-    "final_letter": "Final Letter",
+    "final_letter": "Final letter",
     "applied": "Applied!",
-    "i_applied": "I Applied",
+    "i_applied": "I applied",
     "send": "Send",
     "copied": "Copied",
     "copy": "Copy",
-    "target_role": "Target Role",
-    "failed_title": "Pipeline Failed",
-    "failed_desc": "An error occurred during processing.",
-    "error_details": "Error Details",
-    "abort": "Abort",
+    "target_role": "Target role",
+    "failed_title": "This mission didn’t finish",
+    "failed_desc": "Something went wrong while working on this application.",
+    "error_details": "Error details",
+    "abort": "Stop this mission",
+    "hint": {
+      "started": "Setting up this mission",
+      "scouting": "Then you’ll pick a role",
+      "waiting_offer_selection": "Then we measure the fit",
+      "matching": "Then we write the letter",
+      "writing": "Then a quality check",
+      "critiquing": "Then it’s your review",
+      "waiting_letter_review": "Then it’s ready to send",
+      "completed": "Copy it into the employer’s form yourself"
+    },
+    "insights": {
+      "brief": "Before you approve",
+      "brief_done": "How this application sits",
+      "fit": "Role fit",
+      "quality": "Letter quality",
+      "fit_high": "Strong overlap — the letter can be specific.",
+      "fit_mid": "A stretch on paper. Keep the letter honest about what you bring.",
+      "fit_low": "A real stretch. Don’t overclaim the gaps below.",
+      "fit_none": "Fit will appear once matching finishes.",
+      "quality_high": "Ready to send if it still sounds like you.",
+      "quality_mid": "Solid draft — tighten anything that feels generic.",
+      "quality_low": "Ask for a rewrite before you approve.",
+      "quality_none": "Quality notes will appear after the review.",
+      "on_the_draft": "On the draft",
+      "matching": "Lead with these",
+      "gaps": "Don’t overclaim",
+      "gaps_hint": "The letter should not pretend you have these.",
+      "none_matching": "None called out",
+      "no_gaps": "No major gaps called out",
+      "letter_breakdown": "Letter breakdown"
+    },
+    "dimensions": {
+      "relevance": "Relevance",
+      "tone": "Tone",
+      "structure": "Structure",
+      "specificity": "Specificity",
+      "persuasiveness": "Persuasiveness"
+    },
     "tabs": {
-      "gap": "Gap",
-      "critic": "Critic"
+      "gap": "Fit",
+      "critic": "Quality"
+    },
+    "steps": {
+      "started": "Start",
+      "scouting": "Find roles",
+      "waiting_offer_selection": "Your pick",
+      "matching": "Fit",
+      "writing": "Letter",
+      "critiquing": "Quality",
+      "waiting_letter_review": "Review",
+      "completed": "Send"
+    },
+    "stage": {
+      "started": {
+        "title": "Getting ready",
+        "desc": "Loading your profile and setting the brief for this mission."
+      },
+      "scouting": {
+        "title": "Searching for roles",
+        "desc": "Looking for openings that match your experience — not just keywords."
+      },
+      "matching": {
+        "title": "Measuring the fit",
+        "desc": "Comparing this role to your CV so the letter can lead with what matters."
+      },
+      "writing": {
+        "title": "Writing your letter",
+        "desc": "Drafting in your voice, with the specifics this role actually asked for."
+      },
+      "critiquing": {
+        "title": "Quality check",
+        "desc": "Reading the draft the way a hiring manager would — tone, relevance, and punch."
+      }
+    },
+    "activity": {
+      "title": "What’s happening",
+      "feed": "Updates",
+      "live": "Live",
+      "waiting": "Connecting…",
+      "empty": "The agent is getting ready.",
+      "unavailable": "Couldn’t load live updates. Refresh in a moment.",
+      "working": "Still working on this step",
+      "working_on": "Working on {company}",
+      "initialized": "Getting things ready",
+      "searching": "Searching for roles that fit you",
+      "expanding": "Widening the search",
+      "scoring": "Ranking the strongest matches",
+      "found_offers": "Found roles worth a look",
+      "reading_posting": "Reading the job posting",
+      "matching": "Comparing this role to your CV",
+      "writing": "Drafting a letter in your voice",
+      "critiquing": "Reviewing the letter like a hiring manager",
+      "paused": "Waiting for you",
+      "cancelled": "Stopped",
+      "failed": "Something went wrong",
+      "timeout": "This is taking too long — try again",
+      "done_scout": "Finished searching",
+      "done_read": "Finished reading the posting",
+      "done_match": "Finished the fit analysis",
+      "done_write": "Finished the draft",
+      "done_critique": "Finished the quality check",
+      "done_route": "Chose the next step",
+      "done_memory": "Updated what we know about you"
     }
   },
   "LetterEditor": {
-    "title": "Draft Editor",
-    "chars": "{count} chars",
-    "placeholder": "Drafting...",
-    "feedback_placeholder": "e.g. emphasize leadership experience...",
-    "helper": "Edit the letter above, then approve or request a rewrite.",
+    "title": "Cover letter",
+    "words": "{count} words",
+    "revision": "Revision {count}",
+    "placeholder": "The draft will appear here.",
+    "notes_label": "Want a rewrite?",
+    "feedback_placeholder": "e.g. lead with the RAG work, don’t claim 5 years of production ML…",
+    "helper": "Approve when it sounds like you. Notes go to the writer — never to the employer.",
     "rewrite": "Rewrite",
-    "send": "Send",
-    "approve": "Approve"
+    "approve": "Approve letter"
   },
   "Settings": {
     "title": "Settings",
@@ -408,5 +748,66 @@
     "error": "An error occurred",
     "success": "Success",
     "view": "View"
+  },
+  "Jobs": {
+    "title": "Recommended jobs",
+    "subtitle": "Matched to your CV and preferences — direct ATS listings, not job-board spam.",
+    "search_placeholder": "Search roles, skills, companies…",
+    "search": "Search",
+    "loading": "Finding matches…",
+    "empty": "No jobs in your feed yet",
+    "empty_hint": "Upload a CV and set search preferences so we can rank roles from Greenhouse, Lever, Ashby and Workable.",
+    "empty_cta": "Update profile",
+    "load_more": "Load more",
+    "remote": "Remote",
+    "why_match": "Why this matches",
+    "apply": "Open",
+    "prepare_packet": "Prepare application packet",
+    "packet_started": "Packet queued — opening Applications.",
+    "save": "Save",
+    "dismiss": "Skip",
+    "open_in_careeragent": "Draft with a URL mission instead →",
+    "select_hint": "Select a role to see match reasons and the posting.",
+    "error_generic": "Could not load jobs. Is the job engine running?",
+    "saved": "Saved to your feed.",
+    "dismissed": "Removed from your feed.",
+    "api_unreachable": "Can't reach CareerAgent. Is the API running?"
+  },
+  "Applications": {
+    "title": "Applications",
+    "subtitle": "Packets the agent drafted. You review, then submit on the ATS yourself.",
+    "empty": "No applications yet",
+    "empty_hint": "Pick a job from the feed and request a packet. You stay in control of the submit click.",
+    "inbox": "Inbox",
+    "inbox_empty": "Nothing to review.",
+    "needs_you": "Needs you",
+    "browse_jobs": "Browse jobs",
+    "filter_all": "All",
+    "filter_needs_you": "Needs you",
+    "filter_empty": "Nothing in this filter.",
+    "untitled": "Untitled role",
+    "status": "Status",
+    "status_draft": "Draft",
+    "status_generating": "Writing",
+    "status_packet_ready": "Review",
+    "status_approved": "Approved",
+    "status_submitted": "Submitted",
+    "status_interviewing": "Interviewing",
+    "status_rejected": "Rejected",
+    "status_withdrawn": "Withdrawn",
+    "review": "Review packet",
+    "approve": "Approve letter",
+    "rewrite": "Rewrite with feedback",
+    "feedback_placeholder": "What should change?",
+    "mark_submitted": "I submitted this",
+    "open_ats": "Open application page",
+    "copy_letter": "Copy letter",
+    "copied": "Copied",
+    "letter": "Cover letter",
+    "letter_placeholder": "The letter will appear here.",
+    "generating": "Generating packet…",
+    "generating_hint": "Matcher → letter → critic. Usually 30–90 seconds.",
+    "retry": "Retry packet",
+    "error_generic": "Could not load applications."
   }
 }

@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { getPipelineRun, selectOffer, reviewLetter, cancelPipeline, markApplied, deletePipeline } from "@/lib/api";
 import type { PipelineRun } from "@/lib/types";
+import { PIPELINE_ACTIVE_STEPS } from "@/lib/types";
 import { PipelineProgress } from "@/components/pipeline-progress";
 import { OfferCard } from "@/components/offer-card";
-import { GapReportCard } from "@/components/gap-report";
-import { CriticScoresCard } from "@/components/critic-scores";
 import { LetterEditor } from "@/components/letter-editor";
 import { LiveAgentLog } from "@/components/live-agent-log";
+import { CompanyLogo } from "@/components/company-logo";
+import { MissionInsights } from "@/components/mission-insights";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -31,7 +32,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Loader2,
   Copy,
@@ -53,7 +53,6 @@ export default function PipelineRunPage({
   const { runId } = use(params);
   const router = useRouter();
   const t = useTranslations("MissionDetail");
-  const tStatus = useTranslations("Dashboard.status");
   
   const [run, setRun] = useState<PipelineRun | null>(null);
   const [loading, setLoading] = useState(true);
@@ -217,54 +216,54 @@ export default function PipelineRunPage({
   }
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Breadcrumb + Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="space-y-8 pb-16">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           <Link
             href="/dashboard"
-            className="flex items-center justify-center h-8 w-8 rounded-lg border border-[#EBEBEB] dark:border-[#333] hover:bg-[#F5F5F5] dark:hover:bg-[#222] transition-colors"
+            className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#EBEBEB] transition-colors hover:bg-[#F5F5F5] dark:border-[#333] dark:hover:bg-[#222]"
           >
-            <ArrowLeft className="h-4 w-4 text-[#999] dark:text-[#888]" />
+            <ArrowLeft className="h-4 w-4 text-[#999]" />
           </Link>
-          <div>
-            <h1 className="text-[15px] font-semibold text-[#1a1a1a] dark:text-white tracking-tight">
-              {run.selected_offer?.title || t("active_pipeline")}
-            </h1>
-            <div className="flex items-center gap-2 mt-0.5">
-              {run.selected_offer?.company && (
-                <span className="text-[12px] text-[#999] dark:text-[#888]">{run.selected_offer.company}</span>
-              )}
-              <span className="text-[11px] font-mono text-[#ccc] bg-[#F5F5F5] dark:bg-[#222] px-1.5 py-0.5 rounded">
-                {run.id.substring(0, 8)}
-              </span>
+          {run.selected_offer && (
+            <CompanyLogo
+              name={run.selected_offer.company_info?.name || run.selected_offer.company}
+              url={run.selected_offer.url}
+              size={44}
+            />
+          )}
+          <div className="min-w-0 space-y-2">
+            <div>
+              <h1 className="truncate text-[20px] font-semibold tracking-tight text-[#1a1a1a] dark:text-white">
+                {run.selected_offer?.title || t("active_pipeline")}
+              </h1>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-[#666] dark:text-[#aaa]">
+                {run.selected_offer?.company && (
+                  <span>{run.selected_offer.company_info?.name || run.selected_offer.company}</span>
+                )}
+                {run.selected_offer?.location && (
+                  <>
+                    <span className="text-[#ccc]">·</span>
+                    <span className="text-[#888]">{run.selected_offer.location}</span>
+                  </>
+                )}
+              </div>
             </div>
+            <PipelineProgress currentStatus={run.status} />
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Status */}
-          <div className={cn(
-            "px-3 py-1.5 rounded-lg text-[11px] font-medium",
-            run.status === 'completed' ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400" :
-              run.status === 'failed' ? "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400" :
-                "bg-[#F5F5F5] dark:bg-[#222] text-[#666] dark:text-[#aaa]"
-          )}>
-            {tStatus.has(run.status) ? tStatus(run.status) : run.status}
-          </div>
-
-          {/* Actions */}
-          <AlertDialog>
-            <AlertDialogTrigger
-              className="flex items-center justify-center h-8 w-8 rounded-lg border border-[#EBEBEB] dark:border-[#333] hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-200 dark:hover:border-red-900/30 hover:text-red-500 dark:hover:text-red-400 transition-colors text-[#999] dark:text-[#888]"
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <Trash2 className="h-3.5 w-3.5" />
-              )}
-            </AlertDialogTrigger>
+        <AlertDialog>
+          <AlertDialogTrigger
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#EBEBEB] text-[#999] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-500 dark:border-[#333] dark:text-[#888] dark:hover:border-red-900/30 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="h-3.5 w-3.5" />
+            )}
+          </AlertDialogTrigger>
             <AlertDialogContent className="rounded-xl max-w-md bg-white dark:bg-[#111] border-[#EBEBEB] dark:border-[#333]">
               <AlertDialogHeader>
                 <AlertDialogTitle className="text-[15px] text-[#1a1a1a] dark:text-white">{t("delete_title")}</AlertDialogTitle>
@@ -282,12 +281,8 @@ export default function PipelineRunPage({
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        </AlertDialog>
       </div>
-
-      {/* Progress */}
-      <PipelineProgress currentStatus={run.status} />
 
       {error && (
         <div className="flex items-center gap-2 rounded-lg border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 px-4 py-3 text-[13px] text-red-600 dark:text-red-400">
@@ -356,70 +351,52 @@ export default function PipelineRunPage({
 
       {/* HITL-2: Letter Review */}
       {run.status === "waiting_letter_review" && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div>
-            <h2 className="text-[15px] font-semibold text-[#1a1a1a] dark:text-white">{t("review_draft")}</h2>
-            <p className="text-[13px] text-[#999] dark:text-[#888] mt-0.5">
-              {t("review_desc")}
-            </p>
+        <div className="animate-in fade-in slide-in-from-bottom-2 grid grid-cols-1 items-start gap-6 duration-500 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:border-[#2a2a2a] dark:bg-[#111]">
+            <LetterEditor
+              initialLetter={run.draft_letter || ""}
+              onSubmit={handleReviewLetter}
+              loading={actionLoading}
+              revisionCount={run.revision_count}
+            />
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-            <div className="lg:col-span-8 bg-white dark:bg-[#111] rounded-xl border border-[#EBEBEB] dark:border-[#333] overflow-hidden">
-              <LetterEditor
-                initialLetter={run.draft_letter || ""}
-                onSubmit={handleReviewLetter}
-                loading={actionLoading}
-              />
-            </div>
-
-            <div className="lg:col-span-4">
-              <div className="bg-white dark:bg-[#111] rounded-xl border border-[#EBEBEB] dark:border-[#333] p-4">
-                <Tabs defaultValue="gap" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-[#F5F5F5] dark:bg-[#222] p-0.5 rounded-lg h-8">
-                    <TabsTrigger value="gap" className="rounded-md text-[12px] h-7 text-[#666] dark:text-[#aaa] data-[state=active]:text-[#1a1a1a] data-[state=active]:dark:text-white data-[state=active]:bg-white data-[state=active]:dark:bg-[#111] data-[state=active]:shadow-sm">{t("tabs.gap")}</TabsTrigger>
-                    <TabsTrigger value="critic" className="rounded-md text-[12px] h-7 text-[#666] dark:text-[#aaa] data-[state=active]:text-[#1a1a1a] data-[state=active]:dark:text-white data-[state=active]:bg-white data-[state=active]:dark:bg-[#111] data-[state=active]:shadow-sm">{t("tabs.critic")}</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="gap" className="mt-4">
-                    {run.gap_report && <GapReportCard report={run.gap_report} />}
-                  </TabsContent>
-                  <TabsContent value="critic" className="mt-4">
-                    {run.critic_score && <CriticScoresCard score={run.critic_score} />}
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </div>
-          </div>
+          <aside className="xl:sticky xl:top-6">
+            <MissionInsights gap={run.gap_report} critic={run.critic_score} />
+          </aside>
         </div>
       )}
 
       {/* Completed */}
       {run.status === "completed" && (
-        <div className="space-y-4 animate-in fade-in duration-500">
+        <div className="animate-in fade-in space-y-6 duration-500">
           {!hasSeenCompletion && (
-            <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-lg">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-500 shrink-0" />
-              <p className="text-emerald-700 dark:text-emerald-400 text-[13px] font-medium">{t("ready_to_send")}</p>
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-900/30 dark:bg-emerald-900/10">
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-500" />
+              <p className="text-[13px] font-medium text-emerald-700 dark:text-emerald-400">
+                {t("ready_to_send")}
+              </p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div className="lg:col-span-8 space-y-4">
-              <div className="bg-white dark:bg-[#111] rounded-xl border border-[#EBEBEB] dark:border-[#333] overflow-hidden">
-                <div className="px-4 py-3 border-b border-[#F5F5F5] dark:border-[#222] bg-[#FAFAFA] dark:bg-[#111] flex justify-between items-center">
+          <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="space-y-4">
+              <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:border-[#2a2a2a] dark:bg-[#111]">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#F5F5F5] px-5 py-3 dark:border-[#222]">
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#999] dark:text-[#888]" />
-                    <span className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">{t("final_letter")}</span>
+                    <FileText className="h-4 w-4 text-[#999]" />
+                    <span className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                      {t("final_letter")}
+                    </span>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex flex-wrap gap-1.5">
                     <Button
                       variant={isApplied ? "default" : "outline"}
                       size="sm"
                       className={cn(
-                        "rounded-lg gap-1.5 h-8 px-3 text-[12px] transition-all",
+                        "h-8 gap-1.5 rounded-lg px-3 text-[12px] transition-all",
                         isApplied
-                          ? "bg-emerald-500 hover:bg-emerald-600 text-white border-transparent"
-                          : "border-[#EBEBEB] dark:border-[#333] hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-700 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-900/50 text-[#1a1a1a] dark:text-white"
+                          ? "border-transparent bg-emerald-500 text-white hover:bg-emerald-600"
+                          : "border-[#EBEBEB] bg-transparent text-[#1a1a1a] hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 dark:border-[#333] dark:text-white dark:hover:border-emerald-900/50 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400"
                       )}
                       onClick={handleMarkApplied}
                       disabled={isApplied || isApplying}
@@ -437,23 +414,23 @@ export default function PipelineRunPage({
                       <DropdownMenuTrigger
                         className={cn(
                           buttonVariants({ variant: "outline", size: "sm" }),
-                          "rounded-lg border-[#EBEBEB] dark:border-[#333] gap-1.5 h-8 px-3 text-[12px] hover:bg-[#F5F5F5] dark:hover:bg-[#222] text-[#1a1a1a] dark:text-white bg-transparent"
+                          "h-8 gap-1.5 rounded-lg border-[#EBEBEB] bg-transparent px-3 text-[12px] text-[#1a1a1a] hover:bg-[#F5F5F5] dark:border-[#333] dark:text-white dark:hover:bg-[#222]"
                         )}
                       >
                         <Mail className="h-3 w-3" />
                         {t("send")}
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-44 rounded-lg p-1">
-                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="rounded-md cursor-pointer text-[13px] py-1.5">
+                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
                           <Image src="/google-gmail.svg" alt="Gmail" width={14} height={14} className="mr-2" />
                           Gmail
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="rounded-md cursor-pointer text-[13px] py-1.5">
+                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
                           <Image src="/ms-outlook.svg" alt="Outlook" width={14} height={14} className="mr-2" />
                           Outlook
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="rounded-md cursor-pointer text-[13px] py-1.5">
-                          <Mail className="h-3.5 w-3.5 mr-2 text-[#999] dark:text-[#888]" />
+                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
+                          <Mail className="mr-2 h-3.5 w-3.5 text-[#999]" />
                           Default App
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -461,7 +438,7 @@ export default function PipelineRunPage({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-lg border-[#EBEBEB] dark:border-[#333] gap-1.5 h-8 px-3 text-[12px] hover:bg-[#F5F5F5] dark:hover:bg-[#222] text-[#1a1a1a] dark:text-white bg-transparent"
+                      className="h-8 gap-1.5 rounded-lg border-[#EBEBEB] bg-transparent px-3 text-[12px] text-[#1a1a1a] hover:bg-[#F5F5F5] dark:border-[#333] dark:text-white dark:hover:bg-[#222]"
                       onClick={handleCopy}
                     >
                       {copied ? (
@@ -473,35 +450,24 @@ export default function PipelineRunPage({
                     </Button>
                   </div>
                 </div>
-                <div className="p-6 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1a1a1a] dark:text-white font-[system-ui] selection:bg-blue-100">
+                <div className="whitespace-pre-wrap px-6 py-6 text-[15px] leading-[1.75] text-[#1a1a1a] selection:bg-blue-100 dark:text-white sm:px-8">
                   {run.final_letter}
                 </div>
               </div>
 
               {run.selected_offer && (
                 <div className="space-y-2">
-                  <h3 className="text-[11px] font-semibold text-[#999] dark:text-[#888] uppercase tracking-wider px-1">{t("target_role")}</h3>
+                  <h3 className="px-1 text-[11px] font-semibold uppercase tracking-wider text-[#999]">
+                    {t("target_role")}
+                  </h3>
                   <OfferCard offer={run.selected_offer} />
                 </div>
               )}
             </div>
 
-            <div className="lg:col-span-4">
-              <div className="bg-white dark:bg-[#111] rounded-xl border border-[#EBEBEB] dark:border-[#333] p-4">
-                <Tabs defaultValue="critic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 bg-[#F5F5F5] dark:bg-[#222] p-0.5 rounded-lg h-8">
-                    <TabsTrigger value="critic" className="rounded-md text-[12px] h-7 text-[#666] dark:text-[#aaa] data-[state=active]:text-[#1a1a1a] data-[state=active]:dark:text-white data-[state=active]:bg-white data-[state=active]:dark:bg-[#111] data-[state=active]:shadow-sm">{t("tabs.critic")}</TabsTrigger>
-                    <TabsTrigger value="gap" className="rounded-md text-[12px] h-7 text-[#666] dark:text-[#aaa] data-[state=active]:text-[#1a1a1a] data-[state=active]:dark:text-white data-[state=active]:bg-white data-[state=active]:dark:bg-[#111] data-[state=active]:shadow-sm">{t("tabs.gap")}</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="critic" className="mt-4">
-                    {run.critic_score && <CriticScoresCard score={run.critic_score} />}
-                  </TabsContent>
-                  <TabsContent value="gap" className="mt-4">
-                    {run.gap_report && <GapReportCard report={run.gap_report} />}
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </div>
+            <aside className="xl:sticky xl:top-6">
+              <MissionInsights gap={run.gap_report} critic={run.critic_score} mode="done" />
+            </aside>
           </div>
         </div>
       )}
@@ -531,16 +497,22 @@ export default function PipelineRunPage({
       )}
 
       {/* Processing States */}
-      {["started", "scouting", "matching", "writing", "critiquing"].includes(run.status) && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-[#1a1a1a] dark:bg-[#111] rounded-xl overflow-hidden shadow-lg">
-            <LiveAgentLog runId={runId} />
-          </div>
+      {PIPELINE_ACTIVE_STEPS.includes(run.status) && (
+        <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-500">
+          <LiveAgentLog
+            runId={runId}
+            status={run.status}
+            company={run.selected_offer?.company_info?.name || run.selected_offer?.company}
+          />
+
+          {run.selected_offer && (
+            <OfferCard offer={run.selected_offer} />
+          )}
 
           <Button
             variant="outline"
             size="sm"
-            className="rounded-lg h-8 px-4 text-[12px] text-[#999] dark:text-[#888] border-[#EBEBEB] dark:border-[#333] hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-900/50 transition-all bg-transparent"
+            className="h-8 rounded-lg border-[#EBEBEB] bg-transparent px-4 text-[12px] text-[#999] transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-[#333] dark:hover:border-red-900/50 dark:hover:bg-red-900/30 dark:hover:text-red-400"
             disabled={actionLoading}
             onClick={async () => {
               setActionLoading(true);
@@ -553,7 +525,7 @@ export default function PipelineRunPage({
               }
             }}
           >
-            {actionLoading ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : null}
+            {actionLoading ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : null}
             {t("abort")}
           </Button>
         </div>

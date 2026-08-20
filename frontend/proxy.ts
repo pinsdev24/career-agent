@@ -36,8 +36,22 @@ function isAppPath(pathname: string): boolean {
   );
 }
 
+function isApiProxyPath(pathname: string): boolean {
+  return (
+    pathname === "/backend-api" ||
+    pathname.startsWith("/backend-api/") ||
+    pathname === "/job-engine-api" ||
+    pathname.startsWith("/job-engine-api/")
+  );
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Same-origin API proxies — do not locale-prefix these.
+  if (isApiProxyPath(pathname)) {
+    return await updateSession(request);
+  }
 
   // ── App / dashboard routes ──────────────────────────────────────────────
   // Skip next-intl completely. Auth middleware handles session refresh + auth guard.
@@ -67,6 +81,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Match everything except Next.js internals and static assets
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|backend-api|job-engine-api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

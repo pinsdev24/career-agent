@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from datetime import datetime, timezone
 from typing import Annotated, Any, Literal
 
@@ -93,6 +94,22 @@ def _row_to_application(
     )
 
 
+async def _enqueue_packet_job(
+    application_id: str,
+    user_id: str,
+    posting: dict,
+    user_feedback: str | None = None,
+) -> None:
+    await enqueue_job(
+        "generate_packet_job",
+        application_id,
+        user_id,
+        posting,
+        user_feedback,
+        _job_id=f"packet:{application_id}:{int(time.time())}",
+    )
+
+
 @router.post("", response_model=ApplicationResponse)
 async def create_application(
     data: ApplicationCreateRequest,
@@ -123,14 +140,7 @@ async def create_application(
         status="generating",
         application_id=existing["id"] if existing else None,
     )
-    await enqueue_job(
-        "generate_packet_job",
-        row["id"],
-        user["id"],
-        posting,
-        None,
-        _job_id=f"packet:{row['id']}",
-    )
+    await _enqueue_packet_job(row["id"], user["id"], posting)
     logger.info("enqueued packet for application=%s user=%s", row["id"], user["id"])
     return _row_to_application(row, posting=posting)
 
@@ -170,6 +180,33 @@ async def get_application_detail(
     packet = await latest_packet(supabase, row["id"])
     posting = await get_job_posting(supabase, row["posting_id"])
     return _row_to_application(row, packet=packet, posting=posting)
+
+
+@router.post("/{application_id}/retry", response_model=ApplicationResponse)
+async def retry_application_packet(
+    application_id: str,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+) -> ApplicationResponse:
+    """Re-queue a stuck or failed packet job."""
+    row = await get_application(supabase, application_id, user["id"])
+    if not row:
+        raise NotFoundError("Application not found")
+    if row["status"] not in {"generating", "draft"}:
+        raise HITLError(f"Cannot retry a packet in status={row['status']}")
+
+    posting = await get_job_posting(supabase, row["posting_id"])
+    if not posting:
+        raise NotFoundError("Job posting not found")
+
+    updated = await update_application(
+        supabase,
+        application_id,
+        status="generating",
+        error_details=None,
+    )
+    await _enqueue_packet_job(application_id, user["id"], posting)
+    return _row_to_application(updated, posting=posting)
 
 
 @router.post("/{application_id}/review", response_model=ApplicationResponse)
@@ -212,14 +249,7 @@ async def review_application_packet(
     await update_packet(supabase, packet["id"], draft_letter=letter, user_feedback=data.user_feedback)
     updated = await update_application(supabase, application_id, status="generating")
     await close_work_items(supabase, application_id, "review_packet")
-    await enqueue_job(
-        "generate_packet_job",
-        application_id,
-        user["id"],
-        posting,
-        data.user_feedback,
-        _job_id=f"packet-rewrite:{application_id}:{packet.get('revision_count', 0)}",
-    )
+    await _enqueue_packet_job(application_id, user["id"], posting, data.user_feedback)
     return _row_to_application(updated, packet=packet, posting=posting)
 
 
