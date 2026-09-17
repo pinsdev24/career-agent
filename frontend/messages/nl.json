@@ -25,13 +25,14 @@
     },
     "sidebar": {
       "title": "Ontsnap aan het doolhof van de zoektocht naar een baan.",
-      "subtitle": "Sluit u aan bij Ariadne om uw sollicitaties te automatiseren, op maat gemaakte sollicitatiebrieven te genereren en uw carrièrepotentieel te maximaliseren.",
+      "subtitle": "Word lid van Ariadne voor duidelijkere matches, brieven op maat, en review voordat je indient.",
       "hired": "Aangenomen"
     }
   },
   "Sidebar": {
-    "missions": "Missies",
-    "new_mission": "Nieuwe Missie",
+    "home": "Home",
+    "missions": "Home",
+    "new_mission": "Plak een vacature-URL",
     "profile": "Profiel",
     "settings": "Instellingen",
     "sign_out": "Uitloggen",
@@ -238,11 +239,11 @@
       "title_muted": "niet de pitch.",
       "subtitle": "Missions met matchscores. Drafts naast de gaps. Je ziet altijd waarom — en jij keurt altijd goed.",
       "dashboard_label": "Missions",
-      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_url": "/dashboard",
       "dashboard_caption": "Elke pipeline in één lijst — matchscore, status, volgende actie.",
       "dashboard_alt": "Ariadne-dashboard met missions, matchscores en reviewstatus",
       "review_label": "Review",
-      "review_url": "ariadne.app/review",
+      "review_url": "/applications",
       "review_caption": "Draft links. Gap-analyse rechts. Goedkeuren, herschrijven of bewerken.",
       "review_alt": "Coverletter-review met gap-analyse, matching skills, en goedkeuren of herschrijven",
       "insights": [
@@ -448,16 +449,17 @@
     }
   },
   "Dashboard": {
-    "title": "Missies",
+    "title": "Home",
     "greeting": "Welkom terug, {name}",
-    "subtitle": "Je jobsearch op één plek — matches, dossiers en missies.",
-    "new_mission": "Nieuwe Missie",
-    "loading": "Missies laden...",
+    "subtitle": "Matches, dossiers en wat jouw review nodig heeft — op één plek.",
+    "new_mission": "Plak een vacature-URL",
+    "paste_url": "Staat de URL niet in de feed?",
+    "loading": "Laden…",
     "empty": {
       "title": "Nog niets in beweging",
       "description": "Begin bij aanbevolen vacatures. Kies een rol, maak een dossier, en dien zelf in op de ATS."
     },
-    "empty_from_jobs": "Dossiers staan onder Sollicitaties. Missies zijn de oudere URL/explore-pipelines.",
+    "empty_from_jobs": "Je dossiers staan onder Sollicitaties. Begin liever vanuit Jobs.",
     "groups": {
       "today": "Vandaag",
       "yesterday": "Gisteren",
@@ -477,14 +479,20 @@
       "critiquing": "Kwaliteit"
     },
     "match": "Match",
-    "explore_mission": "Exploratiemissie",
+    "explore_mission": "Verkennen (geavanceerd)",
+    "untitled_pipeline": "URL-pipeline",
+    "untitled_application": "Naamloze rol",
     "stat_inbox": "Te reviewen",
     "stat_jobs": "Topmatches",
-    "stat_missions": "Missies",
+    "stat_missions": "Oudere pipelines",
+    "stat_applications": "Sollicitaties",
     "top_matches": "Topmatches",
     "see_all_jobs": "Alle vacatures",
+    "see_all_applications": "Alle sollicitaties",
     "needs_attention": "Jouw beurt",
-    "recent_missions": "Recente missies",
+    "recent_missions": "Oudere pipelines",
+    "older_pipelines": "Oudere pipelines",
+    "recent_applications": "Recente sollicitaties",
     "browse_jobs": "Vacatures bekijken",
     "review_packet": "Dossier reviewen"
   },
@@ -530,8 +538,8 @@
     "clear_btn": "Geheugen wissen"
   },
   "NewMission": {
-    "title": "Nieuwe Missie",
-    "subtitle": "Start vanuit de jobfeed, of plak een vacature-URL als je die al hebt.",
+    "title": "Plak een vacature-URL",
+    "subtitle": "Gebruik dit alleen als de rol niet in je Jobs-feed staat.",
     "recommended": "Aanbevolen",
     "browse": {
       "label": "Bekijk aanbevolen vacatures",
@@ -549,11 +557,15 @@
     },
     "url_label": "Vacature-URL",
     "url_placeholder": "https://boards.greenhouse.io/bedrijf/jobs/…",
-    "explore_info": "Verkennen zoekt op het open web vanuit je CV. Voor dagelijks gebruik is de Jobs-feed sneller en nauwkeuriger.",
+    "explore_info": "Verkennen zoekt op het open web vanuit je CV en voorkeuren. Voor dagelijks gebruik is de Jobs-feed sneller en nauwkeuriger.",
+    "more_options": "Meer opties",
+    "hide_options": "Opties verbergen",
+    "back_to_url": "Gebruik liever een URL",
     "starting": "Starten…",
-    "start_btn": "Pijplijn starten",
+    "start_btn": "Starten vanaf URL",
+    "start_explore": "Start verkenning",
     "error_url": "Plak een vacature-URL om verder te gaan.",
-    "start_failed": "Pijplijn starten mislukt."
+    "start_failed": "Kon niet starten vanaf deze URL."
   },
   "MissionDetail": {
     "active_pipeline": "Actieve missie",
@@ -766,12 +778,13 @@
     "packet_started": "Dossier in de wachtrij — Sollicitaties wordt geopend.",
     "save": "Opslaan",
     "dismiss": "Overslaan",
-    "open_in_careeragent": "Liever een URL-missie starten →",
+    "open_in_careeragent": "Staat de URL niet in de feed?",
+    "url_not_in_feed": "Staat de URL niet in de feed?",
     "select_hint": "Selecteer een rol voor matchredenen en de vacature.",
     "error_generic": "Kon banen niet laden. Draait de job engine?",
     "saved": "Opgeslagen in je feed.",
     "dismissed": "Verwijderd uit je feed.",
-    "api_unreachable": "CareerAgent is niet bereikbaar. Draait de API?"
+    "api_unreachable": "Ariadne is niet bereikbaar. Draait de API?"
   },
   "Applications": {
     "title": "Sollicitaties",
@@ -799,8 +812,11 @@
     "approve": "Brief goedkeuren",
     "rewrite": "Herschrijven met feedback",
     "feedback_placeholder": "Wat moet er veranderen?",
-    "mark_submitted": "Ik heb gesolliciteerd",
-    "open_ats": "Sollicitatiepagina openen",
+    "mark_submitted": "Markeren als ingediend",
+    "open_ats": "ATS openen",
+    "no_ats_url": "Geen sollicitatiepagina bekend.",
+    "next_steps_title": "Volgende: zelf solliciteren",
+    "next_steps_hint": "Kopieer de brief, open het formulier van de werkgever, en markeer als ingediend. Ariadne solliciteert nooit namens jou.",
     "copy_letter": "Brief kopiëren",
     "copied": "Gekopieerd",
     "letter": "Motivatiebrief",

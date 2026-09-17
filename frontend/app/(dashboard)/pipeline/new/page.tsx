@@ -19,6 +19,8 @@ import {
   ArrowRight,
   Check,
   Briefcase,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 export default function NewPipelinePage() {
@@ -26,6 +28,7 @@ export default function NewPipelinePage() {
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<EntryMode>("url");
   const [url, setUrl] = useState("");
+  const [moreOpen, setMoreOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -35,6 +38,7 @@ export default function NewPipelinePage() {
     if (prefill) {
       setUrl(prefill);
       setMode("url");
+      setMoreOpen(false);
     }
   }, [searchParams]);
 
@@ -56,6 +60,11 @@ export default function NewPipelinePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleMore = () => {
+    if (moreOpen) setMode("url");
+    setMoreOpen(!moreOpen);
   };
 
   return (
@@ -83,59 +92,6 @@ export default function NewPipelinePage() {
         <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-[#bbb]" />
       </Link>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {[
-          {
-            value: "url" as EntryMode,
-            label: t("modes.url.label"),
-            desc: t("modes.url.desc"),
-            icon: Link2,
-          },
-          {
-            value: "explore" as EntryMode,
-            label: t("modes.explore.label"),
-            desc: t("modes.explore.desc"),
-            icon: Search,
-          },
-        ].map((item) => {
-          const isSelected = mode === item.value;
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.value}
-              type="button"
-              onClick={() => setMode(item.value)}
-              className={`relative rounded-2xl border p-4 text-left transition-all ${
-                isSelected
-                  ? "border-[#1a1a1a] bg-white ring-1 ring-[#1a1a1a]/10 dark:border-white dark:bg-[#161616]"
-                  : "border-[#EBEBEB] bg-white hover:border-[#ccc] dark:border-[#333] dark:bg-[#111]"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-                    isSelected
-                      ? "bg-[#1a1a1a] text-white dark:bg-white dark:text-black"
-                      : "bg-[#F5F5F5] text-[#888] dark:bg-[#222]"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div>
-                  <h3 className="text-[13px] font-medium">{item.label}</h3>
-                  <p className="mt-0.5 text-[12px] text-[#888]">{item.desc}</p>
-                </div>
-              </div>
-              {isSelected && (
-                <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#1a1a1a] dark:bg-white">
-                  <Check className="h-3 w-3 text-white dark:text-black" />
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
-
       {mode === "url" && (
         <div className="space-y-3 rounded-2xl border border-[#EBEBEB] bg-white p-5 dark:border-[#333] dark:bg-[#111]">
           <label htmlFor="url" className="text-[12px] font-medium text-[#666]">
@@ -155,9 +111,71 @@ export default function NewPipelinePage() {
         </div>
       )}
 
-      {mode === "explore" && (
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/70 px-4 py-4 text-[13px] leading-relaxed text-[#666] dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-[#bbb]">
-          {t("explore_info")}
+      <div>
+        <button
+          type="button"
+          onClick={toggleMore}
+          aria-expanded={moreOpen}
+          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#888] hover:text-[#1a1a1a] dark:hover:text-white"
+        >
+          {moreOpen ? (
+            <ChevronUp className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronDown className="h-3.5 w-3.5" />
+          )}
+          {moreOpen ? t("hide_options") : t("more_options")}
+        </button>
+      </div>
+
+      {moreOpen && (
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setMode("explore")}
+            className={`relative w-full rounded-2xl border p-4 text-left transition-all ${
+              mode === "explore"
+                ? "border-[#1a1a1a] bg-white ring-1 ring-[#1a1a1a]/10 dark:border-white dark:bg-[#161616]"
+                : "border-[#EBEBEB] bg-white hover:border-[#ccc] dark:border-[#333] dark:bg-[#111]"
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                  mode === "explore"
+                    ? "bg-[#1a1a1a] text-white dark:bg-white dark:text-black"
+                    : "bg-[#F5F5F5] text-[#888] dark:bg-[#222]"
+                }`}
+              >
+                <Search className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="text-[13px] font-medium">{t("modes.explore.label")}</h3>
+                <p className="mt-0.5 text-[12px] text-[#888]">{t("modes.explore.desc")}</p>
+              </div>
+            </div>
+            {mode === "explore" && (
+              <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#1a1a1a] dark:bg-white">
+                <Check className="h-3 w-3 text-white dark:text-black" />
+              </div>
+            )}
+          </button>
+
+          {mode === "explore" && (
+            <div className="rounded-2xl border border-amber-200/80 bg-amber-50/70 px-4 py-4 text-[13px] leading-relaxed text-[#666] dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-[#bbb]">
+              {t("explore_info")}
+            </div>
+          )}
+
+          {mode === "explore" && (
+            <button
+              type="button"
+              onClick={() => setMode("url")}
+              className="inline-flex items-center gap-1.5 text-[12px] text-[#888] hover:text-[#1a1a1a] dark:hover:text-white"
+            >
+              <Link2 className="h-3.5 w-3.5" />
+              {t("back_to_url")}
+            </button>
+          )}
         </div>
       )}
 
@@ -177,7 +195,11 @@ export default function NewPipelinePage() {
         ) : (
           <Rocket className="h-4 w-4" />
         )}
-        {loading ? t("starting") : t("start_btn")}
+        {loading
+          ? t("starting")
+          : mode === "explore"
+            ? t("start_explore")
+            : t("start_btn")}
         {!loading && <ArrowRight className="h-3.5 w-3.5" />}
       </Button>
     </div>

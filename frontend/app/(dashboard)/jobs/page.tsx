@@ -414,7 +414,7 @@ export default function JobsPage() {
                     </Button>
                   </div>
                   <Link
-                    href={`/pipeline/new?url=${encodeURIComponent(selected.apply_url)}`}
+                    href="/pipeline/new"
                     className="block pt-1 text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
                   >
                     {t("open_in_careeragent")}

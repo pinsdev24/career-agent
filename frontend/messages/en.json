@@ -25,13 +25,14 @@
     },
     "sidebar": {
       "title": "Escape the job search labyrinth.",
-      "subtitle": "Join Ariadne to automate your applications, generate tailored cover letters, and maximize your career potential.",
+      "subtitle": "Join Ariadne for clearer matches, tailored letters, and review before you submit.",
       "hired": "Hired"
     }
   },
   "Sidebar": {
-    "missions": "Missions",
-    "new_mission": "New Mission",
+    "home": "Home",
+    "missions": "Home",
+    "new_mission": "Paste a job URL",
     "profile": "Profile",
     "settings": "Settings",
     "sign_out": "Sign Out",
@@ -238,11 +239,11 @@
       "title_muted": "not the pitch.",
       "subtitle": "Missions with match scores. Drafts beside the gaps. You always see why — and you always approve.",
       "dashboard_label": "Missions",
-      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_url": "/dashboard",
       "dashboard_caption": "Every pipeline in one list — match score, status, next action.",
       "dashboard_alt": "Ariadne dashboard showing missions with match scores and review status",
       "review_label": "Review",
-      "review_url": "ariadne.app/review",
+      "review_url": "/applications",
       "review_caption": "Draft on the left. Gap analysis on the right. Approve, rewrite, or edit.",
       "review_alt": "Cover letter review with gap analysis, matching skills, and approve or rewrite controls",
       "insights": [
@@ -448,16 +449,17 @@
     }
   },
   "Dashboard": {
-    "title": "Missions",
+    "title": "Home",
     "greeting": "Welcome back, {name}",
-    "subtitle": "Your job search, in one place — matches, packets, and missions.",
-    "new_mission": "New Mission",
-    "loading": "Loading missions...",
+    "subtitle": "Matches, packets, and what needs your review — in one place.",
+    "new_mission": "Paste a job URL",
+    "paste_url": "Have a URL not in the feed?",
+    "loading": "Loading…",
     "empty": {
       "title": "Nothing in motion yet",
       "description": "Start from recommended jobs. Pick a role, generate a packet, then submit on the ATS yourself."
     },
-    "empty_from_jobs": "Packets live under Applications. Missions are the older URL/explore pipelines.",
+    "empty_from_jobs": "Your packets live under Applications. Prefer starting from Jobs.",
     "groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -477,14 +479,20 @@
       "critiquing": "Quality check"
     },
     "match": "Match",
-    "explore_mission": "Explore Mission",
+    "explore_mission": "Explore (advanced)",
+    "untitled_pipeline": "URL pipeline",
+    "untitled_application": "Untitled role",
     "stat_inbox": "Needs review",
     "stat_jobs": "Top matches",
-    "stat_missions": "Missions",
+    "stat_missions": "Older pipelines",
+    "stat_applications": "Applications",
     "top_matches": "Top matches",
     "see_all_jobs": "See all jobs",
+    "see_all_applications": "See all applications",
     "needs_attention": "Needs you",
-    "recent_missions": "Recent missions",
+    "recent_missions": "Older pipelines",
+    "older_pipelines": "Older pipelines",
+    "recent_applications": "Recent applications",
     "browse_jobs": "Browse jobs",
     "review_packet": "Review packet"
   },
@@ -530,8 +538,8 @@
     "clear_btn": "Clear Memory"
   },
   "NewMission": {
-    "title": "New Mission",
-    "subtitle": "Start from the job feed, or paste a posting if you already have a URL.",
+    "title": "Paste a job URL",
+    "subtitle": "Use this only when the role isn’t in your Jobs feed.",
     "recommended": "Recommended",
     "browse": {
       "label": "Browse recommended jobs",
@@ -550,10 +558,14 @@
     "url_label": "Job posting URL",
     "url_placeholder": "https://boards.greenhouse.io/company/jobs/…",
     "explore_info": "Explore searches the open web from your CV and preferences. For daily use, the Jobs feed is faster and more accurate.",
+    "more_options": "More options",
+    "hide_options": "Hide options",
+    "back_to_url": "Use a URL instead",
     "starting": "Starting…",
-    "start_btn": "Start pipeline",
+    "start_btn": "Start from URL",
+    "start_explore": "Start explore search",
     "error_url": "Paste a job URL to continue.",
-    "start_failed": "Could not start the pipeline."
+    "start_failed": "Could not start from this URL."
   },
   "MissionDetail": {
     "active_pipeline": "Active mission",
@@ -766,12 +778,13 @@
     "packet_started": "Packet queued — opening Applications.",
     "save": "Save",
     "dismiss": "Skip",
-    "open_in_careeragent": "Draft with a URL mission instead →",
+    "open_in_careeragent": "Have a URL not in the feed?",
+    "url_not_in_feed": "Have a URL not in the feed?",
     "select_hint": "Select a role to see match reasons and the posting.",
     "error_generic": "Could not load jobs. Is the job engine running?",
     "saved": "Saved to your feed.",
     "dismissed": "Removed from your feed.",
-    "api_unreachable": "Can't reach CareerAgent. Is the API running?"
+    "api_unreachable": "Can't reach Ariadne. Is the API running?"
   },
   "Applications": {
     "title": "Applications",
@@ -799,8 +812,11 @@
     "approve": "Approve letter",
     "rewrite": "Rewrite with feedback",
     "feedback_placeholder": "What should change?",
-    "mark_submitted": "I submitted this",
-    "open_ats": "Open application page",
+    "mark_submitted": "Mark submitted",
+    "open_ats": "Open ATS",
+    "no_ats_url": "No application page on file.",
+    "next_steps_title": "Next: apply yourself",
+    "next_steps_hint": "Copy the letter, open the employer’s form, then mark it submitted. Ariadne never applies for you.",
     "copy_letter": "Copy letter",
     "copied": "Copied",
     "letter": "Cover letter",
