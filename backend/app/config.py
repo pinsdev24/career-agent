@@ -51,13 +51,13 @@ class Settings(BaseSettings):
 
     # --- LLM (tiered model routing) ---
     # fast_model:   Routing, summaries, memory extraction (cheapest)
-    # llm_model:    Matcher gap analysis (mid-tier, good structured output)
+    # llm_model:    Matcher gap analysis + writer fallback when Kimi fails
     # critic_model: Cover letter evaluation (mid-tier, calibrated scoring)
-    # writer_model: Letter generation (best quality, core value)
-    llm_model: str = "gpt-5-mini"
+    # writer_model: Letter generation via Moonshot/Kimi (best quality, core value)
+    llm_model: str = "gpt-5.6-luna"
     fast_model: str = "gpt-5-nano"
-    critic_model: str = "gpt-5-mini"
-    writer_model: str = "kimi-k2.5"
+    critic_model: str = "gpt-5.6-luna"
+    writer_model: str = "kimi-k2.6"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 
