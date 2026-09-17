@@ -1,0 +1,55 @@
+services:
+  redis:
+    image: redis:7-alpine
+    # Bind to localhost only — never expose Redis on the public interface.
+    # The "SECURITY ATTACK" log is scanners hitting :6379 with HTTP when published to 0.0.0.0.
+    ports:
+      - "127.0.0.1:6379:6379"
+    # protected-mode must be off in Compose: peer containers connect via the bridge IP,
+    # which Redis treats as non-loopback. Host publish stays 127.0.0.1-only.
+    command: ["redis-server", "--protected-mode", "no", "--bind", "0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - job-engine
+
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./app:/app/app
+      - ./companies.seed.yaml:/app/companies.seed.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - job-engine
+
+  worker:
+    build: .
+    command: arq app.workers.settings.WorkerSettings
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./app:/app/app
+      - ./companies.seed.yaml:/app/companies.seed.yaml
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - job-engine
+
+networks:
+  job-engine:
+    driver: bridge

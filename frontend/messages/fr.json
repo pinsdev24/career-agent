@@ -39,7 +39,9 @@
     "sign_out_confirm_title": "Êtes-vous sûr de vouloir vous déconnecter ?",
     "sign_out_confirm_desc": "Vous devrez vous reconnecter pour accéder à votre tableau de bord.",
     "cancel": "Annuler",
-    "confirm": "Oui, me déconnecter"
+    "confirm": "Oui, me déconnecter",
+    "jobs": "Emplois",
+    "applications": "Candidatures"
   },
   "Landing": {
     "nav": {
@@ -56,16 +58,33 @@
       "eyebrow": "La plateforme carrière pour les ambitieux",
       "title_line1": "L'agent",
       "title_prefix": "pour",
-      "title_words": ["décrocher", "postuler", "matcher", "réussir"],
+      "title_words": [
+        "décrocher",
+        "postuler",
+        "matcher",
+        "réussir"
+      ],
       "subtitle": "Votre boîte à outils pour arrêter les lettres génériques et commencer à décrocher des entretiens. Analysez les offres, matchez vos compétences, et envoyez des candidatures qui sonnent comme vous.",
       "cta_primary": "Essai gratuit",
       "cta_secondary": "Voir comment ça marche"
     },
     "marquee": [
-      { "value": "24x", "label": "candidatures plus rapides" },
-      { "value": "94%", "label": "précision de matching" },
-      { "value": "5 min", "label": "pour relire un brouillon" },
-      { "value": "3", "label": "entretiens dès la 1re semaine" }
+      {
+        "value": "24x",
+        "label": "candidatures plus rapides"
+      },
+      {
+        "value": "94%",
+        "label": "précision de matching"
+      },
+      {
+        "value": "5 min",
+        "label": "pour relire un brouillon"
+      },
+      {
+        "value": "3",
+        "label": "entretiens dès la 1re semaine"
+      }
     ],
     "stats": {
       "applications": "Candidatures générées",
@@ -114,25 +133,85 @@
       "preview_run": "run_7f3a",
       "preview_logs": [
         [
-          { "type": "info", "time": "14:02:11", "text": "Pipeline initialisé." },
-          { "type": "agent_action", "time": "14:02:13", "text": "Lecture du CV — 2 pages" },
-          { "type": "agent_action", "time": "14:02:16", "text": "Extraction des compétences, rôles et intentions" },
-          { "type": "node_finish", "time": "14:02:19", "text": "Étape terminée : Profil" },
-          { "type": "info", "time": "14:02:20", "text": "18 compétences cartographiées. Profil prêt." }
+          {
+            "type": "info",
+            "time": "14:02:11",
+            "text": "Pipeline initialisé."
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:13",
+            "text": "Lecture du CV — 2 pages"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:02:16",
+            "text": "Extraction des compétences, rôles et intentions"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:02:19",
+            "text": "Étape terminée : Profil"
+          },
+          {
+            "type": "info",
+            "time": "14:02:20",
+            "text": "18 compétences cartographiées. Profil prêt."
+          }
         ],
         [
-          { "type": "info", "time": "14:08:02", "text": "Scout : recherche sur le web ouvert" },
-          { "type": "agent_action", "time": "14:08:05", "text": "Classement des postes par affinité sémantique" },
-          { "type": "agent_action", "time": "14:08:09", "text": "Matcher : analyse des écarts" },
-          { "type": "node_finish", "time": "14:08:12", "text": "Étape terminée : Matcher" },
-          { "type": "info", "time": "14:08:13", "text": "Match 94 %. Shortlist prête." }
+          {
+            "type": "info",
+            "time": "14:08:02",
+            "text": "Scout : recherche sur le web ouvert"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:05",
+            "text": "Classement des postes par affinité sémantique"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:08:09",
+            "text": "Matcher : analyse des écarts"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:08:12",
+            "text": "Étape terminée : Matcher"
+          },
+          {
+            "type": "info",
+            "time": "14:08:13",
+            "text": "Match 94 %. Shortlist prête."
+          }
         ],
         [
-          { "type": "info", "time": "14:14:31", "text": "Rédacteur : brouillon dans votre ton" },
-          { "type": "agent_action", "time": "14:14:34", "text": "Critique : notation sur 5 dimensions" },
-          { "type": "node_finish", "time": "14:14:38", "text": "Score 91/100 — nouveau meilleur brouillon" },
-          { "type": "info", "time": "14:14:39", "text": "En pause pour votre relecture" },
-          { "type": "node_finish", "time": "14:14:40", "text": "Lettre prête à approuver." }
+          {
+            "type": "info",
+            "time": "14:14:31",
+            "text": "Rédacteur : brouillon dans votre ton"
+          },
+          {
+            "type": "agent_action",
+            "time": "14:14:34",
+            "text": "Critique : notation sur 5 dimensions"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:38",
+            "text": "Score 91/100 — nouveau meilleur brouillon"
+          },
+          {
+            "type": "info",
+            "time": "14:14:39",
+            "text": "En pause pour votre relecture"
+          },
+          {
+            "type": "node_finish",
+            "time": "14:14:40",
+            "text": "Lettre prête à approuver."
+          }
         ]
       ],
       "steps": [
@@ -167,9 +246,18 @@
       "review_caption": "Le brouillon à gauche. L'analyse d'écarts à droite. Approuver, réécrire, ou modifier.",
       "review_alt": "Relecture de lettre avec analyse d'écarts, compétences matchées, et boutons approuver ou réécrire",
       "insights": [
-        { "k": "Match", "v": "Affinité sémantique sur chaque poste, pas du bruit de mots-clés." },
-        { "k": "Statut", "v": "Lettre à relire ou terminée — la prochaine action est évidente." },
-        { "k": "Contrôle", "v": "Rien ne part sans votre réécriture ou votre accord." }
+        {
+          "k": "Match",
+          "v": "Affinité sémantique sur chaque poste, pas du bruit de mots-clés."
+        },
+        {
+          "k": "Statut",
+          "v": "Lettre à relire ou terminée — la prochaine action est évidente."
+        },
+        {
+          "k": "Contrôle",
+          "v": "Rien ne part sans votre réécriture ou votre accord."
+        }
       ]
     },
     "scout": {
@@ -186,12 +274,36 @@
       "status": "Réseau Scout",
       "status_ok": "Tout opérationnel",
       "sources": [
-        { "city": "LinkedIn", "region": "Professionnel", "ms": "96%" },
-        { "city": "Welcome to the Jungle", "region": "Europe", "ms": "91%" },
-        { "city": "Indeed", "region": "Global", "ms": "88%" },
-        { "city": "Pages carrières", "region": "Direct", "ms": "93%" },
-        { "city": "Jobboards", "region": "Niche", "ms": "87%" },
-        { "city": "Votre URL", "region": "Manuel", "ms": "100%" }
+        {
+          "city": "LinkedIn",
+          "region": "Professionnel",
+          "ms": "96%"
+        },
+        {
+          "city": "Welcome to the Jungle",
+          "region": "Europe",
+          "ms": "91%"
+        },
+        {
+          "city": "Indeed",
+          "region": "Global",
+          "ms": "88%"
+        },
+        {
+          "city": "Pages carrières",
+          "region": "Direct",
+          "ms": "93%"
+        },
+        {
+          "city": "Jobboards",
+          "region": "Niche",
+          "ms": "87%"
+        },
+        {
+          "city": "Votre URL",
+          "region": "Manuel",
+          "ms": "100%"
+        }
       ]
     },
     "metrics": {
@@ -209,12 +321,29 @@
       "title": "La confiance",
       "title_muted": "n'est pas négociable.",
       "subtitle": "Votre CV et vos lettres restent les vôtres. Chiffrement, accès par ligne, et validation avant envoi — intégrés à chaque couche.",
-      "badges": ["Auth Supabase", "RLS", "TLS", "Chiffré"],
+      "badges": [
+        "Auth Supabase",
+        "RLS",
+        "TLS",
+        "Chiffré"
+      ],
       "items": [
-        { "title": "Chiffrement au repos", "desc": "Données personnelles et documents chiffrés, jamais vendus ni partagés avec des tiers." },
-        { "title": "Accès par ligne", "desc": "Chaque requête est authentifiée. Vous ne voyez que vos missions, brouillons et profil." },
-        { "title": "Vous approuvez d'abord", "desc": "Rien n'est envoyé en votre nom. L'humain dans la boucle est le défaut, pas une option." },
-        { "title": "Privé par conception", "desc": "Surface minimale : CV, contexte de l'offre, et la lettre que vous choisissez de garder." }
+        {
+          "title": "Chiffrement au repos",
+          "desc": "Données personnelles et documents chiffrés, jamais vendus ni partagés avec des tiers."
+        },
+        {
+          "title": "Accès par ligne",
+          "desc": "Chaque requête est authentifiée. Vous ne voyez que vos missions, brouillons et profil."
+        },
+        {
+          "title": "Vous approuvez d'abord",
+          "desc": "Rien n'est envoyé en votre nom. L'humain dans la boucle est le défaut, pas une option."
+        },
+        {
+          "title": "Privé par conception",
+          "desc": "Surface minimale : CV, contexte de l'offre, et la lettre que vous choisissez de garder."
+        }
       ]
     },
     "control": {
@@ -223,10 +352,22 @@
       "title_muted": "Pas autour de vous.",
       "subtitle": "Les agents font la recherche et le premier jet. Vous gardez le jugement — modifier, réécrire, ou approuver avant que quoi que ce soit parte.",
       "items": [
-        { "title": "Mémoire de ton", "desc": "Vos retours s'accumulent. Plus vous relisez, plus ça sonne comme vous." },
-        { "title": "Rapports d'écarts", "desc": "Voyez exactement où vous matchez — et où non — puis choisissez comment vous positionner." },
-        { "title": "Scores du Critique", "desc": "Structure, pertinence et ton notés avant même d'ouvrir le brouillon." },
-        { "title": "Boucles de réécriture", "desc": "Demandez une passe. Le pipeline relance. Gardez la version qui vous va." }
+        {
+          "title": "Mémoire de ton",
+          "desc": "Vos retours s'accumulent. Plus vous relisez, plus ça sonne comme vous."
+        },
+        {
+          "title": "Rapports d'écarts",
+          "desc": "Voyez exactement où vous matchez — et où non — puis choisissez comment vous positionner."
+        },
+        {
+          "title": "Scores du Critique",
+          "desc": "Structure, pertinence et ton notés avant même d'ouvrir le brouillon."
+        },
+        {
+          "title": "Boucles de réécriture",
+          "desc": "Demandez une passe. Le pipeline relance. Gardez la version qui vous va."
+        }
       ]
     },
     "testimonials": {
@@ -308,13 +449,15 @@
   },
   "Dashboard": {
     "title": "Missions",
-    "subtitle": "Suivez et gérez vos pipelines de candidature.",
+    "greeting": "Bon retour, {name}",
+    "subtitle": "Votre recherche d'emploi, au même endroit — matches, dossiers et missions.",
     "new_mission": "Nouvelle Mission",
     "loading": "Chargement des missions...",
     "empty": {
-      "title": "Pas encore de missions",
-      "description": "Lancez une nouvelle mission pour déployer les agents d'Ariadne sur votre prochaine candidature."
+      "title": "Rien en cours pour le moment",
+      "description": "Partez des offres recommandées. Choisissez un poste, générez un dossier, puis postulez vous-même sur l'ATS."
     },
+    "empty_from_jobs": "Les dossiers sont dans Candidatures. Les missions sont les anciens pipelines URL / explorer.",
     "groups": {
       "today": "Aujourd'hui",
       "yesterday": "Hier",
@@ -328,10 +471,22 @@
       "waiting_letter_review": "Réviser Lettre",
       "writing": "Rédaction",
       "analyzing": "Analyse",
-      "scouting": "Recherche"
+      "scouting": "Recherche",
+      "started": "Préparation",
+      "matching": "Correspondance",
+      "critiquing": "Qualité"
     },
     "match": "Match",
-    "explore_mission": "Mission Exploration"
+    "explore_mission": "Mission Exploration",
+    "stat_inbox": "À relire",
+    "stat_jobs": "Meilleurs matches",
+    "stat_missions": "Missions",
+    "top_matches": "Meilleurs matches",
+    "see_all_jobs": "Voir toutes les offres",
+    "needs_attention": "À vous",
+    "recent_missions": "Missions récentes",
+    "browse_jobs": "Parcourir les offres",
+    "review_packet": "Relire le dossier"
   },
   "Profile": {
     "title": "Profil",
@@ -376,64 +531,171 @@
   },
   "NewMission": {
     "title": "Nouvelle Mission",
-    "subtitle": "Lancez un nouveau pipeline de candidature.",
+    "subtitle": "Partez du fil d'offres, ou collez une URL si vous l'avez déjà.",
+    "recommended": "Recommandé",
+    "browse": {
+      "label": "Parcourir les offres recommandées",
+      "desc": "Voir les postes matchés à votre CV, puis générer un dossier en un clic."
+    },
     "modes": {
       "url": {
-        "label": "URL Directe",
-        "desc": "Collez un lien d'offre d'emploi"
+        "label": "Coller l'URL d'une offre",
+        "desc": "Greenhouse, Lever, Ashby, ou une page carrières"
       },
       "explore": {
-        "label": "Explorer",
-        "desc": "Laisser les agents trouver des offres"
+        "label": "Explorer pour moi",
+        "desc": "Scanner le web à partir de votre profil"
       }
     },
-    "url_label": "URL de l'offre d'emploi",
-    "url_placeholder": "https://entreprise.com/carrieres/offre",
-    "explore_info": "Le système utilisera vos données de profil pour trouver des offres correspondantes. Assurez-vous que votre profil est à jour.",
-    "starting": "Démarrage...",
-    "start_btn": "Lancer le Pipeline",
-    "error_url": "Veuillez entrer une URL d'offre."
+    "url_label": "URL de l'offre",
+    "url_placeholder": "https://boards.greenhouse.io/entreprise/jobs/…",
+    "explore_info": "Explorer cherche sur le web ouvert à partir de votre CV. Au quotidien, le fil Emplois est plus rapide et plus fiable.",
+    "starting": "Démarrage…",
+    "start_btn": "Lancer le pipeline",
+    "error_url": "Collez une URL d'offre pour continuer.",
+    "start_failed": "Impossible de lancer le pipeline."
   },
   "MissionDetail": {
-    "active_pipeline": "Pipeline Actif",
+    "active_pipeline": "Mission en cours",
     "delete_title": "Supprimer cette mission ?",
     "delete_desc": "Cela supprimera définitivement toutes les données. Cette action est irréversible.",
     "delete_btn": "Supprimer",
     "cancel": "Annuler",
     "no_offers": "Aucune offre trouvée",
-    "select_offer": "Sélectionnez une offre",
+    "select_offer": "Choisissez un poste pour continuer",
     "no_offers_desc": "Aucune offre correspondante trouvée. Essayez d'ajuster vos préférences.",
-    "select_offer_desc": "Choisissez l'opportunité la plus pertinente pour continuer.",
-    "confirm_selection": "Confirmer la sélection",
-    "review_draft": "Réviser le brouillon",
-    "review_desc": "L'agent critique a révisé votre lettre. Finalisez ou demandez des changements.",
-    "processing": "Traitement...",
+    "select_offer_desc": "Choisissez l'opportunité qui vous convient. Vous restez maître de la suite.",
+    "confirm_selection": "Continuer avec ce poste",
+    "review_draft": "Relisez votre lettre",
+    "review_desc": "Lisez-la comme un recruteur. Modifiez, demandez une réécriture, ou approuvez.",
+    "processing": "En cours…",
     "ready_to_send": "Votre lettre de motivation est prête.",
-    "final_letter": "Lettre Finale",
+    "final_letter": "Lettre finale",
     "applied": "Postulé !",
     "i_applied": "J'ai postulé",
     "send": "Envoyer",
     "copied": "Copié",
     "copy": "Copier",
-    "target_role": "Poste Cible",
-    "failed_title": "Échec du Pipeline",
-    "failed_desc": "Une erreur est survenue lors du traitement.",
+    "target_role": "Poste visé",
+    "failed_title": "Cette mission ne s'est pas terminée",
+    "failed_desc": "Un problème est survenu pendant le traitement de cette candidature.",
     "error_details": "Détails de l'erreur",
-    "abort": "Abandonner",
+    "abort": "Arrêter la mission",
+    "hint": {
+      "started": "Préparation de cette mission",
+      "scouting": "Ensuite, vous choisirez un poste",
+      "waiting_offer_selection": "Ensuite, nous mesurons l'adéquation",
+      "matching": "Ensuite, nous rédigeons la lettre",
+      "writing": "Ensuite, un contrôle qualité",
+      "critiquing": "Ensuite, c'est votre relecture",
+      "waiting_letter_review": "Ensuite, elle est prête à envoyer",
+      "completed": "Copiez-la vous-même dans le formulaire de l'employeur"
+    },
+    "insights": {
+      "brief": "Avant d'approuver",
+      "brief_done": "Où en est cette candidature",
+      "fit": "Adéquation",
+      "quality": "Qualité de la lettre",
+      "fit_high": "Forte correspondance — la lettre peut être précise.",
+      "fit_mid": "Un écart sur le papier. Gardez la lettre honnête sur ce que vous apportez.",
+      "fit_low": "Un vrai écart. N'exagérez pas les manques ci-dessous.",
+      "fit_none": "L'adéquation apparaîtra après l'analyse.",
+      "quality_high": "Prête à envoyer si elle sonne toujours comme vous.",
+      "quality_mid": "Bon brouillon — resserrez ce qui paraît générique.",
+      "quality_low": "Demandez une réécriture avant d'approuver.",
+      "quality_none": "Les notes de qualité apparaîtront après la revue.",
+      "on_the_draft": "Sur le brouillon",
+      "matching": "Mettez ça en avant",
+      "gaps": "Ne pas surjouer",
+      "gaps_hint": "La lettre ne doit pas prétendre que vous avez cela.",
+      "none_matching": "Rien de mis en avant",
+      "no_gaps": "Pas d'écart majeur",
+      "letter_breakdown": "Détail de la lettre"
+    },
+    "dimensions": {
+      "relevance": "Pertinence",
+      "tone": "Ton",
+      "structure": "Structure",
+      "specificity": "Précision",
+      "persuasiveness": "Force de persuasion"
+    },
     "tabs": {
-      "gap": "Écarts",
-      "critic": "Critique"
+      "gap": "Adéquation",
+      "critic": "Qualité"
+    },
+    "steps": {
+      "started": "Début",
+      "scouting": "Recherche",
+      "waiting_offer_selection": "Votre choix",
+      "matching": "Fit",
+      "writing": "Lettre",
+      "critiquing": "Qualité",
+      "waiting_letter_review": "Relecture",
+      "completed": "Envoi"
+    },
+    "stage": {
+      "started": {
+        "title": "Préparation",
+        "desc": "Chargement de votre profil et du brief de cette mission."
+      },
+      "scouting": {
+        "title": "Recherche de postes",
+        "desc": "Nous cherchons des offres qui correspondent à votre expérience — pas seulement aux mots-clés."
+      },
+      "matching": {
+        "title": "Mesure de l'adéquation",
+        "desc": "Comparaison de ce poste avec votre CV pour que la lettre mette en avant l'essentiel."
+      },
+      "writing": {
+        "title": "Rédaction de votre lettre",
+        "desc": "Un brouillon dans votre voix, avec les détails que ce poste demande vraiment."
+      },
+      "critiquing": {
+        "title": "Contrôle qualité",
+        "desc": "Lecture du brouillon comme un recruteur — ton, pertinence, impact."
+      }
+    },
+    "activity": {
+      "title": "Ce qui se passe",
+      "feed": "Mises à jour",
+      "live": "En direct",
+      "waiting": "Connexion…",
+      "empty": "L'agent se prépare.",
+      "unavailable": "Impossible de charger les mises à jour. Réessayez dans un instant.",
+      "working": "Toujours en train de travailler sur cette étape",
+      "working_on": "Travail sur {company}",
+      "initialized": "Mise en place",
+      "searching": "Recherche de postes qui vous correspondent",
+      "expanding": "Élargissement de la recherche",
+      "scoring": "Classement des meilleures correspondances",
+      "found_offers": "Des postes intéressants ont été trouvés",
+      "reading_posting": "Lecture de l'offre",
+      "matching": "Comparaison de ce poste avec votre CV",
+      "writing": "Rédaction d'une lettre dans votre voix",
+      "critiquing": "Relecture comme un recruteur",
+      "paused": "En attente de votre action",
+      "cancelled": "Arrêté",
+      "failed": "Un problème est survenu",
+      "timeout": "Cela prend trop de temps — réessayez",
+      "done_scout": "Recherche terminée",
+      "done_read": "Lecture de l'offre terminée",
+      "done_match": "Analyse d'adéquation terminée",
+      "done_write": "Brouillon terminé",
+      "done_critique": "Contrôle qualité terminé",
+      "done_route": "Étape suivante choisie",
+      "done_memory": "Mémoire mise à jour"
     }
   },
   "LetterEditor": {
-    "title": "Éditeur de Brouillon",
-    "chars": "{count} caractères",
-    "placeholder": "Rédaction...",
-    "feedback_placeholder": "ex: souligner l'expérience en leadership...",
-    "helper": "Modifiez la lettre ci-dessus, puis approuvez ou demandez une réécriture.",
+    "title": "Lettre de motivation",
+    "words": "{count} mots",
+    "revision": "Révision {count}",
+    "placeholder": "Le brouillon apparaîtra ici.",
+    "notes_label": "Une réécriture ?",
+    "feedback_placeholder": "ex. commencer par le travail RAG, ne pas revendiquer 5 ans de ML en production…",
+    "helper": "Approuvez quand ça sonne comme vous. Les notes vont à l'écrivain — jamais à l'employeur.",
     "rewrite": "Réécrire",
-    "send": "Envoyer",
-    "approve": "Approuver"
+    "approve": "Approuver la lettre"
   },
   "Settings": {
     "title": "Paramètres",
@@ -486,5 +748,66 @@
     "error": "Une erreur est survenue",
     "success": "Succès",
     "view": "Voir"
+  },
+  "Jobs": {
+    "title": "Emplois recommandés",
+    "subtitle": "Matchés à votre CV et vos préférences — annonces ATS directes, pas d'agrégateurs.",
+    "search_placeholder": "Rechercher postes, compétences, entreprises…",
+    "search": "Rechercher",
+    "loading": "Recherche des offres…",
+    "empty": "Aucune offre dans votre fil",
+    "empty_hint": "Uploadez un CV et définissez vos préférences pour classer les offres Greenhouse, Lever, Ashby et Workable.",
+    "empty_cta": "Mettre à jour le profil",
+    "load_more": "Charger plus",
+    "remote": "Télétravail",
+    "why_match": "Pourquoi ça match",
+    "apply": "Ouvrir",
+    "prepare_packet": "Préparer le dossier",
+    "packet_started": "Dossier en file — ouverture de Candidatures.",
+    "save": "Sauver",
+    "dismiss": "Passer",
+    "open_in_careeragent": "Rédiger via une mission URL à la place →",
+    "select_hint": "Sélectionnez une offre pour voir le match et l'annonce.",
+    "error_generic": "Impossible de charger les offres. Le job engine tourne-t-il ?",
+    "saved": "Enregistré dans votre fil.",
+    "dismissed": "Retiré de votre fil.",
+    "api_unreachable": "CareerAgent est injoignable. L'API tourne-t-elle ?"
+  },
+  "Applications": {
+    "title": "Candidatures",
+    "subtitle": "Dossiers générés par l'agent. Vous relisez, puis postulez sur l'ATS.",
+    "empty": "Aucune candidature pour le moment",
+    "empty_hint": "Choisissez une offre dans le fil et demandez un dossier. Vous gardez le clic final.",
+    "inbox": "Boîte de relecture",
+    "inbox_empty": "Rien à relire.",
+    "needs_you": "À vous",
+    "browse_jobs": "Parcourir les offres",
+    "filter_all": "Tout",
+    "filter_needs_you": "À vous",
+    "filter_empty": "Rien dans ce filtre.",
+    "untitled": "Poste sans titre",
+    "status": "Statut",
+    "status_draft": "Brouillon",
+    "status_generating": "Rédaction",
+    "status_packet_ready": "Relecture",
+    "status_approved": "Approuvé",
+    "status_submitted": "Envoyé",
+    "status_interviewing": "Entretien",
+    "status_rejected": "Refusé",
+    "status_withdrawn": "Retiré",
+    "review": "Relire le dossier",
+    "approve": "Approuver la lettre",
+    "rewrite": "Réécrire avec un commentaire",
+    "feedback_placeholder": "Que faut-il changer ?",
+    "mark_submitted": "J'ai postulé",
+    "open_ats": "Ouvrir la page de candidature",
+    "copy_letter": "Copier la lettre",
+    "copied": "Copié",
+    "letter": "Lettre de motivation",
+    "letter_placeholder": "La lettre apparaîtra ici.",
+    "generating": "Génération du dossier…",
+    "generating_hint": "Matching → lettre → critique. Comptez 30 à 90 secondes.",
+    "retry": "Relancer le dossier",
+    "error_generic": "Impossible de charger les candidatures."
   }
 }

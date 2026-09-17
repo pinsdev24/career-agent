@@ -3,6 +3,7 @@
 import pytest
 
 from app.graph.builder import build_graph, compile_graph, _route_entry, _route_after_critic
+from app.workers.packet import build_packet_graph, _route_packet_after_critic
 from app.config import get_settings
 
 
@@ -71,3 +72,17 @@ class TestRouteAfterCritic:
             "run_id": "x",
         }
         assert _route_after_critic(state) == "hitl2"
+
+
+class TestPacketGraph:
+    def test_packet_nodes(self) -> None:
+        graph = build_packet_graph()
+        assert {"memory_loader", "matcher", "writer", "critic"}.issubset(set(graph.nodes.keys()))
+        assert "scout" not in graph.nodes
+        assert "hitl1" not in graph.nodes
+        assert "hitl2" not in graph.nodes
+
+    def test_packet_route_done_at_threshold(self) -> None:
+        settings = get_settings()
+        state = {"critic_score": settings.critic_threshold, "revision_count": 1, "run_id": "x"}
+        assert _route_packet_after_critic(state) == "done"

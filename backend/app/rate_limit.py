@@ -4,7 +4,7 @@ import asyncio
 import time
 from collections import defaultdict, deque
 from collections.abc import Awaitable, Callable
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, status
 
@@ -44,6 +44,13 @@ class InMemoryRateLimiter:
 
 
 _limiter = InMemoryRateLimiter()
+_redis: Any = None
+
+
+def configure_rate_limit_redis(client: Any) -> None:
+    """Share Redis across API workers for multi-instance rate limits."""
+    global _redis
+    _redis = client
 
 
 def user_rate_limit(
@@ -56,10 +63,30 @@ def user_rate_limit(
         user: Annotated[dict, Depends(get_current_user)],
         settings: Annotated[Settings, Depends(get_settings)],
     ) -> None:
+        key = f"{action}:{user['id']}"
+        limit = limit_getter(settings)
+        window_seconds = window_getter(settings)
+        if _redis is not None:
+            try:
+                redis_key = f"rl:{key}"
+                count = await _redis.incr(redis_key)
+                if count == 1:
+                    await _redis.expire(redis_key, window_seconds)
+                if count > limit:
+                    raise HTTPException(
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                        detail="Too many requests. Please try again later.",
+                        headers={"Retry-After": str(window_seconds)},
+                    )
+                return
+            except HTTPException:
+                raise
+            except Exception:
+                pass
         await _limiter.check(
-            key=f"{action}:{user['id']}",
-            limit=limit_getter(settings),
-            window_seconds=window_getter(settings),
+            key=key,
+            limit=limit,
+            window_seconds=window_seconds,
         )
 
     return dependency

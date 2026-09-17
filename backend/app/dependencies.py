@@ -7,6 +7,7 @@ and auth utilities.
 import logging
 from typing import Annotated
 
+import httpx
 from fastapi import Depends, Header, HTTPException, Request, status
 from supabase import AsyncClient, acreate_client
 
@@ -52,14 +53,12 @@ async def get_supabase_client(
 
 async def get_current_user(
     authorization: Annotated[str | None, Header()] = None,
-    supabase: AsyncClient = Depends(get_supabase_client),
+    settings: Settings = Depends(get_settings),
 ) -> dict:
-    """Extract and validate the user from the Supabase JWT Bearer token.
+    """Validate the Supabase JWT via Auth HTTP API.
 
-    Returns a minimal user dict: {"id": str, "email": str}.
-
-    Raises:
-        HTTPException 401: If token is missing, malformed, or invalid.
+    Do not call ``supabase.auth.get_user`` on the shared service-role client —
+    that mutates client session state and 401s concurrent requests.
     """
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
@@ -69,18 +68,23 @@ async def get_current_user(
         )
 
     token = authorization.removeprefix("Bearer ").strip()
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing or invalid Authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
+    url = f"{settings.supabase_url.rstrip('/')}/auth/v1/user"
     try:
-        response = await supabase.auth.get_user(token)
-        if response.user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired token",
-                headers={"WWW-Authenticate": "Bearer"},
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(
+                url,
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "apikey": settings.supabase_service_key,
+                },
             )
-        return {"id": str(response.user.id), "email": response.user.email}
-    except HTTPException:
-        raise
     except Exception as exc:
         logger.warning("Auth validation failed: %s", exc)
         raise HTTPException(
@@ -88,3 +92,31 @@ async def get_current_user(
             detail="Authentication failed",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+    if response.status_code == 401:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if response.status_code >= 400:
+        logger.warning(
+            "Auth validation failed status=%s body=%s",
+            response.status_code,
+            response.text[:300],
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication failed",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    data = response.json()
+    user_id = data.get("id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return {"id": str(user_id), "email": data.get("email")}

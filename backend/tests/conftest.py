@@ -19,7 +19,8 @@ os.environ.setdefault("TAVILY_API_KEY", "tvly-test-fake-key-for-testing")
 os.environ.setdefault("SUPABASE_URL", "https://nbyxjxjpzvovxhoelkzx.supabase.co")
 os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-service-key")
 os.environ.setdefault("SUPABASE_DB_URL", "postgresql://postgres:test@localhost:5432/postgres")
-os.environ.setdefault("FRONTEND_URL", "http://localhost:3000")
+os.environ.setdefault("RESEND_API_KEY", "")
+os.environ.setdefault("REDIS_URL", "")
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +183,7 @@ def mock_supabase() -> MagicMock:
     table.upsert.return_value = table
     table.delete.return_value = table
     table.eq.return_value = table
+    table.limit.return_value = table
     table.order.return_value = table
     table.gte.return_value = table
     table.execute = AsyncMock(return_value=MagicMock(data=[]))
@@ -196,8 +198,26 @@ async def async_client(mock_supabase: MagicMock) -> AsyncGenerator[AsyncClient, 
 
     app.state.supabase = mock_supabase
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test",
-    ) as client:
-        yield client
+    class FakeAuthClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def get(self, url, headers=None):
+            response = MagicMock()
+            response.status_code = 200
+            response.json.return_value = {"id": "user-abc", "email": "jane@example.com"}
+            response.text = ""
+            return response
+
+    with patch("app.dependencies.httpx.AsyncClient", FakeAuthClient):
+        async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            yield client

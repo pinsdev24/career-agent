@@ -1,6 +1,5 @@
 """Pipeline router — start runs and check status."""
 
-import asyncio
 import logging
 import uuid
 from typing import Annotated
@@ -10,7 +9,7 @@ from supabase import AsyncClient
 
 from app.dependencies import get_current_user, get_supabase_client
 from app.exceptions import NotFoundError
-from app.graph.runner import cancel_pipeline, run_pipeline
+from app.graph.runner import cancel_pipeline
 from app.models.schemas import (
     PipelineRunResponse,
     PipelineStartRequest,
@@ -19,6 +18,7 @@ from app.models.schemas import (
 )
 from app.rate_limit import rate_limit_pipeline_start
 from app.tools.supabase_ops import create_pipeline_run, get_pipeline_run, get_user_runs
+from app.workers import enqueue_job
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -33,8 +33,7 @@ async def start_pipeline(
 ) -> PipelineStatusResponse:
     """Start a new pipeline run.
 
-    Creates a pipeline_runs row then kicks off the LangGraph graph as a
-    non-blocking background task so the HTTP response returns immediately.
+    Creates a pipeline_runs row then enqueues the LangGraph job on ARQ.
     """
     run_id = str(uuid.uuid4())
 
@@ -54,18 +53,16 @@ async def start_pipeline(
         offer_url=str(data.offer_url) if data.offer_url else None,
     )
 
-    # Launch the graph in the background (non-blocking)
-    asyncio.create_task(
-        run_pipeline(
-            run_id=run_id,
-            user_id=user["id"],
-            entry_mode=data.entry_mode.value,
-            offer_url=str(data.offer_url) if data.offer_url else None,
-            supabase=supabase,
-        )
+    await enqueue_job(
+        "run_pipeline_job",
+        run_id,
+        user["id"],
+        data.entry_mode.value,
+        str(data.offer_url) if data.offer_url else None,
+        _job_id=f"pipeline:{run_id}",
     )
 
-    logger.info("Pipeline run %s created and graph task launched", run_id)
+    logger.info("Pipeline run %s created and queued", run_id)
 
     return PipelineStatusResponse(
         id=run_id,
@@ -118,8 +115,31 @@ async def cancel_pipeline_run(
     return {"status": "success", "cancelled": cancelled}
 
 
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from app.graph.pubsub import log_emitter
+
+_SSE_HEADERS = {
+    "Cache-Control": "no-cache, no-transform",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+}
+
+
+@router.get("/{run_id}/logs")
+async def get_pipeline_logs(
+    run_id: str,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+) -> JSONResponse:
+    """Return persisted agent activity for a run (Redis history, not live SSE)."""
+    run = await get_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
+    if not run:
+        raise NotFoundError(f"Pipeline run {run_id} not found")
+    return JSONResponse(
+        {"events": await log_emitter.events(run_id)},
+        headers={"Cache-Control": "no-store"},
+    )
+
 
 @router.get("/{run_id}/stream")
 async def stream_pipeline_logs(
@@ -128,14 +148,14 @@ async def stream_pipeline_logs(
     supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
 ):
     """Server-Sent Events endpoint to stream real-time execution logs."""
-    # Ensure they own the run
     run = await get_pipeline_run(supabase=supabase, run_id=run_id, user_id=user["id"])
     if not run:
         raise NotFoundError(f"Pipeline run {run_id} not found")
 
     return StreamingResponse(
         log_emitter.stream(run_id),
-        media_type="text/event-stream"
+        media_type="text/event-stream",
+        headers=_SSE_HEADERS,
     )
 
 @router.post("/{run_id}/applied")

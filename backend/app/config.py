@@ -37,22 +37,27 @@ class Settings(BaseSettings):
     langsmith_tracing: bool = False
     langsmith_project: str = "CareerAgent"
 
-    # --- Resend ---
-    resend_api_key: str
-    #from_email: str = "[EMAIL_ADDRESS]"
+    # --- Resend (optional) ---
+    resend_api_key: str = ""
+    from_email: str = "Ariadne <onboarding@resend.dev>"
+
+    # --- Redis / ARQ ---
+    redis_url: str = ""
+    require_redis: bool = False
+    require_postgres_checkpointer: bool = False
 
     # --- App ---
     frontend_url: str = "http://localhost:3000"
 
     # --- LLM (tiered model routing) ---
     # fast_model:   Routing, summaries, memory extraction (cheapest)
-    # llm_model:    Matcher gap analysis (mid-tier, good structured output)
+    # llm_model:    Matcher gap analysis + writer fallback when Kimi fails
     # critic_model: Cover letter evaluation (mid-tier, calibrated scoring)
-    # writer_model: Letter generation (best quality, core value)
-    llm_model: str = "gpt-5-mini"
+    # writer_model: Letter generation via Moonshot/Kimi (best quality, core value)
+    llm_model: str = "gpt-5.6-luna"
     fast_model: str = "gpt-5-nano"
-    critic_model: str = "gpt-5-mini"
-    writer_model: str = "kimi-k2.5"
+    critic_model: str = "gpt-5.6-luna"
+    writer_model: str = "kimi-k3"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 

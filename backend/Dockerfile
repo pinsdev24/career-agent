@@ -75,7 +75,8 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/health')"
 
-# Entrypoint: uvicorn serves the FastAPI app
+# Entrypoint: API process. Run the ARQ worker separately:
+#   arq app.workers.settings.WorkerSettings
 # $PORT is injected by Railway at runtime; falls back to 8000 locally
 CMD uvicorn app.main:app \
         --host 0.0.0.0 \

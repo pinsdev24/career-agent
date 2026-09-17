@@ -1,172 +1,277 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef } from "react"
-import { Terminal, Loader2, CheckCircle2, AlertCircle, Cpu } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  CheckCircle2,
+  Compass,
+  FilePenLine,
+  Loader2,
+  ScanSearch,
+  Sparkles,
+  Wand2,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/api-base";
+import { getPipelineLogs } from "@/lib/api";
+import { narrativeKey, softenLogMessage } from "@/lib/agent-narrative";
+import type { AgentLogEvent } from "@/lib/types";
 
-interface AgentLog {
-  type: "info" | "agent_action" | "node_finish" | "error"
-  node?: string
-  message: string
+const STAGE_ICON = {
+  started: Sparkles,
+  scouting: Compass,
+  matching: ScanSearch,
+  writing: FilePenLine,
+  critiquing: Wand2,
+} as const;
+
+function parseSseChunk(chunk: string): AgentLogEvent[] {
+  const events: AgentLogEvent[] = [];
+  for (const block of chunk.split("\n\n")) {
+    const dataLine = block.split("\n").find((line) => line.startsWith("data:"));
+    if (!dataLine) continue;
+    const dataStr = dataLine.replace(/^data:\s?/, "").trim();
+    if (!dataStr) continue;
+    try {
+      const parsed = JSON.parse(dataStr) as AgentLogEvent;
+      if (parsed && typeof parsed.message === "string") events.push(parsed);
+    } catch {
+      // ignore keepalives / malformed frames
+    }
+  }
+  return events;
 }
 
-export function LiveAgentLog({ runId }: { runId: string }) {
-  const [logs, setLogs] = useState<AgentLog[]>([])
-  const [isConnected, setIsConnected] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
+export function LiveAgentLog({
+  runId,
+  status,
+  company,
+}: {
+  runId: string;
+  status: string;
+  company?: string | null;
+}) {
+  const t = useTranslations("MissionDetail.activity");
+  const tStage = useTranslations("MissionDetail.stage");
+  const [logs, setLogs] = useState<AgentLogEvent[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [feedError, setFeedError] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const labelFor = (log: AgentLogEvent) => {
+    const key = narrativeKey(log);
+    if (t.has(key)) return t(key);
+    return softenLogMessage(log.message) || t("working");
+  };
 
   useEffect(() => {
-    // Auto-scroll to bottom when new logs arrive
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [logs])
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
 
   useEffect(() => {
-    let isActive = true;
+    let cancelled = false;
     let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
 
-    const connectToStream = async () => {
+    const pullHistory = async () => {
       try {
-        const { createClient } = await import("@/lib/supabase/client")
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"}/pipeline/${runId}/stream`, {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to connect: ${response.statusText}`);
+        const events = await getPipelineLogs(runId);
+        if (!cancelled) {
+          setLogs(events);
+          setIsConnected(true);
+          setFeedError(false);
         }
-
-        setIsConnected(true);
-        reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
-
-        if (reader) {
-          while (isActive) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            
-            // Keep the last incomplete chunk in the buffer
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-              if (line.startsWith("data:")) {
-                try {
-                  const dataStr = line.replace("data:", "").trim();
-                  if (dataStr) {
-                    const newLog = JSON.parse(dataStr) as AgentLog;
-                    setLogs((prev) => [...prev, newLog]);
-                  }
-                } catch (e) {
-                  console.error("Failed to parse log event", e, line);
-                }
-              }
-            }
-          }
-        }
-      } catch (err) {
-        if (isActive) {
-          console.error("Stream connection failed:", err);
+      } catch {
+        if (!cancelled) {
           setIsConnected(false);
+          setFeedError(true);
         }
       }
     };
 
-    connectToStream();
+    const connectStream = async () => {
+      try {
+        const { createClient } = await import("@/lib/supabase/client");
+        const supabase = createClient();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        const response = await fetch(`${API_URL}/pipeline/${runId}/stream`, {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`,
+            Accept: "text/event-stream",
+            "Cache-Control": "no-cache",
+          },
+          cache: "no-store",
+        });
+        if (!response.ok || !response.body) return;
+
+        if (!cancelled) setIsConnected(true);
+        reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        while (!cancelled) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const parts = buffer.split("\n\n");
+          buffer = parts.pop() || "";
+          const incoming = parseSseChunk(
+            parts.length ? `${parts.join("\n\n")}\n\n` : ""
+          );
+          if (incoming.length && !cancelled) {
+            await pullHistory();
+          }
+        }
+      } catch {
+        // polling remains the source of truth
+      }
+    };
+
+    void pullHistory();
+    void connectStream();
+    const timer = window.setInterval(pullHistory, 1500);
 
     return () => {
-      isActive = false;
-      reader?.cancel();
+      cancelled = true;
+      window.clearInterval(timer);
+      reader?.cancel().catch(() => undefined);
     };
   }, [runId]);
 
+  const visible = useMemo(() => {
+    const seen = new Set<string>();
+    const out: AgentLogEvent[] = [];
+    for (const log of logs) {
+      const label = labelFor(log);
+      const fp = `${log.type}:${label}`;
+      if (seen.has(fp)) continue;
+      seen.add(fp);
+      out.push(log);
+    }
+    return out.slice(-8);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logs, t]);
+
+  const Icon =
+    STAGE_ICON[status as keyof typeof STAGE_ICON] || Sparkles;
+  const stageTitle = tStage.has(`${status}.title`)
+    ? tStage(`${status}.title`)
+    : t("working");
+  const stageDesc = tStage.has(`${status}.desc`)
+    ? tStage(`${status}.desc`)
+    : t("empty");
+
   return (
-    <div className="flex flex-col bg-[#1a1a1a] overflow-hidden h-[440px] text-[#888] selection:bg-white dark:bg-[#111]/20 rounded-xl">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 bg-black/20 px-4 py-2.5 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <Terminal className="h-3.5 w-3.5 text-[#555]" />
-          <span className="text-[11px] font-medium text-[#555]">
-            Agent Console
-          </span>
-        </div>
-        <div className="flex items-center gap-2 px-2.5 py-1 bg-white dark:bg-[#111]/5 rounded-md">
-          <span className="relative flex h-1.5 w-1.5">
-            {isConnected ? (
-              <>
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-              </>
-            ) : (
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
-            )}
-          </span>
-          <span className="text-[10px] font-medium text-[#666] dark:text-[#aaa]">
-            {isConnected ? "Connected" : "Disconnected"}
-          </span>
-        </div>
-      </div>
-
-      {/* Logs */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-1.5 font-mono text-[12px]">
-        {logs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full space-y-3">
-            <Loader2 className="h-4 w-4 animate-spin text-[#444]" />
-            <span className="text-[11px] text-[#444]">Connecting to agent...</span>
-          </div>
-        ) : (
-          logs.map((log, index) => {
-            const isLast = index === logs.length - 1;
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "flex items-start gap-2.5 py-0.5 transition-opacity duration-300",
-                  isLast ? "opacity-100" : "opacity-40"
-                )}
-              >
-                <div className="mt-0.5 shrink-0">
-                  {log.type === "info" && <Terminal className="h-3 w-3 text-[#555]" />}
-                  {log.type === "agent_action" && <Cpu className={cn("h-3 w-3 text-amber-400", isLast && "animate-pulse")} />}
-                  {log.type === "node_finish" && <CheckCircle2 className="h-3 w-3 text-emerald-400" />}
-                  {log.type === "error" && <AlertCircle className="h-3 w-3 text-red-400" />}
-                </div>
-
-                <div className={cn(
-                  "flex-1 leading-relaxed",
-                  log.type === "info" && "text-[#777]",
-                  log.type === "agent_action" && "text-amber-300/80",
-                  log.type === "node_finish" && "text-emerald-300/70",
-                  log.type === "error" && "text-red-400"
-                )}>
-                  <span className="text-[10px] opacity-30 mr-3 tabular-nums">
-                    {new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                  </span>
-                  {log.message}
-                </div>
-              </div>
-            )
-          })
+    <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] dark:border-[#2a2a2a] dark:bg-[#111]">
+      <div
+        className={cn(
+          "relative overflow-hidden px-6 py-8 sm:px-8",
+          status === "writing" &&
+            "bg-gradient-to-br from-amber-50 via-white to-white dark:from-amber-950/30 dark:via-[#111] dark:to-[#111]",
+          status === "critiquing" &&
+            "bg-gradient-to-br from-violet-50 via-white to-white dark:from-violet-950/30 dark:via-[#111] dark:to-[#111]",
+          status === "scouting" &&
+            "bg-gradient-to-br from-sky-50 via-white to-white dark:from-sky-950/30 dark:via-[#111] dark:to-[#111]",
+          status === "matching" &&
+            "bg-gradient-to-br from-emerald-50 via-white to-white dark:from-emerald-950/30 dark:via-[#111] dark:to-[#111]",
+          status === "started" &&
+            "bg-gradient-to-br from-[#F7F7F7] via-white to-white dark:from-[#161616] dark:via-[#111] dark:to-[#111]"
         )}
-        <div ref={bottomRef} className="h-2" />
+      >
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 dark:bg-[#1a1a1a] dark:ring-white/10">
+              <span className="absolute inset-1 animate-ping rounded-xl bg-[#1a1a1a] opacity-10 dark:bg-white" />
+              <Icon className="relative h-6 w-6 text-[#1a1a1a] dark:text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-[#888]">
+                {company ? t("working_on", { company }) : t("title")}
+              </p>
+              <h2 className="mt-1 text-[22px] font-semibold tracking-tight text-[#1a1a1a] dark:text-white">
+                {stageTitle}
+              </h2>
+              <p className="mt-1.5 max-w-xl text-[13px] leading-relaxed text-[#666] dark:text-[#999]">
+                {stageDesc}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 self-start rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-medium text-[#666] ring-1 ring-[#EBEBEB] dark:bg-[#1a1a1a]/80 dark:text-[#aaa] dark:ring-[#333]">
+            <span className="relative flex h-1.5 w-1.5">
+              {isConnected && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              )}
+              <span
+                className={cn(
+                  "relative inline-flex h-1.5 w-1.5 rounded-full",
+                  isConnected ? "bg-emerald-500" : "bg-[#ccc]"
+                )}
+              />
+            </span>
+            {isConnected ? t("live") : t("waiting")}
+          </div>
+        </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-4 py-2 bg-black/20 border-t border-white/5 flex items-center justify-between">
-        <span className="text-[10px] text-[#444]">
-          {logs.length} events
-        </span>
-        <span className="text-[10px] font-mono text-[#333]">
-          {runId.substring(0, 12)}...
-        </span>
+      <div className="border-t border-[#F0F0F0] px-6 py-5 dark:border-[#222] sm:px-8">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#999]">
+          {t("feed")}
+        </p>
+        <div className="max-h-[280px] space-y-2 overflow-y-auto pr-1">
+          {visible.length === 0 ? (
+            <div className="flex items-center gap-3 rounded-xl bg-[#FAFAFA] px-4 py-3 text-[13px] text-[#888] dark:bg-[#161616]">
+              {!feedError && <Loader2 className="h-4 w-4 animate-spin" />}
+              {feedError ? t("unavailable") : t("empty")}
+            </div>
+          ) : (
+            <AnimatePresence initial={false}>
+              {visible.map((log, index) => {
+                const isLast = index === visible.length - 1;
+                const isError = log.type === "error";
+                return (
+                  <motion.div
+                    key={`${log.type}-${log.message}-${index}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={cn(
+                      "flex items-start gap-3 rounded-xl px-3 py-2.5",
+                      isLast ? "bg-[#FAFAFA] dark:bg-[#161616]" : "opacity-70"
+                    )}
+                  >
+                    <div className="mt-0.5 shrink-0">
+                      {isError ? (
+                        <span className="block h-2 w-2 rounded-full bg-red-500" />
+                      ) : isLast ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-[#1a1a1a] dark:text-white" />
+                      ) : (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                      )}
+                    </div>
+                    <p
+                      className={cn(
+                        "text-[13px] leading-relaxed",
+                        isError
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-[#1a1a1a] dark:text-white"
+                      )}
+                    >
+                      {labelFor(log)}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
+          <div ref={bottomRef} />
+        </div>
       </div>
     </div>
-  )
+  );
 }

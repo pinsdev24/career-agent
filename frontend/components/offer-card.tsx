@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import type { JobOffer } from "@/lib/types";
+import { CompanyLogo } from "@/components/company-logo";
+import { MatchScore } from "@/components/match-score";
 import {
   MapPin,
   ExternalLink,
@@ -9,6 +11,7 @@ import {
   Users,
   CheckCircle2,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface OfferCardProps {
   offer: JobOffer;
@@ -18,35 +21,36 @@ interface OfferCardProps {
 
 export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
   const t = useTranslations("Common");
-  const matchColor =
-    offer.pre_score > 80
-      ? "text-emerald-600 bg-emerald-50"
-      : offer.pre_score > 60
-        ? "text-amber-600 bg-amber-50"
-        : "text-[#999] dark:text-[#888] bg-[#F5F5F5] dark:bg-[#222]";
-
   const ci = offer.company_info;
+  const companyName = ci?.name || offer.company;
 
   return (
     <div
-      className={`group transition-all duration-200 rounded-xl border bg-white dark:bg-[#111] ${ onClick ? "cursor-pointer" : "" } ${ selected ? "border-[#1a1a1a] ring-1 ring-[#1a1a1a]/5" : "border-[#EBEBEB] dark:border-[#333] hover:border-[#ccc]" }`}
+      className={cn(
+        "group rounded-2xl border bg-white transition-all duration-200 dark:bg-[#111]",
+        onClick && "cursor-pointer",
+        selected
+          ? "border-[#1a1a1a] ring-1 ring-[#1a1a1a]/10 dark:border-white"
+          : "border-[#EBEBEB] hover:border-[#ccc] dark:border-[#333]"
+      )}
       onClick={onClick}
     >
       <div className="p-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2 flex-1 min-w-0">
+          <div className="min-w-0 flex-1 space-y-2">
             <div className="flex items-start gap-3">
+              <CompanyLogo name={companyName} url={offer.url} size={40} />
               {selected && (
-                <div className="w-5 h-5 rounded-full bg-[#1a1a1a] dark:bg-[#111] text-white flex items-center justify-center shrink-0 mt-0.5">
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1a1a1a] text-white dark:bg-white dark:text-black">
                   <CheckCircle2 className="h-3 w-3" />
                 </div>
               )}
               <div className="min-w-0">
-                <h3 className="text-[14px] font-medium text-[#1a1a1a] dark:text-white leading-snug">
+                <h3 className="text-[14px] font-medium leading-snug text-[#1a1a1a] dark:text-white">
                   {offer.title}
                 </h3>
-                <p className="text-[13px] text-[#999] dark:text-[#888] mt-0.5">
-                  {ci?.name || offer.company}
+                <p className="mt-0.5 text-[13px] text-[#888]">
+                  {companyName}
                 </p>
               </div>
             </div>
@@ -90,10 +94,7 @@ export function OfferCard({ offer, onClick, selected }: OfferCardProps) {
             )}
           </div>
 
-          {/* Score */}
-          <div className={`px-2.5 py-1 rounded-md text-[11px] font-semibold tabular-nums shrink-0 ${matchColor}`}>
-            {offer.pre_score}%
-          </div>
+          <MatchScore score={offer.pre_score} />
         </div>
       </div>
 

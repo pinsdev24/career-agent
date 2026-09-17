@@ -1,0 +1,80 @@
+# Seed ATS company boards (public JSON APIs)
+companies:
+  - slug: stripe
+    name: Stripe
+    ats_provider: greenhouse
+    board_token: stripe
+    careers_url: https://boards.greenhouse.io/stripe
+
+  - slug: figma
+    name: Figma
+    ats_provider: greenhouse
+    board_token: figma
+    careers_url: https://boards.greenhouse.io/figma
+
+  - slug: notion
+    name: Notion
+    ats_provider: greenhouse
+    board_token: notion
+    careers_url: https://boards.greenhouse.io/notion
+
+  - slug: airbnb
+    name: Airbnb
+    ats_provider: greenhouse
+    board_token: airbnb
+    careers_url: https://boards.greenhouse.io/airbnb
+
+  - slug: netlify
+    name: Netlify
+    ats_provider: lever
+    board_token: netlify
+    careers_url: https://jobs.lever.co/netlify
+
+  - slug: palantir
+    name: Palantir
+    ats_provider: lever
+    board_token: palantir
+    careers_url: https://jobs.lever.co/palantir
+
+  - slug: ramp
+    name: Ramp
+    ats_provider: ashby
+    board_token: ramp
+    careers_url: https://jobs.ashbyhq.com/ramp
+
+  - slug: linear
+    name: Linear
+    ats_provider: ashby
+    board_token: linear
+    careers_url: https://jobs.ashbyhq.com/linear
+
+  - slug: remotecom
+    name: Remote.com
+    ats_provider: greenhouse
+    board_token: remotecom
+    careers_url: https://boards.greenhouse.io/remotecom
+
+  - slug: coinbase
+    name: Coinbase
+    ats_provider: greenhouse
+    board_token: coinbase
+    careers_url: https://boards.greenhouse.io/coinbase
+
+  - slug: datadog
+    name: Datadog
+    ats_provider: greenhouse
+    board_token: datadog
+    careers_url: https://boards.greenhouse.io/datadog
+
+  - slug: cloudflare
+    name: Cloudflare
+    ats_provider: greenhouse
+    board_token: cloudflare
+    careers_url: https://boards.greenhouse.io/cloudflare
+
+  - slug: vercel
+    name: Vercel
+    ats_provider: greenhouse
+    board_token: vercel
+    careers_url: https://boards.greenhouse.io/vercel
+
