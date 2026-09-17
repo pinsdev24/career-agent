@@ -25,7 +25,7 @@
     },
     "sidebar": {
       "title": "Escape the job search labyrinth.",
-      "subtitle": "Join Ariadne to automate your applications, generate tailored cover letters, and maximize your career potential.",
+      "subtitle": "Join Ariadne for clearer matches, tailored letters, and review before you submit.",
       "hired": "Hired"
     }
   },
@@ -451,7 +451,7 @@
   "Dashboard": {
     "title": "Home",
     "greeting": "Welcome back, {name}",
-    "subtitle": "Browse jobs, prepare a packet, then review and mark it submitted.",
+    "subtitle": "Matches, packets, and what needs your review — in one place.",
     "new_mission": "Paste a job URL",
     "paste_url": "Have a URL not in the feed?",
     "loading": "Loading…",
@@ -459,7 +459,7 @@
       "title": "Nothing in motion yet",
       "description": "Start from recommended jobs. Pick a role, generate a packet, then submit on the ATS yourself."
     },
-    "empty_from_jobs": "Pick a role from Jobs to prepare a packet. Packets show up under Applications.",
+    "empty_from_jobs": "Your packets live under Applications. Prefer starting from Jobs.",
     "groups": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -479,12 +479,12 @@
       "critiquing": "Quality check"
     },
     "match": "Match",
-    "explore_mission": "URL pipeline",
+    "explore_mission": "Explore (advanced)",
     "untitled_pipeline": "URL pipeline",
     "untitled_application": "Untitled role",
     "stat_inbox": "Needs review",
     "stat_jobs": "Top matches",
-    "stat_missions": "Applications",
+    "stat_missions": "Older pipelines",
     "stat_applications": "Applications",
     "top_matches": "Top matches",
     "see_all_jobs": "See all jobs",
@@ -539,7 +539,7 @@
   },
   "NewMission": {
     "title": "Paste a job URL",
-    "subtitle": "Use this when the role is not in the Jobs feed. For daily use, start from recommended jobs.",
+    "subtitle": "Use this only when the role isn’t in your Jobs feed.",
     "recommended": "Recommended",
     "browse": {
       "label": "Browse recommended jobs",
@@ -562,7 +562,7 @@
     "hide_options": "Hide options",
     "back_to_url": "Use a URL instead",
     "starting": "Starting…",
-    "start_btn": "Start from this URL",
+    "start_btn": "Start from URL",
     "start_explore": "Start explore search",
     "error_url": "Paste a job URL to continue.",
     "start_failed": "Could not start from this URL."
@@ -778,6 +778,7 @@
     "packet_started": "Packet queued — opening Applications.",
     "save": "Save",
     "dismiss": "Skip",
+    "open_in_careeragent": "Have a URL not in the feed?",
     "url_not_in_feed": "Have a URL not in the feed?",
     "select_hint": "Select a role to see match reasons and the posting.",
     "error_generic": "Could not load jobs. Is the job engine running?",

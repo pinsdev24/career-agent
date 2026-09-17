@@ -25,7 +25,7 @@
     },
     "sidebar": {
       "title": "Échappez au labyrinthe de la recherche d'emploi.",
-      "subtitle": "Rejoignez Ariadne pour automatiser vos candidatures, générer des lettres de motivation sur mesure et maximiser votre potentiel de carrière.",
+      "subtitle": "Rejoignez Ariadne pour des matches plus clairs, des lettres sur mesure, et une relecture avant d'envoyer.",
       "hired": "Recruté"
     }
   },
@@ -451,7 +451,7 @@
   "Dashboard": {
     "title": "Accueil",
     "greeting": "Bon retour, {name}",
-    "subtitle": "Parcourez les offres, préparez un dossier, puis relisez et marquez comme envoyé.",
+    "subtitle": "Les matches, les dossiers, et ce qui demande votre relecture — au même endroit.",
     "new_mission": "Coller l'URL d'une offre",
     "paste_url": "Vous avez une URL absente du fil ?",
     "loading": "Chargement…",
@@ -459,7 +459,7 @@
       "title": "Rien en cours pour le moment",
       "description": "Partez des offres recommandées. Choisissez un poste, générez un dossier, puis postulez vous-même sur l'ATS."
     },
-    "empty_from_jobs": "Choisissez une offre pour préparer un dossier. Les dossiers apparaissent dans Candidatures.",
+    "empty_from_jobs": "Vos dossiers sont dans Candidatures. Préférez partir des Emplois.",
     "groups": {
       "today": "Aujourd'hui",
       "yesterday": "Hier",
@@ -479,12 +479,12 @@
       "critiquing": "Qualité"
     },
     "match": "Match",
-    "explore_mission": "Pipeline URL",
+    "explore_mission": "Explorer (avancé)",
     "untitled_pipeline": "Pipeline URL",
     "untitled_application": "Poste sans titre",
     "stat_inbox": "À relire",
     "stat_jobs": "Meilleurs matches",
-    "stat_missions": "Candidatures",
+    "stat_missions": "Anciens pipelines",
     "stat_applications": "Candidatures",
     "top_matches": "Meilleurs matches",
     "see_all_jobs": "Voir toutes les offres",
@@ -539,7 +539,7 @@
   },
   "NewMission": {
     "title": "Coller l'URL d'une offre",
-    "subtitle": "Utilisez cette page si le poste n'est pas dans le fil Emplois. Au quotidien, partez des offres recommandées.",
+    "subtitle": "Utilisez cette page seulement si le poste n'est pas dans votre fil Emplois.",
     "recommended": "Recommandé",
     "browse": {
       "label": "Parcourir les offres recommandées",
@@ -557,12 +557,12 @@
     },
     "url_label": "URL de l'offre",
     "url_placeholder": "https://boards.greenhouse.io/entreprise/jobs/…",
-    "explore_info": "Explorer cherche sur le web ouvert à partir de votre CV. Au quotidien, le fil Emplois est plus rapide et plus fiable.",
+    "explore_info": "Explorer cherche sur le web ouvert à partir de votre CV et de vos préférences. Au quotidien, le fil Emplois est plus rapide et plus précis.",
     "more_options": "Plus d'options",
     "hide_options": "Masquer les options",
     "back_to_url": "Utiliser une URL à la place",
     "starting": "Démarrage…",
-    "start_btn": "Démarrer à partir de cette URL",
+    "start_btn": "Démarrer depuis l'URL",
     "start_explore": "Lancer la recherche Explorer",
     "error_url": "Collez une URL d'offre pour continuer.",
     "start_failed": "Impossible de démarrer à partir de cette URL."
@@ -778,6 +778,7 @@
     "packet_started": "Dossier en file — ouverture de Candidatures.",
     "save": "Sauver",
     "dismiss": "Passer",
+    "open_in_careeragent": "Vous avez une URL absente du fil ?",
     "url_not_in_feed": "Vous avez une URL absente du fil ?",
     "select_hint": "Sélectionnez une offre pour voir le match et l'annonce.",
     "error_generic": "Impossible de charger les offres. Le job engine tourne-t-il ?",

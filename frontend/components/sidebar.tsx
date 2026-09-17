@@ -39,7 +39,7 @@ import {
 import { Logo } from "@/components/logo";
 
 const navItemsConfig = [
-  { href: "/dashboard", labelKey: "home", icon: LayoutGrid },
+  { href: "/dashboard", labelKey: "missions", icon: LayoutGrid },
   { href: "/jobs", labelKey: "jobs", icon: Briefcase },
   { href: "/applications", labelKey: "applications", icon: Inbox },
 ];

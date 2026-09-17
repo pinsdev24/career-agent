@@ -25,7 +25,7 @@
     },
     "sidebar": {
       "title": "Ontsnap aan het doolhof van de zoektocht naar een baan.",
-      "subtitle": "Sluit u aan bij Ariadne om uw sollicitaties te automatiseren, op maat gemaakte sollicitatiebrieven te genereren en uw carrièrepotentieel te maximaliseren.",
+      "subtitle": "Word lid van Ariadne voor duidelijkere matches, brieven op maat, en review voordat je indient.",
       "hired": "Aangenomen"
     }
   },
@@ -451,7 +451,7 @@
   "Dashboard": {
     "title": "Home",
     "greeting": "Welkom terug, {name}",
-    "subtitle": "Bekijk vacatures, bereid een dossier voor, review het en markeer als ingediend.",
+    "subtitle": "Matches, dossiers en wat jouw review nodig heeft — op één plek.",
     "new_mission": "Plak een vacature-URL",
     "paste_url": "Staat de URL niet in de feed?",
     "loading": "Laden…",
@@ -459,7 +459,7 @@
       "title": "Nog niets in beweging",
       "description": "Begin bij aanbevolen vacatures. Kies een rol, maak een dossier, en dien zelf in op de ATS."
     },
-    "empty_from_jobs": "Kies een vacature om een dossier voor te bereiden. Dossiers verschijnen onder Sollicitaties.",
+    "empty_from_jobs": "Je dossiers staan onder Sollicitaties. Begin liever vanuit Jobs.",
     "groups": {
       "today": "Vandaag",
       "yesterday": "Gisteren",
@@ -479,12 +479,12 @@
       "critiquing": "Kwaliteit"
     },
     "match": "Match",
-    "explore_mission": "URL-pipeline",
+    "explore_mission": "Verkennen (geavanceerd)",
     "untitled_pipeline": "URL-pipeline",
     "untitled_application": "Naamloze rol",
     "stat_inbox": "Te reviewen",
     "stat_jobs": "Topmatches",
-    "stat_missions": "Sollicitaties",
+    "stat_missions": "Oudere pipelines",
     "stat_applications": "Sollicitaties",
     "top_matches": "Topmatches",
     "see_all_jobs": "Alle vacatures",
@@ -539,7 +539,7 @@
   },
   "NewMission": {
     "title": "Plak een vacature-URL",
-    "subtitle": "Gebruik deze pagina als de rol niet in de Jobs-feed staat. Voor dagelijks gebruik start je bij aanbevolen vacatures.",
+    "subtitle": "Gebruik dit alleen als de rol niet in je Jobs-feed staat.",
     "recommended": "Aanbevolen",
     "browse": {
       "label": "Bekijk aanbevolen vacatures",
@@ -557,12 +557,12 @@
     },
     "url_label": "Vacature-URL",
     "url_placeholder": "https://boards.greenhouse.io/bedrijf/jobs/…",
-    "explore_info": "Verkennen zoekt op het open web vanuit je CV. Voor dagelijks gebruik is de Jobs-feed sneller en nauwkeuriger.",
+    "explore_info": "Verkennen zoekt op het open web vanuit je CV en voorkeuren. Voor dagelijks gebruik is de Jobs-feed sneller en nauwkeuriger.",
     "more_options": "Meer opties",
     "hide_options": "Opties verbergen",
     "back_to_url": "Gebruik liever een URL",
     "starting": "Starten…",
-    "start_btn": "Starten vanaf deze URL",
+    "start_btn": "Starten vanaf URL",
     "start_explore": "Start verkenning",
     "error_url": "Plak een vacature-URL om verder te gaan.",
     "start_failed": "Kon niet starten vanaf deze URL."
@@ -778,6 +778,7 @@
     "packet_started": "Dossier in de wachtrij — Sollicitaties wordt geopend.",
     "save": "Opslaan",
     "dismiss": "Overslaan",
+    "open_in_careeragent": "Staat de URL niet in de feed?",
     "url_not_in_feed": "Staat de URL niet in de feed?",
     "select_hint": "Selecteer een rol voor matchredenen en de vacature.",
     "error_generic": "Kon banen niet laden. Draait de job engine?",

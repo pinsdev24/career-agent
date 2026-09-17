@@ -87,20 +87,12 @@ export default function DashboardPage() {
         title={firstName ? t("greeting", { name: firstName }) : t("title")}
         subtitle={t("subtitle")}
         actions={
-          <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <Link href="/jobs">
-              <Button className="h-9 rounded-lg px-4 text-[13px]">
-                <Briefcase className="h-4 w-4" />
-                {t("browse_jobs")}
-              </Button>
-            </Link>
-            <Link
-              href="/pipeline/new"
-              className="text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
-            >
-              {t("paste_url")}
-            </Link>
-          </div>
+          <Link href="/jobs">
+            <Button className="h-9 rounded-lg px-4 text-[13px]">
+              <Briefcase className="h-4 w-4" />
+              {t("browse_jobs")}
+            </Button>
+          </Link>
         }
       />
 
@@ -277,7 +269,7 @@ export default function DashboardPage() {
       {!loading && runs.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
-            {t("older_pipelines")}
+            {t("recent_missions")}
           </h2>
           <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
             {runs.slice(0, 8).map((run, index) => {
@@ -293,7 +285,7 @@ export default function DashboardPage() {
                   }`}
                 >
                   <CompanyLogo
-                    name={run.selected_offer?.company || t("untitled_pipeline")}
+                    name={run.selected_offer?.company || t("explore_mission")}
                     url={run.selected_offer?.url || run.offer_url}
                     size={40}
                   />
@@ -301,7 +293,7 @@ export default function DashboardPage() {
                     <h3 className="truncate text-[13px] font-medium">
                       {run.selected_offer?.title ||
                         run.offer_url ||
-                        t("untitled_pipeline")}
+                        t("explore_mission")}
                     </h3>
                     <p className="mt-0.5 truncate text-[12px] text-[#777]">
                       {run.selected_offer?.company}
