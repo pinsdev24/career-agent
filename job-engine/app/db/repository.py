@@ -9,6 +9,7 @@ from supabase import AsyncClient
 from app.logging_setup import get_logger
 from app.models.schemas import CanonicalJob, JobPostingOut, ScoreBreakdown
 from app.normalize.posting import fingerprint
+from app.quality.display import clean_job_title, display_company
 
 logger = get_logger(__name__)
 
@@ -547,19 +548,26 @@ def row_to_job_out(
     skills = row.get("skills") or []
     if isinstance(skills, str):
         skills = []
+    apply_url = row["apply_url"]
+    company = display_company(
+        row.get("company_name"),
+        company_slug=row.get("company_slug"),
+        apply_url=apply_url,
+    ) or (row.get("company_name") or "")
+    title = clean_job_title(row.get("title") or "", company) or (row.get("title") or "")
     return JobPostingOut(
         id=UUID(row["id"]),
         source=row["source"],
         external_id=row["external_id"],
-        company_name=row["company_name"],
+        company_name=company,
         company_slug=row.get("company_slug"),
-        title=row["title"],
+        title=title,
         location=row.get("location"),
         remote=row.get("remote"),
         contract_type=row.get("contract_type"),
         salary=row.get("salary"),
         description_text=row.get("description_text"),
-        apply_url=row["apply_url"],
+        apply_url=apply_url,
         skills=skills,
         status=row["status"],
         posted_at=row.get("posted_at"),

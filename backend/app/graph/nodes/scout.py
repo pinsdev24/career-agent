@@ -106,6 +106,46 @@ def _is_snippet_available(content: str) -> bool:
     return not bool(_UNAVAILABLE_SNIPPET_PATTERNS.search(content[:500]))
 
 
+def _clean_discovered_title(title: str, company: str | None = None) -> str:
+    """Strip aggregator chrome so HITL cards match the Jobs offer contract."""
+    text = re.sub(r"\s+", " ", title or "").strip()
+    if not text:
+        return ""
+    if "|" in text or "｜" in text:
+        text = re.split(r"\s*[|｜]\s*", text, maxsplit=1)[0].strip()
+    text = re.sub(
+        r"\s+[-–—]\s+(?:jobs?|careers?|vacatures|emplois?|application(?:\s+[-–—]\s+\w+)?|workable|linkedin|greenhouse|lever|ashby)\s*$",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"^(?:apply(?:\s+now)?(?:\s+for)?|job application for|application for|hiring:)\s+",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if company:
+        text = re.sub(
+            rf"\s+(?:at|chez|bij|@)\s+{re.escape(company)}\s*$",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+    return text.strip() or title
+
+
+def _canonical_company_name(company: str, url: str) -> str:
+    name = (company or "").strip()
+    if not name or name.lower() in {"unknown", "greenhouse", "lever", "ashby", "workable", "linkedin"}:
+        return _extract_company_from_url(url)
+    if "." in name and " " not in name:
+        from_url = _extract_company_from_url(url)
+        if from_url and from_url.lower() != "unknown":
+            return from_url
+    return name
+
+
 # ---------------------------------------------------------------------------
 # ATS-aware company name extraction from URL
 # ---------------------------------------------------------------------------
@@ -390,10 +430,12 @@ async def scout_node(state: AgentState, config: RunnableConfig) -> AgentState:
             if idx < len(company_names) and company_names[idx] != "Unknown"
             else _extract_company_from_url(url)
         )
+        company = _canonical_company_name(company, url)
+        title = _clean_discovered_title(result.get("title", "Unknown"), company)
 
         offers.append({
             "id": str(uuid.uuid4()),
-            "title": result.get("title", "Unknown"),
+            "title": title or result.get("title", "Unknown"),
             "company": company,
             "url": url,
             "snippet": content[:300],

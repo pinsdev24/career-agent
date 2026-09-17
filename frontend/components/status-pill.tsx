@@ -20,6 +20,13 @@ const APPLICATION_TONE: Record<string, keyof typeof TONES> = {
   withdrawn: "muted",
 };
 
+const JOB_TONE: Record<string, keyof typeof TONES> = {
+  active: "success",
+  expired: "danger",
+  removed: "danger",
+  unknown: "muted",
+};
+
 const PIPELINE_TONE: Record<string, keyof typeof TONES> = {
   completed: "success",
   failed: "danger",
@@ -43,7 +50,10 @@ export function StatusPill({
   pulse?: boolean;
 }) {
   const tone =
-    APPLICATION_TONE[status] || PIPELINE_TONE[status] || "muted";
+    APPLICATION_TONE[status] ||
+    PIPELINE_TONE[status] ||
+    JOB_TONE[status] ||
+    "muted";
   const showPulse =
     pulse ||
     status === "generating" ||
