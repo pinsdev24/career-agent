@@ -302,9 +302,9 @@ export default function DashboardPage() {
       {!loading && !setupLoading && !hasAnything && (
         <EmptyState
           icon={Briefcase}
-          title={ready ? t("empty.title") : tFirst("home_empty_title")}
+          title={ready ? t("empty.title") : tFirst("title")}
           description={
-            ready ? t("empty.description") : tFirst("home_empty_desc")
+            ready ? t("empty.description") : tFirst("banner_desc")
           }
           actionHref={ready ? "/jobs" : undefined}
           actionLabel={ready ? t("browse_jobs") : tFirst("banner_cta")}

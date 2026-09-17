@@ -149,9 +149,14 @@ export function FirstRunProvider({ children }: { children: ReactNode }) {
         <div className="mb-5 flex flex-col gap-3 rounded-xl border border-[#EBEBEB] bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-[#333] dark:bg-[#111]">
           <div className="flex min-w-0 items-start gap-2.5">
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#1a1a1a] dark:text-white" />
-            <p className="text-[13px] leading-relaxed text-[#444] dark:text-[#ccc]">
-              {t("banner_title")}
-            </p>
+            <div className="min-w-0">
+              <p className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                {t("banner_title")}
+              </p>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-[#666] dark:text-[#888]">
+                {t("banner_desc")}
+              </p>
+            </div>
           </div>
           <Button
             type="button"

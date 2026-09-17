@@ -88,7 +88,7 @@ export function FirstRunWizard({
 
   const handlePdf = async (file: File) => {
     if (!file.name.toLowerCase().endsWith(".pdf")) {
-      setError(t("cv_pdf_only"));
+      setError(t("step1_error"));
       return;
     }
     setUploading(true);
@@ -96,8 +96,8 @@ export function FirstRunWizard({
     try {
       const next = await uploadCV(file);
       onProfileUpdated(next);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("cv_error"));
+    } catch {
+      setError(t("step1_error"));
     } finally {
       setUploading(false);
     }
@@ -113,7 +113,7 @@ export function FirstRunWizard({
   const saveRole = async () => {
     const title = jobTitle.trim();
     if (!title) {
-      setError(t("role_required"));
+      setError(t("step2_error"));
       return;
     }
     setSaving(true);
@@ -125,8 +125,8 @@ export function FirstRunWizard({
       );
       onProfileUpdated(next);
       setStep(3);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("role_error"));
+    } catch {
+      setError(t("step2_error"));
     } finally {
       setSaving(false);
     }
@@ -136,7 +136,7 @@ export function FirstRunWizard({
     const loc = location.trim();
     const remotePref = remote.trim();
     if (!loc && !remotePref) {
-      setError(t("where_required"));
+      setError(t("step3_error"));
       return;
     }
     setSaving(true);
@@ -151,8 +151,8 @@ export function FirstRunWizard({
       );
       onProfileUpdated(next);
       setStep("done");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("where_error"));
+    } catch {
+      setError(t("step3_error"));
     } finally {
       setSaving(false);
     }
@@ -165,20 +165,20 @@ export function FirstRunWizard({
 
   const title =
     step === 1
-      ? t("cv_title")
+      ? t("step1_title")
       : step === 2
-        ? t("role_title")
+        ? t("step2_title")
         : step === 3
-          ? t("where_title")
+          ? t("step3_title")
           : t("done_title");
 
   const description =
     step === 1
-      ? t("cv_desc")
+      ? t("step1_desc")
       : step === 2
-        ? t("role_desc")
+        ? t("step2_desc")
         : step === 3
-          ? t("where_desc")
+          ? t("step3_desc")
           : t("done_desc");
 
   return (
@@ -187,9 +187,14 @@ export function FirstRunWizard({
         showCloseButton={false}
         className="max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-white p-6 sm:max-w-lg dark:bg-[#111]"
       >
+        {step !== "done" && (
+          <p className="mb-3 text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+            {t("title")}
+          </p>
+        )}
         <div className="mb-4 flex items-center justify-between gap-3">
           <p className="text-[11px] font-medium uppercase tracking-wider text-[#999]">
-            {t("step_of", { current: progressStep })}
+            {t("progress", { current: progressStep, total: 3 })}
           </p>
           <div className="flex gap-1.5">
             {[1, 2, 3].map((n) => (
@@ -250,19 +255,13 @@ export function FirstRunWizard({
                 )}
                 <p className="mt-3 text-[13px] font-medium text-[#1a1a1a] dark:text-white">
                   {uploading
-                    ? t("cv_uploading")
+                    ? t("step1_uploading")
                     : cvReady
-                      ? t("cv_success")
-                      : t("cv_drop")}
+                      ? extractedName
+                        ? t("step1_success_named", { name: extractedName })
+                        : t("step1_success")
+                      : t("step1_cta")}
                 </p>
-                {!cvReady && (
-                  <p className="mt-1 text-[12px] text-[#888]">{t("cv_or")}</p>
-                )}
-                {cvReady && extractedName && (
-                  <p className="mt-1 text-[12px] text-[#888]">
-                    {t("cv_extracted", { name: extractedName })}
-                  </p>
-                )}
               </label>
             </div>
           )}
@@ -270,12 +269,12 @@ export function FirstRunWizard({
           {step === 2 && (
             <div className="space-y-1.5">
               <Label className="text-[11px] text-[#888]">
-                <Briefcase className="h-3 w-3" /> {t("role_label")}
+                <Briefcase className="h-3 w-3" /> {t("step2_label")}
               </Label>
               <Input
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
-                placeholder={t("role_placeholder")}
+                placeholder={t("step2_placeholder")}
                 className="h-10 rounded-lg bg-[#FAFAFA] text-[13px] dark:bg-[#161616]"
                 autoFocus
               />
@@ -286,19 +285,19 @@ export function FirstRunWizard({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-[11px] text-[#888]">
-                  <MapPin className="h-3 w-3" /> {t("location_label")}
+                  <MapPin className="h-3 w-3" /> {t("step3_location_label")}
                 </Label>
                 <Input
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder={t("location_placeholder")}
+                  placeholder={t("step3_location_placeholder")}
                   className="h-10 rounded-lg bg-[#FAFAFA] text-[13px] dark:bg-[#161616]"
                   autoFocus
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-[11px] text-[#888]">
-                  <Wifi className="h-3 w-3" /> {t("remote_label")}
+                  <Wifi className="h-3 w-3" /> {t("step3_remote_label")}
                 </Label>
                 <div className="grid grid-cols-3 gap-2">
                   {REMOTE_PREFERENCE_OPTIONS.map((option) => {
@@ -408,7 +407,7 @@ export function FirstRunWizard({
                 onClick={goToJobs}
                 className="h-10 rounded-lg px-5 text-[13px]"
               >
-                {t("browse_jobs")}
+                {t("done_cta")}
               </Button>
             )}
           </div>

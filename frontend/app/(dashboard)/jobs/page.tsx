@@ -209,8 +209,8 @@ export default function JobsPage() {
           <EmptyState
             icon={Briefcase}
             title={t("empty")}
-            description={t("empty_hint_setup")}
-            actionLabel={t("empty_cta_setup")}
+            description={t("empty_hint")}
+            actionLabel={t("empty_cta")}
             onAction={openWizard}
           />
         ) : (
