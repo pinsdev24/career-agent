@@ -11,18 +11,19 @@ import { getRecommendedJobs } from "@/lib/job-engine";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { CompanyLogo } from "@/components/company-logo";
+import { JobCard } from "@/components/job-card";
 import { MatchScore } from "@/components/match-score";
 import { StatusPill } from "@/components/status-pill";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeTime } from "@/lib/company";
+import { postingToDisplay } from "@/lib/offer-display";
 import {
   ArrowUpRight,
   Inbox,
   Briefcase,
   FileText,
-  MapPin,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -192,31 +193,12 @@ export default function DashboardPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {jobs.map((job) => (
-              <Link
+              <JobCard
                 key={job.id}
+                variant="tile"
                 href="/jobs"
-                className="rounded-2xl border border-[#EBEBEB] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:border-[#333] dark:bg-[#111]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <CompanyLogo
-                    name={job.company_name}
-                    slug={job.company_slug}
-                    url={job.apply_url}
-                    size={40}
-                  />
-                  <MatchScore score={job.score ?? job.score_breakdown?.total} compact />
-                </div>
-                <h3 className="mt-3 line-clamp-2 text-[14px] font-semibold leading-snug">
-                  {job.title}
-                </h3>
-                <p className="mt-1 truncate text-[12px] text-[#777]">{job.company_name}</p>
-                {job.location && (
-                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-[#888]">
-                    <MapPin className="h-3 w-3" />
-                    {job.location}
-                  </p>
-                )}
-              </Link>
+                display={postingToDisplay(job)}
+              />
             ))}
           </div>
         </section>

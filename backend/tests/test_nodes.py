@@ -385,3 +385,15 @@ class TestHITLNodes:
 
         # Should fall back to the draft
         assert result["final_letter"] == sample_agent_state["draft_letter"]
+
+
+def test_scout_strips_aggregator_title_chrome() -> None:
+    from app.graph.nodes.scout import _canonical_company_name, _clean_discovered_title
+
+    assert _clean_discovered_title("Engineer | Acme | LinkedIn", "Acme") == "Engineer"
+    assert (
+        _clean_discovered_title("Backend Engineer - Application - Workable")
+        == "Backend Engineer"
+    )
+    assert _canonical_company_name("jobs.lever.co", "https://jobs.lever.co/netlify/abc") == "Netlify"
+

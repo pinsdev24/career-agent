@@ -755,6 +755,25 @@
     "save": "Voorkeuren opslaan",
     "saving": "Opslaan..."
   },
+  "Offer": {
+    "date_unknown": "Datum onbekend",
+    "insufficient_signal": "Nog te weinig signaal om deze match te duiden.",
+    "untitled": "Naamloze rol",
+    "unknown_company": "Onbekend bedrijf",
+    "source_greenhouse": "Greenhouse",
+    "source_lever": "Lever",
+    "source_ashby": "Ashby",
+    "source_workable": "Workable",
+    "source_web": "Web",
+    "status_active": "Actief",
+    "status_expired": "Verlopen",
+    "status_removed": "Verwijderd",
+    "status_unknown": "Onbekend",
+    "prepare_disabled_inactive": "Voorbereiden kan alleen bij actieve vacatures.",
+    "prepare_disabled_invalid_url": "Geen geldige sollicitatielink bij deze vacature.",
+    "prepare_disabled_closed": "Deze vacature lijkt gesloten, Voorbereiden is uitgeschakeld.",
+    "prepare_disabled_not_found": "De sollicitatiepagina is niet gevonden."
+  },
   "Common": {
     "loading": "Laden...",
     "error": "Er is een fout opgetreden",

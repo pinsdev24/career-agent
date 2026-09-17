@@ -6,6 +6,7 @@ from datetime import datetime
 
 from app.models.schemas import AtsProvider, CanonicalJob
 from app.normalize.url import canonicalize_url
+from app.quality.display import clean_job_title, display_company
 
 
 def _normalize_ws(text: str) -> str:
@@ -60,12 +61,16 @@ def build_canonical_job(
     """Build a CanonicalJob with hash and canonical URL."""
     url = canonicalize_url(apply_url)
     desc = _normalize_ws(description_text)
+    company = display_company(
+        company_name, company_slug=company_slug, apply_url=url
+    ) or _normalize_ws(company_name)
+    role = clean_job_title(title, company) or _normalize_ws(title)
     return CanonicalJob(
         source=source,
         external_id=str(external_id),
         company_slug=company_slug,
-        company_name=_normalize_ws(company_name),
-        title=_normalize_ws(title),
+        company_name=company,
+        title=role,
         location=_normalize_ws(location) if location else None,
         remote=remote,
         contract_type=contract_type,

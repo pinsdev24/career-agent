@@ -755,6 +755,25 @@
     "save": "Save Preferences",
     "saving": "Saving..."
   },
+  "Offer": {
+    "date_unknown": "Date unknown",
+    "insufficient_signal": "Not enough signal yet to explain this match.",
+    "untitled": "Untitled role",
+    "unknown_company": "Unknown company",
+    "source_greenhouse": "Greenhouse",
+    "source_lever": "Lever",
+    "source_ashby": "Ashby",
+    "source_workable": "Workable",
+    "source_web": "Web",
+    "status_active": "Active",
+    "status_expired": "Expired",
+    "status_removed": "Removed",
+    "status_unknown": "Unknown",
+    "prepare_disabled_inactive": "Prepare is available only for active listings.",
+    "prepare_disabled_invalid_url": "No valid application link on this listing.",
+    "prepare_disabled_closed": "This listing looks closed, so Prepare is disabled.",
+    "prepare_disabled_not_found": "The application page could not be found."
+  },
   "Common": {
     "loading": "Loading...",
     "error": "An error occurred",

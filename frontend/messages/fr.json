@@ -755,6 +755,25 @@
     "save": "Enregistrer les préférences",
     "saving": "Enregistrement..."
   },
+  "Offer": {
+    "date_unknown": "Date inconnue",
+    "insufficient_signal": "Pas assez de signal pour expliquer ce match.",
+    "untitled": "Poste sans titre",
+    "unknown_company": "Entreprise inconnue",
+    "source_greenhouse": "Greenhouse",
+    "source_lever": "Lever",
+    "source_ashby": "Ashby",
+    "source_workable": "Workable",
+    "source_web": "Web",
+    "status_active": "Active",
+    "status_expired": "Expirée",
+    "status_removed": "Retirée",
+    "status_unknown": "Inconnu",
+    "prepare_disabled_inactive": "Préparer n’est disponible que pour les offres actives.",
+    "prepare_disabled_invalid_url": "Pas de lien de candidature valide sur cette offre.",
+    "prepare_disabled_closed": "Cette offre semble fermée, Préparer est désactivé.",
+    "prepare_disabled_not_found": "La page de candidature est introuvable."
+  },
   "Common": {
     "loading": "Chargement...",
     "error": "Une erreur est survenue",
