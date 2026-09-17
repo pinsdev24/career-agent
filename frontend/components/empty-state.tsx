@@ -1,3 +1,5 @@
+"use client";
+
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,6 +11,9 @@ export function EmptyState({
   description,
   actionHref,
   actionLabel,
+  onAction,
+  secondaryHref,
+  secondaryLabel,
   className,
 }: {
   icon: ComponentType<{ className?: string }>;
@@ -16,6 +21,9 @@ export function EmptyState({
   description: string;
   actionHref?: string;
   actionLabel?: string;
+  onAction?: () => void;
+  secondaryHref?: string;
+  secondaryLabel?: string;
   className?: string;
 }) {
   return (
@@ -32,9 +40,28 @@ export function EmptyState({
       <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-[#888]">
         {description}
       </p>
-      {actionHref && actionLabel && (
+      {actionLabel && onAction && (
+        <div className="mt-5 inline-flex">
+          <Button
+            type="button"
+            onClick={onAction}
+            className="h-9 rounded-lg px-4 text-[13px]"
+          >
+            {actionLabel}
+          </Button>
+        </div>
+      )}
+      {actionLabel && actionHref && !onAction && (
         <Link href={actionHref} className="mt-5 inline-flex">
           <Button className="h-9 rounded-lg px-4 text-[13px]">{actionLabel}</Button>
+        </Link>
+      )}
+      {secondaryHref && secondaryLabel && (
+        <Link
+          href={secondaryHref}
+          className="mt-3 block text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
+        >
+          {secondaryLabel}
         </Link>
       )}
     </div>
