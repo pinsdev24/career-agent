@@ -273,13 +273,7 @@ export function whyReasons(input: {
   skills?: string[] | null;
 }): string[] {
   const reasons = unique((input.reasons || []).map((item) => collapseWs(item)).filter(Boolean));
-  if (reasons.length) return reasons.slice(0, MAX_WHY_REASONS);
-  const skills = unique(
-    [...(input.matchingSkills || []), ...(input.skills || [])]
-      .map((item) => collapseWs(item))
-      .filter(Boolean)
-  );
-  return skills.slice(0, MAX_WHY_REASONS);
+  return reasons.slice(0, MAX_WHY_REASONS);
 }
 
 export function sourceChip(source?: string | null): SourceChip {
@@ -405,14 +399,12 @@ export function prepareReasonKey(reason: PrepareGateReason): string | null {
     case "ok":
       return null;
     case "inactive":
-      return "prepare_disabled_inactive";
+      return "prepare_disabled_expired";
     case "invalid_url":
-      return "prepare_disabled_invalid_url";
     case "closed_job":
-      return "prepare_disabled_closed";
     case "not_found":
-      return "prepare_disabled_not_found";
+      return "prepare_disabled_dead_link";
     default:
-      return "prepare_disabled_invalid_url";
+      return "prepare_disabled_unavailable";
   }
 }

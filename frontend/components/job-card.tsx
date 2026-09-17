@@ -57,9 +57,8 @@ function MetaBits({
   locale: string;
   showRemote: boolean;
 }) {
-  const t = useTranslations("Offer");
   const tJobs = useTranslations("Jobs");
-  const freshness = freshnessLabel(display.postedAt, locale, t("date_unknown"));
+  const freshness = freshnessLabel(display.postedAt, locale, tJobs("date_unknown"));
   return (
     <>
       {display.location ? (
@@ -77,11 +76,7 @@ function MetaBits({
   );
 }
 
-function WhyChips({ reasons, empty }: { reasons: string[]; empty: string }) {
-  const t = useTranslations("Offer");
-  if (reasons.length === 0) {
-    return <p className="text-[12px] leading-snug text-[#888]">{empty || t("insufficient_signal")}</p>;
-  }
+function WhyChips({ reasons }: { reasons: string[] }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {reasons.map((reason) => (
@@ -115,13 +110,12 @@ export function JobCard({
 }: JobCardProps) {
   const t = useTranslations("Offer");
   const tJobs = useTranslations("Jobs");
-  const tCommon = useTranslations("Common");
   const locale = useLocale();
   const title = display.title || t("untitled");
   const company = display.companyName || t("unknown_company");
   const statusKey = `status_${(display.status || "unknown").toLowerCase()}`;
   const statusLabel = t.has(statusKey) ? t(statusKey) : display.status || t("status_unknown");
-  const sourceLabel = t(`source_${display.source}`);
+  const sourceLabel = tJobs(`source_${display.source}`);
 
   const logo = (
     <CompanyLogo
@@ -194,7 +188,7 @@ export function JobCard({
             </div>
             {display.why.length > 0 ? (
               <div className="mt-2">
-                <WhyChips reasons={display.why} empty="" />
+                <WhyChips reasons={display.why} />
               </div>
             ) : null}
           </div>
@@ -252,10 +246,11 @@ export function JobCard({
                     href={display.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label={tJobs("open_posting")}
                     className="inline-flex items-center gap-1 font-medium text-[#1a1a1a] underline-offset-2 hover:underline dark:text-white"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    {tCommon("view")} <ExternalLink className="h-3 w-3" />
+                    {tJobs("open_posting")} <ExternalLink className="h-3 w-3" />
                   </a>
                 ) : null}
               </div>
@@ -264,9 +259,7 @@ export function JobCard({
                   {display.snippet}
                 </p>
               ) : null}
-              {display.why.length ? (
-                <WhyChips reasons={display.why} empty={t("insufficient_signal")} />
-              ) : null}
+              {display.why.length ? <WhyChips reasons={display.why} /> : null}
             </div>
             <MatchScore score={display.score} />
           </div>
@@ -330,18 +323,13 @@ export function JobCard({
             {tJobs("why_match")}
           </div>
           {display.why.length ? (
-            <div className="flex flex-wrap gap-1.5">
+            <ul className="list-disc space-y-1 pl-4 text-[12px] leading-snug text-[#555] dark:text-[#bbb]">
               {display.why.map((reason) => (
-                <span
-                  key={reason}
-                  className="rounded-lg bg-[#F7F7F7] px-2 py-1 text-[12px] leading-snug text-[#555] dark:bg-[#1c1c1c] dark:text-[#bbb]"
-                >
-                  {reason}
-                </span>
+                <li key={reason}>{reason}</li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <p className="text-[12px] leading-snug text-[#888]">{t("insufficient_signal")}</p>
+            <p className="text-[12px] leading-snug text-[#888]">{tJobs("why_insufficient")}</p>
           )}
         </div>
 
@@ -375,7 +363,9 @@ export function JobCard({
           {prepareBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : tJobs("prepare_packet")}
         </Button>
         {reasonKey ? (
-          <p className="text-center text-[12px] text-amber-700 dark:text-amber-300">{t(reasonKey)}</p>
+          <p className="text-center text-[12px] text-amber-700 dark:text-amber-300">
+            {tJobs(reasonKey)}
+          </p>
         ) : null}
         <div className="grid grid-cols-3 gap-2">
           {display.applyUrl ? (
@@ -383,6 +373,7 @@ export function JobCard({
               href={display.applyUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={tJobs("open_posting")}
               className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-[#EBEBEB] text-[12px] font-medium text-[#1a1a1a] hover:bg-[#FAFAFA] dark:border-[#333] dark:text-white dark:hover:bg-[#1a1a1a]"
             >
               {tJobs("apply")}

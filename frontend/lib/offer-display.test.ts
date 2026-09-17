@@ -7,6 +7,7 @@ import {
   evaluatePrepareGate,
   looksLikeUrlHost,
   postingToDisplay,
+  prepareReasonKey,
   sourceChip,
   whyReasons,
 } from "./offer-display";
@@ -108,12 +109,9 @@ describe("whyReasons", () => {
     ).toEqual(["a", "b", "c"]);
   });
 
-  it("falls back to matching skills then skills", () => {
-    expect(whyReasons({ matchingSkills: ["Python", "FastAPI"] })).toEqual([
-      "Python",
-      "FastAPI",
-    ]);
-    expect(whyReasons({ skills: ["SQL"] })).toEqual(["SQL"]);
+  it("does not treat skills as why — empty reasons means insufficient signal", () => {
+    expect(whyReasons({ matchingSkills: ["Python", "FastAPI"] })).toEqual([]);
+    expect(whyReasons({ skills: ["SQL"] })).toEqual([]);
     expect(whyReasons({})).toEqual([]);
   });
 });
@@ -159,6 +157,14 @@ describe("link / prepare gate", () => {
         descriptionText: "We are hiring a senior engineer to join our team.",
       }).allowed
     ).toBe(true);
+  });
+
+  it("maps gate failures onto the UX Jobs.prepare_disabled_* keys", () => {
+    expect(prepareReasonKey("inactive")).toBe("prepare_disabled_expired");
+    expect(prepareReasonKey("invalid_url")).toBe("prepare_disabled_dead_link");
+    expect(prepareReasonKey("closed_job")).toBe("prepare_disabled_dead_link");
+    expect(prepareReasonKey("not_found")).toBe("prepare_disabled_dead_link");
+    expect(prepareReasonKey("ok")).toBeNull();
   });
 });
 
