@@ -17,6 +17,7 @@ import { createApplication } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
 import { evaluatePrepareGate, postingToDisplay } from "@/lib/offer-display";
 import { EmptyState } from "@/components/empty-state";
+import { useFirstRun } from "@/components/first-run-provider";
 import { JobCard } from "@/components/job-card";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function JobsPage() {
   const t = useTranslations("Jobs");
   const router = useRouter();
+  const { ready, loading: setupLoading, openWizard } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +73,15 @@ export default function JobsPage() {
     void loadFeed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!ready || loading) return;
+    if (items.length === 0 && mode === "recommend") {
+      void loadFeed(true);
+    }
+    // Refresh recommend after first-run completes on this page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,13 +199,29 @@ export default function JobsPage() {
           <Skeleton className="hidden h-[520px] rounded-2xl lg:block" />
         </div>
       ) : items.length === 0 ? (
-        <EmptyState
-          icon={Briefcase}
-          title={t("empty")}
-          description={t("empty_hint")}
-          actionHref="/profile"
-          actionLabel={t("empty_cta")}
-        />
+        setupLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[88px] w-full rounded-2xl" />
+            ))}
+          </div>
+        ) : !ready ? (
+          <EmptyState
+            icon={Briefcase}
+            title={t("empty")}
+            description={t("empty_hint_setup")}
+            actionLabel={t("empty_cta_setup")}
+            onAction={openWizard}
+          />
+        ) : (
+          <EmptyState
+            icon={Briefcase}
+            title={t("empty_warming")}
+            description={t("empty_warming_hint")}
+            secondaryHref="/pipeline/new"
+            secondaryLabel={t("empty_warming_cta")}
+          />
+        )
       ) : (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:min-h-0">
           <div className="space-y-2 lg:overflow-y-auto lg:pr-1">

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { getProfile, uploadCV, getMemories, updateMemory } from "@/lib/api";
 import type { Profile, Memory } from "@/lib/types";
+import { useFirstRun } from "@/components/first-run-provider";
 import {
   FileCheck,
   Brain,
@@ -37,6 +38,7 @@ import {
 export default function ProfilePage() {
   const t = useTranslations("Profile");
   const tCommon = useTranslations("Common");
+  const { setProfile: setFirstRunProfile } = useFirstRun();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,7 @@ export default function ProfilePage() {
     try {
       const p = await getProfile();
       setProfile(p);
+      setFirstRunProfile(p);
 
       setLoadingMemories(true);
       const m = await getMemories();
@@ -60,7 +63,7 @@ export default function ProfilePage() {
       setLoading(false);
       setLoadingMemories(false);
     }
-  }, []);
+  }, [setFirstRunProfile]);
 
   useEffect(() => {
     loadProfile();
@@ -82,6 +85,7 @@ export default function ProfilePage() {
     try {
       const p = await uploadCV(file);
       setProfile(p);
+      setFirstRunProfile(p);
       setSuccess(t("cv_active"));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Upload failed");

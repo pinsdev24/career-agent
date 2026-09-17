@@ -15,6 +15,7 @@ import { JobCard } from "@/components/job-card";
 import { MatchScore } from "@/components/match-score";
 import { StatusPill } from "@/components/status-pill";
 import { EmptyState } from "@/components/empty-state";
+import { useFirstRun } from "@/components/first-run-provider";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeTime } from "@/lib/company";
@@ -29,6 +30,8 @@ import {
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
   const tApp = useTranslations("Applications");
+  const tFirst = useTranslations("FirstRun");
+  const { ready, loading: setupLoading, openWizard } = useFirstRun();
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [inbox, setInbox] = useState<WorkItem[]>([]);
@@ -296,13 +299,16 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {!loading && !hasAnything && (
+      {!loading && !setupLoading && !hasAnything && (
         <EmptyState
           icon={Briefcase}
-          title={t("empty.title")}
-          description={t("empty.description")}
-          actionHref="/jobs"
-          actionLabel={t("browse_jobs")}
+          title={ready ? t("empty.title") : tFirst("home_empty_title")}
+          description={
+            ready ? t("empty.description") : tFirst("home_empty_desc")
+          }
+          actionHref={ready ? "/jobs" : undefined}
+          actionLabel={ready ? t("browse_jobs") : tFirst("banner_cta")}
+          onAction={ready ? undefined : openWizard}
         />
       )}
     </div>

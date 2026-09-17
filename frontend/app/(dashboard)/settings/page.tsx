@@ -11,10 +11,12 @@ import { LanguagePreference } from "@/lib/types";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { setUserLocale } from "@/lib/i18n/locale";
 import { useLocale } from "next-intl";
+import { useFirstRun } from "@/components/first-run-provider";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
   const currentLocale = useLocale();
+  const { setProfile: setFirstRunProfile } = useFirstRun();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -80,7 +82,7 @@ export default function SettingsPage() {
     setError(null);
     setSuccess(null);
     try {
-      await updatePreferences(
+      const updated = await updatePreferences(
         tone as any,
         {
           job_title: jobTitle,
@@ -90,6 +92,7 @@ export default function SettingsPage() {
         },
         language
       );
+      setFirstRunProfile(updated);
       setSuccess("Preferences saved successfully.");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: unknown) {
