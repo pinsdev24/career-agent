@@ -27,7 +27,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   LayoutGrid,
-  FolderPlus,
   LogOut,
   PanelLeftClose,
   PanelLeft,
@@ -40,10 +39,9 @@ import {
 import { Logo } from "@/components/logo";
 
 const navItemsConfig = [
-  { href: "/dashboard", labelKey: "missions", icon: LayoutGrid },
+  { href: "/dashboard", labelKey: "home", icon: LayoutGrid },
   { href: "/jobs", labelKey: "jobs", icon: Briefcase },
   { href: "/applications", labelKey: "applications", icon: Inbox },
-  { href: "/pipeline/new", labelKey: "new_mission", icon: FolderPlus },
 ];
 
 export function Sidebar() {

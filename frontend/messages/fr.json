@@ -30,8 +30,9 @@
     }
   },
   "Sidebar": {
-    "missions": "Missions",
-    "new_mission": "Nouvelle Mission",
+    "home": "Accueil",
+    "missions": "Accueil",
+    "new_mission": "Coller l'URL d'une offre",
     "profile": "Profil",
     "settings": "Paramètres",
     "sign_out": "Déconnexion",
@@ -238,11 +239,11 @@
       "title_muted": "pas le pitch.",
       "subtitle": "Des missions avec un score de match. Le brouillon à côté des écarts. Vous voyez toujours pourquoi — et vous approuvez toujours.",
       "dashboard_label": "Missions",
-      "dashboard_url": "ariadne.app/dashboard",
+      "dashboard_url": "/dashboard",
       "dashboard_caption": "Tous les pipelines dans une liste — score, statut, prochaine action.",
       "dashboard_alt": "Tableau de bord Ariadne avec les missions, scores de match et statuts de relecture",
       "review_label": "Relecture",
-      "review_url": "ariadne.app/review",
+      "review_url": "/applications",
       "review_caption": "Le brouillon à gauche. L'analyse d'écarts à droite. Approuver, réécrire, ou modifier.",
       "review_alt": "Relecture de lettre avec analyse d'écarts, compétences matchées, et boutons approuver ou réécrire",
       "insights": [
@@ -448,16 +449,17 @@
     }
   },
   "Dashboard": {
-    "title": "Missions",
+    "title": "Accueil",
     "greeting": "Bon retour, {name}",
-    "subtitle": "Votre recherche d'emploi, au même endroit — matches, dossiers et missions.",
-    "new_mission": "Nouvelle Mission",
-    "loading": "Chargement des missions...",
+    "subtitle": "Parcourez les offres, préparez un dossier, puis relisez et marquez comme envoyé.",
+    "new_mission": "Coller l'URL d'une offre",
+    "paste_url": "Vous avez une URL absente du fil ?",
+    "loading": "Chargement…",
     "empty": {
       "title": "Rien en cours pour le moment",
       "description": "Partez des offres recommandées. Choisissez un poste, générez un dossier, puis postulez vous-même sur l'ATS."
     },
-    "empty_from_jobs": "Les dossiers sont dans Candidatures. Les missions sont les anciens pipelines URL / explorer.",
+    "empty_from_jobs": "Choisissez une offre pour préparer un dossier. Les dossiers apparaissent dans Candidatures.",
     "groups": {
       "today": "Aujourd'hui",
       "yesterday": "Hier",
@@ -477,14 +479,20 @@
       "critiquing": "Qualité"
     },
     "match": "Match",
-    "explore_mission": "Mission Exploration",
+    "explore_mission": "Pipeline URL",
+    "untitled_pipeline": "Pipeline URL",
+    "untitled_application": "Poste sans titre",
     "stat_inbox": "À relire",
     "stat_jobs": "Meilleurs matches",
-    "stat_missions": "Missions",
+    "stat_missions": "Candidatures",
+    "stat_applications": "Candidatures",
     "top_matches": "Meilleurs matches",
     "see_all_jobs": "Voir toutes les offres",
+    "see_all_applications": "Voir toutes les candidatures",
     "needs_attention": "À vous",
-    "recent_missions": "Missions récentes",
+    "recent_missions": "Anciens pipelines",
+    "older_pipelines": "Anciens pipelines",
+    "recent_applications": "Candidatures récentes",
     "browse_jobs": "Parcourir les offres",
     "review_packet": "Relire le dossier"
   },
@@ -530,8 +538,8 @@
     "clear_btn": "Effacer la mémoire"
   },
   "NewMission": {
-    "title": "Nouvelle Mission",
-    "subtitle": "Partez du fil d'offres, ou collez une URL si vous l'avez déjà.",
+    "title": "Coller l'URL d'une offre",
+    "subtitle": "Utilisez cette page si le poste n'est pas dans le fil Emplois. Au quotidien, partez des offres recommandées.",
     "recommended": "Recommandé",
     "browse": {
       "label": "Parcourir les offres recommandées",
@@ -550,10 +558,14 @@
     "url_label": "URL de l'offre",
     "url_placeholder": "https://boards.greenhouse.io/entreprise/jobs/…",
     "explore_info": "Explorer cherche sur le web ouvert à partir de votre CV. Au quotidien, le fil Emplois est plus rapide et plus fiable.",
+    "more_options": "Plus d'options",
+    "hide_options": "Masquer les options",
+    "back_to_url": "Utiliser une URL à la place",
     "starting": "Démarrage…",
-    "start_btn": "Lancer le pipeline",
+    "start_btn": "Démarrer à partir de cette URL",
+    "start_explore": "Lancer la recherche Explorer",
     "error_url": "Collez une URL d'offre pour continuer.",
-    "start_failed": "Impossible de lancer le pipeline."
+    "start_failed": "Impossible de démarrer à partir de cette URL."
   },
   "MissionDetail": {
     "active_pipeline": "Mission en cours",
@@ -766,12 +778,12 @@
     "packet_started": "Dossier en file — ouverture de Candidatures.",
     "save": "Sauver",
     "dismiss": "Passer",
-    "open_in_careeragent": "Rédiger via une mission URL à la place →",
+    "url_not_in_feed": "Vous avez une URL absente du fil ?",
     "select_hint": "Sélectionnez une offre pour voir le match et l'annonce.",
     "error_generic": "Impossible de charger les offres. Le job engine tourne-t-il ?",
     "saved": "Enregistré dans votre fil.",
     "dismissed": "Retiré de votre fil.",
-    "api_unreachable": "CareerAgent est injoignable. L'API tourne-t-elle ?"
+    "api_unreachable": "Impossible de joindre Ariadne. L'API tourne-t-elle ?"
   },
   "Applications": {
     "title": "Candidatures",
@@ -799,8 +811,11 @@
     "approve": "Approuver la lettre",
     "rewrite": "Réécrire avec un commentaire",
     "feedback_placeholder": "Que faut-il changer ?",
-    "mark_submitted": "J'ai postulé",
-    "open_ats": "Ouvrir la page de candidature",
+    "mark_submitted": "Marquer comme envoyé",
+    "open_ats": "Ouvrir l'ATS",
+    "no_ats_url": "Aucune page de candidature enregistrée.",
+    "next_steps_title": "Ensuite : postulez vous-même",
+    "next_steps_hint": "Copiez la lettre, ouvrez le formulaire de l'employeur, puis marquez comme envoyé. Ariadne ne postule jamais à votre place.",
     "copy_letter": "Copier la lettre",
     "copied": "Copié",
     "letter": "Lettre de motivation",

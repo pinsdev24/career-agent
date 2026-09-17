@@ -18,16 +18,16 @@ import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeTime } from "@/lib/company";
 import {
-  Plus,
   ArrowUpRight,
   Inbox,
   Briefcase,
-  Rocket,
+  FileText,
   MapPin,
 } from "lucide-react";
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
+  const tApp = useTranslations("Applications");
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [inbox, setInbox] = useState<WorkItem[]>([]);
@@ -73,9 +73,13 @@ export default function DashboardPage() {
     void load();
   }, []);
 
-  const waitingRuns = runs.filter((run) =>
-    ["waiting_offer_selection", "waiting_letter_review"].includes(run.status)
-  ).length;
+  const hasAnything =
+    inbox.length > 0 || jobs.length > 0 || apps.length > 0 || runs.length > 0;
+
+  const statusLabel = (status: string) =>
+    tApp.has(`status_${status}`)
+      ? tApp(`status_${status}`)
+      : status.replaceAll("_", " ");
 
   return (
     <div className="space-y-8">
@@ -83,12 +87,20 @@ export default function DashboardPage() {
         title={firstName ? t("greeting", { name: firstName }) : t("title")}
         subtitle={t("subtitle")}
         actions={
-          <Link href="/pipeline/new">
-            <Button className="h-9 rounded-lg px-4 text-[13px]">
-              <Plus className="h-4 w-4" />
-              {t("new_mission")}
-            </Button>
-          </Link>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <Link href="/jobs">
+              <Button className="h-9 rounded-lg px-4 text-[13px]">
+                <Briefcase className="h-4 w-4" />
+                {t("browse_jobs")}
+              </Button>
+            </Link>
+            <Link
+              href="/pipeline/new"
+              className="text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
+            >
+              {t("paste_url")}
+            </Link>
+          </div>
         }
       />
 
@@ -114,10 +126,10 @@ export default function DashboardPage() {
               icon: Briefcase,
             },
             {
-              href: "/dashboard",
-              label: t("stat_missions"),
-              value: waitingRuns || runs.length,
-              icon: Rocket,
+              href: "/applications",
+              label: t("stat_applications"),
+              value: apps.length,
+              icon: FileText,
             },
           ].map((stat) => (
             <Link
@@ -133,6 +145,44 @@ export default function DashboardPage() {
             </Link>
           ))}
         </div>
+      )}
+
+      {!loading && inbox.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+            {t("needs_attention")}
+          </h2>
+          <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
+            {inbox.slice(0, 4).map((item, index) => (
+              <Link
+                key={item.id}
+                href={
+                  item.application_id
+                    ? `/applications/${item.application_id}`
+                    : "/applications"
+                }
+                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] dark:hover:bg-[#161616] ${
+                  index !== 0 ? "border-t border-[#F3F3F3] dark:border-[#222]" : ""
+                }`}
+              >
+                <CompanyLogo
+                  name={String(item.payload?.company || "Company")}
+                  url={String(item.payload?.apply_url || "")}
+                  size={36}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium">
+                    {(item.payload?.title as string) || t("review_packet")}
+                  </p>
+                  <p className="truncate text-[12px] text-[#777]">
+                    {(item.payload?.company as string) || ""}
+                  </p>
+                </div>
+                <StatusPill status="packet_ready" label={t("review_packet")} />
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {!loading && jobs.length > 0 && (
@@ -180,67 +230,55 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {!loading && inbox.length > 0 && (
+      {!loading && apps.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
-            {t("needs_attention")}
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+              {t("recent_applications")}
+            </h2>
+            <Link
+              href="/applications"
+              className="text-[12px] font-medium text-[#666] hover:text-[#1a1a1a] dark:hover:text-white"
+            >
+              {t("see_all_applications")}
+            </Link>
+          </div>
           <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
-            {inbox.slice(0, 4).map((item, index) => (
+            {apps.slice(0, 6).map((app, index) => (
               <Link
-                key={item.id}
-                href={
-                  item.application_id
-                    ? `/applications/${item.application_id}`
-                    : "/applications"
-                }
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] dark:hover:bg-[#161616] ${
+                key={app.id}
+                href={`/applications/${app.id}`}
+                className={`flex items-center gap-3.5 px-4 py-3.5 hover:bg-[#FAFAFA] dark:hover:bg-[#161616] ${
                   index !== 0 ? "border-t border-[#F3F3F3] dark:border-[#222]" : ""
                 }`}
               >
                 <CompanyLogo
-                  name={String(item.payload?.company || "Company")}
-                  url={String(item.payload?.apply_url || "")}
-                  size={36}
+                  name={app.posting?.company_name || "Company"}
+                  url={app.posting?.apply_url}
+                  size={40}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-medium">
-                    {(item.payload?.title as string) || t("review_packet")}
-                  </p>
-                  <p className="truncate text-[12px] text-[#777]">
-                    {(item.payload?.company as string) || ""}
+                  <h3 className="truncate text-[13px] font-medium">
+                    {app.posting?.title || t("untitled_application")}
+                  </h3>
+                  <p className="mt-0.5 truncate text-[12px] text-[#777]">
+                    {app.posting?.company_name}
+                    {app.updated_at ? ` · ${formatRelativeTime(app.updated_at)}` : ""}
                   </p>
                 </div>
-                <StatusPill status="packet_ready" label={t("review_packet")} />
+                <StatusPill status={app.status} label={statusLabel(app.status)} />
+                <ArrowUpRight className="h-4 w-4 text-[#ddd]" />
               </Link>
             ))}
           </div>
         </section>
       )}
 
-      <section className="space-y-3">
-        <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
-          {t("recent_missions")}
-        </h2>
-        {loading ? (
-          <Skeleton className="h-48 w-full rounded-2xl" />
-        ) : runs.length === 0 && apps.length === 0 ? (
-          <EmptyState
-            icon={Rocket}
-            title={t("empty.title")}
-            description={t("empty.description")}
-            actionHref="/jobs"
-            actionLabel={t("browse_jobs")}
-          />
-        ) : runs.length === 0 ? (
-          <EmptyState
-            icon={Rocket}
-            title={t("empty.title")}
-            description={t("empty_from_jobs")}
-            actionHref="/jobs"
-            actionLabel={t("browse_jobs")}
-          />
-        ) : (
+      {!loading && runs.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-[13px] font-semibold uppercase tracking-wide text-[#888]">
+            {t("older_pipelines")}
+          </h2>
           <div className="overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111]">
             {runs.slice(0, 8).map((run, index) => {
               const label = t.has(`status.${run.status}`)
@@ -255,7 +293,7 @@ export default function DashboardPage() {
                   }`}
                 >
                   <CompanyLogo
-                    name={run.selected_offer?.company || t("explore_mission")}
+                    name={run.selected_offer?.company || t("untitled_pipeline")}
                     url={run.selected_offer?.url || run.offer_url}
                     size={40}
                   />
@@ -263,7 +301,7 @@ export default function DashboardPage() {
                     <h3 className="truncate text-[13px] font-medium">
                       {run.selected_offer?.title ||
                         run.offer_url ||
-                        t("explore_mission")}
+                        t("untitled_pipeline")}
                     </h3>
                     <p className="mt-0.5 truncate text-[12px] text-[#777]">
                       {run.selected_offer?.company}
@@ -281,8 +319,18 @@ export default function DashboardPage() {
               );
             })}
           </div>
-        )}
-      </section>
+        </section>
+      )}
+
+      {!loading && !hasAnything && (
+        <EmptyState
+          icon={Briefcase}
+          title={t("empty.title")}
+          description={t("empty.description")}
+          actionHref="/jobs"
+          actionLabel={t("browse_jobs")}
+        />
+      )}
     </div>
   );
 }
