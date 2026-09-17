@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-5.6-luna"
     fast_model: str = "gpt-5-nano"
     critic_model: str = "gpt-5.6-luna"
-    writer_model: str = "kimi-k2.6"
+    writer_model: str = "kimi-k3"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536
 
