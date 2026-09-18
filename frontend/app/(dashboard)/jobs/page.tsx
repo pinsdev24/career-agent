@@ -22,6 +22,12 @@ import { JobCard } from "@/components/job-card";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { remotePreferenceToFilter } from "@/lib/profile-ready";
+import {
+  jobsChipMessageKey,
+  jobsEmptyMessageKeys,
+  selectJobsChipKind,
+  selectJobsEmptyKind,
+} from "@/lib/jobs-copy";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");
@@ -47,6 +53,14 @@ export default function JobsPage() {
   const prefRemote = remotePreferenceToFilter(
     profile?.search_preferences?.remote_preference
   );
+  const copyCtx = {
+    title: targetTitle,
+    location: prefLocation,
+    remote: prefRemote === true,
+  };
+  const chipKind = selectJobsChipKind(copyCtx);
+  const emptyKind = selectJobsEmptyKind(copyCtx);
+  const emptyKeys = jobsEmptyMessageKeys(emptyKind);
 
   const loadFeed = useCallback(
     async (reset = true) => {
@@ -199,11 +213,11 @@ export default function JobsPage() {
         </Button>
       </form>
 
-      {ready && (targetTitle || prefLocation) && items.length > 0 && !loading && (
+      {ready && chipKind && items.length > 0 && !loading && (
         <p className="text-[12px] text-[#888]">
-          {t("match_chip", {
-            target: targetTitle || t("match_chip_any_role"),
-            location: prefLocation || t("match_chip_any_location"),
+          {t(jobsChipMessageKey(chipKind), {
+            title: targetTitle,
+            location: prefLocation,
           })}
         </p>
       )}
@@ -241,15 +255,14 @@ export default function JobsPage() {
         ) : (
           <EmptyState
             icon={Briefcase}
-            title={
-              targetTitle || prefLocation
-                ? t("empty_warming_for", {
-                    target: targetTitle || t("match_chip_any_role"),
-                    location: prefLocation || t("match_chip_any_location"),
-                  })
-                : t("empty_warming")
-            }
-            description={t("empty_warming_hint")}
+            title={t(emptyKeys.title, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
+            description={t(emptyKeys.hint, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
             secondaryHref="/pipeline/new"
             secondaryLabel={t("empty_warming_cta")}
           />
