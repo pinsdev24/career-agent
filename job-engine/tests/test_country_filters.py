@@ -29,7 +29,11 @@ def test_gent_belgium_is_be():
 def test_bare_gent_token_is_be_not_substring_of_argentina():
     assert parse_posting_location("Gent").country_code == "BE"
     # The whole string Argentina is a country name, not the city token "gent".
+    assert parse_posting_location("Argentina").country_code == "AR"
     assert parse_posting_location("Argentina").country_code != "BE"
+    # Unanchored "gent" would false-positive; token parse must not.
+    assert "gent" in "argentina"
+    assert parse_posting_location("Remote Argentina").country_code == "AR"
 
 
 def test_legacy_location_normalizes_to_be():
