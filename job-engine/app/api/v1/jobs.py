@@ -20,6 +20,13 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
+def _csv_list(value: str | None) -> list[str] | None:
+    if value is None:
+        return None
+    items = [p.strip() for p in value.split(",") if p.strip()]
+    return items
+
+
 def _repo(supabase: AsyncClient) -> JobRepository:
     return JobRepository(supabase)
 
@@ -75,19 +82,34 @@ async def recommend(
     redis_client: Annotated[redis.Redis, Depends(get_redis)],
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = None,
+    countries: str | None = Query(None, description="Comma-separated ISO alpha-2 codes"),
+    work_modes: str | None = Query(None),
+    contract_types: str | None = Query(None),
+    roles: str | None = Query(None),
 ) -> JobListResponse:
     settings = get_settings()
     repo = _repo(supabase)
     profile = await repo.get_profile(user["id"]) or {}
     prefs = profile.get("search_preferences") or {}
-    cache_key = f"recommend:{user['id']}:{prefs_hash(prefs)}:{limit}:{cursor or ''}"
+    cache_key = (
+        f"recommend:{user['id']}:{prefs_hash(prefs)}:{limit}:{cursor or ''}:"
+        f"{countries or ''}:{work_modes or ''}:{contract_types or ''}:{roles or ''}"
+    )
 
     cached = await _cache_get(redis_client, cache_key)
     if cached:
         RECOMMEND_CACHE_HITS.inc()
         return JobListResponse.model_validate_json(cached)
 
-    result = await Ranker(repo).recommend(user["id"], limit=limit, cursor=cursor)
+    result = await Ranker(repo).recommend(
+        user["id"],
+        limit=limit,
+        cursor=cursor,
+        override_countries=_csv_list(countries),
+        override_work_modes=_csv_list(work_modes),
+        override_contract_types=_csv_list(contract_types),
+        override_roles=_csv_list(roles),
+    )
     if not result.items:
         await _maybe_enqueue_discovery(
             redis_client,
@@ -111,6 +133,10 @@ async def search(
     q: str = Query(""),
     location: str | None = None,
     remote: bool | None = None,
+    countries: str | None = Query(None),
+    work_modes: str | None = Query(None),
+    contract_types: str | None = Query(None),
+    roles: str | None = Query(None),
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = None,
 ) -> JobListResponse:
@@ -121,6 +147,10 @@ async def search(
         remote=remote,
         limit=limit,
         cursor=cursor,
+        countries=_csv_list(countries),
+        work_modes=_csv_list(work_modes),
+        contract_types=_csv_list(contract_types),
+        roles=_csv_list(roles),
     )
 
 

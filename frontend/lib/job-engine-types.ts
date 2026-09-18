@@ -20,6 +20,8 @@ export interface JobPosting {
   company_slug?: string | null;
   title: string;
   location?: string | null;
+  country_code?: string | null;
+  city?: string | null;
   remote?: boolean | null;
   contract_type?: string | null;
   salary?: string | null;

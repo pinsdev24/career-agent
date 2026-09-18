@@ -59,11 +59,28 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export async function getRecommendedJobs(
   cursor?: string | null,
-  limit = 20
+  limit = 20,
+  filters?: JobSearchFilters
 ): Promise<JobListResponse> {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.set("cursor", cursor);
+  applyJobFilters(params, filters);
   return request<JobListResponse>(`/v1/jobs/recommend?${params}`);
+}
+
+export type JobSearchFilters = {
+  countries?: string[];
+  workModes?: string[];
+  contractTypes?: string[];
+  roles?: string[];
+};
+
+function applyJobFilters(params: URLSearchParams, filters?: JobSearchFilters) {
+  if (!filters) return;
+  if (filters.countries?.length) params.set("countries", filters.countries.join(","));
+  if (filters.workModes?.length) params.set("work_modes", filters.workModes.join(","));
+  if (filters.contractTypes?.length) params.set("contract_types", filters.contractTypes.join(","));
+  if (filters.roles?.length) params.set("roles", filters.roles.join(","));
 }
 
 export async function searchJobs(opts: {
@@ -72,6 +89,10 @@ export async function searchJobs(opts: {
   remote?: boolean;
   cursor?: string | null;
   limit?: number;
+  countries?: string[];
+  workModes?: string[];
+  contractTypes?: string[];
+  roles?: string[];
 }): Promise<JobListResponse> {
   const params = new URLSearchParams();
   if (opts.q) params.set("q", opts.q);
@@ -79,6 +100,12 @@ export async function searchJobs(opts: {
   if (opts.remote !== undefined) params.set("remote", String(opts.remote));
   if (opts.cursor) params.set("cursor", opts.cursor);
   params.set("limit", String(opts.limit ?? 20));
+  applyJobFilters(params, {
+    countries: opts.countries,
+    workModes: opts.workModes,
+    contractTypes: opts.contractTypes,
+    roles: opts.roles,
+  });
   return request<JobListResponse>(`/v1/jobs/search?${params}`);
 }
 

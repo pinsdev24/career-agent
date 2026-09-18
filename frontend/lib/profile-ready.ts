@@ -10,6 +10,10 @@ function isNonEmpty(value: unknown): boolean {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function nonEmptyList(value: unknown): boolean {
+  return Array.isArray(value) && value.some((item) => isNonEmpty(item));
+}
+
 export function hasUploadedCv(profile: Profile | null | undefined): boolean {
   if (!profile) return false;
   if (isNonEmpty(profile.cv_raw_text)) return true;
@@ -26,7 +30,12 @@ export function hasTargetJobTitle(profile: Profile | null | undefined): boolean 
 
 export function hasLocationOrRemote(profile: Profile | null | undefined): boolean {
   const prefs = profile?.search_preferences;
-  return isNonEmpty(prefs?.location) || isNonEmpty(prefs?.remote_preference);
+  return (
+    nonEmptyList(prefs?.countries) ||
+    isNonEmpty(prefs?.location) ||
+    nonEmptyList(prefs?.work_modes) ||
+    isNonEmpty(prefs?.remote_preference)
+  );
 }
 
 /** Ready when CV is uploaded, target title is set, and location OR remote is set. */
@@ -111,8 +120,19 @@ export function isRemotePreferenceOption(
 }
 
 export function remotePreferenceToFilter(
-  value: string | null | undefined
+  value: string | null | undefined,
+  workModes?: string[] | null
 ): boolean | undefined {
+  const modes = (workModes || []).map((item) => item.trim().toLowerCase());
+  if (modes.length) {
+    const unique = new Set(modes);
+    if (unique.size === 1 && unique.has("remote")) return true;
+    if (unique.size === 1 && unique.has("onsite")) return false;
+    if (unique.has("onsite") && unique.has("hybrid") && !unique.has("remote")) {
+      return false;
+    }
+    return undefined;
+  }
   const normalized = (value || "").trim().toLowerCase();
   if (normalized === "remote" || normalized === "fully remote") return true;
   if (

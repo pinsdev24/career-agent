@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.rank.countries import countries_from_text, country_query_names
 from app.rank.geo import expand_location_aliases
 
 # Public ATS hosts we already know how to sync (not Personio / new adapters).
@@ -273,9 +274,44 @@ def demand_packs_from_profile(
     skills = cv.get("skills") if isinstance(cv.get("skills"), list) else []
     skills_s = [str(s) for s in skills if s]
     location = (prefs.get("location") or "").strip() or str(cv.get("location") or "").strip()
-    return build_demand_packs(
-        title=title,
-        location=location,
-        skills=skills_s,
-        max_queries=max_queries,
-    )
+    countries = [str(c).upper() for c in (prefs.get("countries") or []) if c]
+    if not countries:
+        countries = countries_from_text(location)
+    if countries and not location:
+        location = country_query_names(countries[0])[0]
+    roles = [str(r).strip() for r in (prefs.get("preferred_roles") or []) if str(r).strip()]
+    titles = [t for t in ([title] + roles) if t]
+    seen_titles: set[str] = set()
+    unique_titles: list[str] = []
+    for item in titles:
+        key = item.lower()
+        if key in seen_titles:
+            continue
+        seen_titles.add(key)
+        unique_titles.append(item)
+    if not unique_titles:
+        unique_titles = [title] if title else []
+
+    queries: list[str] = []
+    per = max(4, max_queries // max(len(unique_titles), 1))
+    for role_title in unique_titles[:4]:
+        queries.extend(
+            build_demand_packs(
+                title=role_title,
+                location=location,
+                skills=skills_s,
+                max_queries=per,
+            )
+        )
+        if len(queries) >= max_queries:
+            break
+    # de-dupe preserving order
+    out: list[str] = []
+    seen_q: set[str] = set()
+    for q in queries:
+        key = q.lower()
+        if key in seen_q:
+            continue
+        seen_q.add(key)
+        out.append(q)
+    return out[:max_queries]

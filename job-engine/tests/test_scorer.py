@@ -141,7 +141,7 @@ def test_geo_contributes_to_rank_score():
     assert local.geo == 1.0
     assert far.geo == 0.0
     assert local.total > far.total
-    assert any("Belgium" in r for r in local.reasons)
+    assert any(r == "why_location_match" or "Belgium" in r for r in local.reasons)
 
     argentina = score_job(
         {**job, "id": "3", "location": "Argentina"},
@@ -152,4 +152,5 @@ def test_geo_contributes_to_rank_score():
         location_pref="Belgique",
     )
     assert argentina.geo == 0.0
+    assert "why_location_match" not in argentina.reasons
     assert not any("Location matches" in r for r in argentina.reasons)

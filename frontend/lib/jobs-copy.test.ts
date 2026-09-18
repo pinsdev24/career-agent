@@ -13,6 +13,16 @@ describe("selectJobsEmptyKind", () => {
     ).toBe("geo_role");
   });
 
+  it("uses filters empty when structured filters are on", () => {
+    expect(
+      selectJobsEmptyKind({
+        title: "Ingénieur IA",
+        location: "Belgium",
+        structuredFilters: true,
+      })
+    ).toBe("filters");
+  });
+
   it("uses geo when only location is set", () => {
     expect(selectJobsEmptyKind({ location: "Belgium" })).toBe("geo");
   });
@@ -74,6 +84,10 @@ describe("message keys", () => {
       title: "empty_warming",
       hint: "empty_warming_hint",
     });
+    expect(jobsEmptyMessageKeys("filters")).toEqual({
+      title: "empty_filters",
+      hint: "empty_filters_hint",
+    });
   });
 
   it("maps chip kinds to matches_for* keys", () => {
@@ -115,6 +129,15 @@ describe("Jobs EN paste-ready copy", () => {
     expect(jobs).not.toHaveProperty("empty_warming_for");
     expect(jobs).not.toHaveProperty("match_chip");
     expect(jobs.empty).toBe("No jobs in your feed yet");
+    expect(jobs.empty_filters).toBe("No roles match these filters.");
+    expect(jobs.empty_filters_hint).toBe(
+      "Try widening country, work mode, or roles — we won’t show mismatched geo just to fill the list."
+    );
+    expect(jobs.empty_filters_cta).toBe("Clear filters");
+    expect(jobs.why_location_match).toBe("Location fit");
+    expect(jobs.why_location_match_detail).toBe("Matches your countries");
+    expect(jobs.filter_countries).toBe("Country");
+    expect(jobs.filter_more).toBe("More filters");
   });
 });
 

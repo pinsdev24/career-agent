@@ -10,7 +10,9 @@ from app.logging_setup import get_logger
 from app.models.schemas import CanonicalJob, JobPostingOut, ScoreBreakdown
 from app.normalize.posting import fingerprint
 from app.quality.display import clean_job_title, display_company
-from app.rank.geo import expand_location_aliases, location_matches, location_rpc_filter
+from app.rank.countries import parse_posting_location
+from app.rank.filters import CatalogFilters, row_matches_structured
+from app.rank.geo import expand_location_aliases, location_rpc_filter
 
 logger = get_logger(__name__)
 
@@ -52,18 +54,24 @@ def apply_catalog_filters(
     filter_remote: bool | None = None,
     filter_location: str | None = None,
     filter_contract: str | None = None,
+    filter_countries: list[str] | None = None,
 ):
-    """Apply location/remote filters in SQL.
+    """Apply location/remote/country filters in SQL.
 
-    Location aliases use a single PostgREST ``or``. Remote=false is *not*
+    Country codes are the Cut 3 hard geo gate. Location aliases remain as a
+    recall hint only when no country codes are available. Remote=false is *not*
     encoded here (``or`` would collide); callers also run ``row_matches_filters``.
     """
     if filter_remote is True:
         q = q.eq("remote", True)
-    aliases = expand_location_aliases(filter_location)
-    if aliases:
-        clause = ",".join(f"location.ilike.%{alias}%" for alias in aliases)
-        q = q.or_(clause)
+    codes = [c.upper() for c in (filter_countries or []) if c and len(c) == 2]
+    if codes:
+        q = q.in_("country_code", codes)
+    else:
+        aliases = expand_location_aliases(filter_location)
+        if aliases:
+            clause = ",".join(f"location.ilike.%{alias}%" for alias in aliases)
+            q = q.or_(clause)
     if filter_contract:
         q = q.ilike("contract_type", f"%{filter_contract}%")
     return q
@@ -75,19 +83,26 @@ def row_matches_filters(
     filter_remote: bool | None = None,
     filter_location: str | None = None,
     filter_contract: str | None = None,
+    filter_countries: list[str] | None = None,
+    filter_work_modes: list[str] | None = None,
+    filter_contract_types: list[str] | None = None,
+    filter_roles: list[str] | None = None,
+    filters: CatalogFilters | None = None,
 ) -> bool:
-    """Honest post-filter so geo/remote prefs cannot be silently dropped."""
-    if filter_remote is True and row.get("remote") is not True:
-        return False
-    if filter_remote is False and row.get("remote") is True:
-        return False
-    if filter_location and not location_matches(row.get("location"), filter_location):
-        return False
-    if filter_contract:
-        contract = (row.get("contract_type") or "").lower()
-        if filter_contract.lower() not in contract:
-            return False
-    return True
+    """Honest post-filter so geo/remote/role prefs cannot be silently dropped."""
+    if filters is None:
+        from app.models.prefs import parse_contract_types, parse_work_modes
+
+        filters = CatalogFilters(
+            countries=[c.upper() for c in (filter_countries or []) if c],
+            work_modes=parse_work_modes(filter_work_modes),
+            contract_types=parse_contract_types(filter_contract_types),
+            roles=list(filter_roles or []),
+            location=filter_location,
+            remote=filter_remote,
+            contract=filter_contract,
+        )
+    return row_matches_structured(row, filters)
 
 
 class JobRepository:
@@ -180,7 +195,9 @@ class JobRepository:
                 continue
             title = (prefs.get("job_title") or "").strip()
             location = (prefs.get("location") or "").strip()
-            if title or location:
+            countries = prefs.get("countries") or []
+            roles = prefs.get("preferred_roles") or []
+            if title or location or countries or roles:
                 rows.append(row)
         return rows
 
@@ -284,6 +301,8 @@ class JobRepository:
             fp = fingerprint(job.company_slug, job.title, job.location)
             prev = existing_map.get(job.external_id)
             unchanged = bool(prev and prev.get("content_hash") == job.content_hash)
+            loc = job.location
+            parsed = parse_posting_location(loc)
             row = {
                 "source": job.source.value,
                 "external_id": job.external_id,
@@ -291,7 +310,9 @@ class JobRepository:
                 "company_slug": job.company_slug,
                 "company_name": job.company_name,
                 "title": job.title,
-                "location": job.location,
+                "location": loc,
+                "country_code": job.country_code or parsed.country_code,
+                "city": job.city or parsed.city,
                 "remote": job.remote,
                 "contract_type": job.contract_type,
                 "salary": job.salary,
@@ -541,6 +562,7 @@ class JobRepository:
         filter_remote: bool | None = None,
         filter_location: str | None = None,
         filter_contract: str | None = None,
+        filter_countries: list[str] | None = None,
     ) -> list[dict]:
         result = await self.db.rpc(
             "match_job_postings",
@@ -549,8 +571,13 @@ class JobRepository:
                 "match_count": match_count,
                 "match_threshold": 0.05,
                 "filter_remote": filter_remote,
-                "filter_location": location_rpc_filter(filter_location),
+                "filter_location": location_rpc_filter(filter_location)
+                if not filter_countries
+                else None,
                 "filter_contract": filter_contract,
+                "filter_countries": "|".join(c.upper() for c in filter_countries)
+                if filter_countries
+                else None,
             },
         ).execute()
         return result.data or []
@@ -564,6 +591,7 @@ class JobRepository:
         filter_remote: bool | None = None,
         filter_location: str | None = None,
         filter_contract: str | None = None,
+        filter_countries: list[str] | None = None,
     ) -> list[dict]:
         result = await self.db.rpc(
             "search_job_postings_hybrid",
@@ -572,8 +600,13 @@ class JobRepository:
                 "query_embedding": embedding,
                 "match_count": match_count,
                 "filter_remote": filter_remote,
-                "filter_location": location_rpc_filter(filter_location),
+                "filter_location": location_rpc_filter(filter_location)
+                if not filter_countries
+                else None,
                 "filter_contract": filter_contract,
+                "filter_countries": "|".join(c.upper() for c in filter_countries)
+                if filter_countries
+                else None,
             },
         ).execute()
         return result.data or []
@@ -586,6 +619,10 @@ class JobRepository:
         filter_remote: bool | None = None,
         filter_location: str | None = None,
         filter_contract: str | None = None,
+        filter_countries: list[str] | None = None,
+        filter_work_modes: list[str] | None = None,
+        filter_contract_types: list[str] | None = None,
+        filter_roles: list[str] | None = None,
     ) -> list[dict]:
         """Tokenized ILIKE search over title/company/location/description."""
         tokens = _query_tokens(query)
@@ -603,6 +640,7 @@ class JobRepository:
                 filter_remote=filter_remote,
                 filter_location=filter_location,
                 filter_contract=filter_contract,
+                filter_countries=filter_countries,
             )
 
         fetch_limit = max(limit, 80)
@@ -617,6 +655,10 @@ class JobRepository:
                 filter_remote=filter_remote,
                 filter_location=filter_location,
                 filter_contract=filter_contract,
+                filter_countries=filter_countries,
+                filter_work_modes=filter_work_modes,
+                filter_contract_types=filter_contract_types,
+                filter_roles=filter_roles,
             ):
                 continue
             if tokens and not _row_matches_tokens(row, tokens):
@@ -633,6 +675,10 @@ class JobRepository:
         filter_remote: bool | None = None,
         filter_location: str | None = None,
         filter_contract: str | None = None,
+        filter_countries: list[str] | None = None,
+        filter_work_modes: list[str] | None = None,
+        filter_contract_types: list[str] | None = None,
+        filter_roles: list[str] | None = None,
     ) -> list[dict]:
         q = (
             self.db.table("job_postings")
@@ -646,6 +692,7 @@ class JobRepository:
             filter_remote=filter_remote,
             filter_location=filter_location,
             filter_contract=filter_contract,
+            filter_countries=filter_countries,
         )
         result = await q.execute()
         return [
@@ -656,8 +703,40 @@ class JobRepository:
                 filter_remote=filter_remote,
                 filter_location=filter_location,
                 filter_contract=filter_contract,
+                filter_countries=filter_countries,
+                filter_work_modes=filter_work_modes,
+                filter_contract_types=filter_contract_types,
+                filter_roles=filter_roles,
             )
         ]
+
+    async def backfill_country_codes(self, *, limit: int = 500) -> int:
+        """Fill country_code/city for existing postings that still lack a code."""
+        result = await (
+            self.db.table("job_postings")
+            .select("id, location, country_code, city")
+            .is_("country_code", "null")
+            .limit(limit)
+            .execute()
+        )
+        updated = 0
+        for row in result.data or []:
+            parsed = parse_posting_location(row.get("location"))
+            if not parsed.country_code and not parsed.city:
+                continue
+            payload: dict = {"updated_at": datetime.now(timezone.utc).isoformat()}
+            if parsed.country_code:
+                payload["country_code"] = parsed.country_code
+            if parsed.city:
+                payload["city"] = parsed.city
+            await (
+                self.db.table("job_postings")
+                .update(payload)
+                .eq("id", row["id"])
+                .execute()
+            )
+            updated += 1
+        return updated
 
     async def ingest_stats(self) -> dict[str, Any]:
         runs = await (
@@ -710,6 +789,8 @@ def row_to_job_out(
         company_slug=row.get("company_slug"),
         title=title,
         location=row.get("location"),
+        country_code=row.get("country_code"),
+        city=row.get("city"),
         remote=row.get("remote"),
         contract_type=row.get("contract_type"),
         salary=row.get("salary"),
