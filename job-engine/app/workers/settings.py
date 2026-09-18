@@ -1,7 +1,7 @@
 """ARQ worker settings and scheduled jobs."""
 
 import redis.asyncio as redis
-from arq import create_pool, cron
+from arq import cron
 from arq.connections import RedisSettings
 
 from app.config import get_settings
@@ -12,11 +12,10 @@ from app.logging_setup import get_logger, setup_logging
 from app.workers.discovery import discover_via_tavily
 from app.workers.embed import embed_pending_jobs
 from app.workers.freshness import revalidate_stale_jobs
+from app.workers.queue import QUEUE_NAME, enqueue_job
 from app.workers.sync import seed_companies_from_yaml, sync_company_board
 
 logger = get_logger(__name__)
-
-QUEUE_NAME = "arq:job-engine"
 
 
 def _redis_settings() -> RedisSettings:
@@ -36,12 +35,7 @@ async def startup(ctx: dict) -> None:
 
     # Ensure catalog fills on boot — don't wait for the next cron window.
     try:
-        pool = await create_pool(
-            RedisSettings.from_dsn(settings.redis_url),
-            default_queue_name=QUEUE_NAME,
-        )
-        await pool.enqueue_job("sync_all_companies")
-        await pool.aclose()
+        await enqueue_job("sync_all_companies")
         logger.info("startup_sync_enqueued")
     except Exception as exc:
         logger.warning("startup_sync_enqueue_failed", error=str(exc))
@@ -75,15 +69,21 @@ async def job_revalidate_stale(ctx: dict) -> dict:
     return await revalidate_stale_jobs(ctx["repo"])
 
 
-async def job_discover_tavily(ctx: dict) -> dict:
-    return await discover_via_tavily(ctx["repo"])
+async def job_discover_tavily(ctx: dict, queries: list[str] | None = None) -> dict:
+    """Discover boards from profile demand packs (or an explicit query list).
+
+    Newly upserted companies are synced immediately — do not wait for the 6h cron.
+    """
+    result = await discover_via_tavily(ctx["repo"], queries=queries)
+    for company_id in result.get("company_ids") or []:
+        await enqueue_job("job_sync_company", company_id)
+    return result
 
 
 async def job_sync_company(ctx: dict, company_id: str) -> dict:
     repo: JobRepository = ctx["repo"]
-    companies = await repo.list_active_companies()
-    company = next((c for c in companies if c["id"] == company_id), None)
-    if not company:
+    company = await repo.get_company(company_id)
+    if not company or not company.get("is_active", True):
         return {"error": "company_not_found"}
     return await sync_company_board(repo, ctx["redis"], company, ctx["http"])
 

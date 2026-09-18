@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     ats_rate_limit_per_second: float = 2.0
     freshness_stale_days: int = 3
     min_extract_chars: int = 100
+    discovery_max_queries: int = 16
+    discovery_max_new_companies: int = 20
+    max_active_companies: int = 200
+    empty_board_deactivate_after: int = 2
 
     # --- Ranking weights (must sum conceptually; normalized at runtime) ---
     weight_semantic: float = 0.40

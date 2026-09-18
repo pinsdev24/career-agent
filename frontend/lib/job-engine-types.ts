@@ -6,6 +6,7 @@ export interface ScoreBreakdown {
   recency: number;
   source_trust: number;
   novelty: number;
+  geo?: number;
   total: number;
   matching_skills: string[];
   reasons: string[];

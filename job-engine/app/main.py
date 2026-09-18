@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="MACA Job Engine",
+    title="Ariadne Job Engine",
     description="Personalized job catalog and recommendations",
     version="0.1.0",
     lifespan=lifespan,

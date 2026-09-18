@@ -11,6 +11,7 @@ import {
   isRemotePreferenceOption,
   mergeSearchPreferences,
   readFirstRunSkipped,
+  remotePreferenceToFilter,
   writeFirstRunSkipped,
 } from "./profile-ready";
 
@@ -179,6 +180,20 @@ describe("isRemotePreferenceOption", () => {
     expect(isRemotePreferenceOption("hybrid")).toBe(true);
     expect(isRemotePreferenceOption("onsite")).toBe(true);
     expect(isRemotePreferenceOption("fully remote")).toBe(false);
+  });
+});
+
+describe("remotePreferenceToFilter", () => {
+  it("maps onsite to false so search does not dump remote-only catalogs", () => {
+    expect(remotePreferenceToFilter("onsite")).toBe(false);
+    expect(remotePreferenceToFilter("on-site")).toBe(false);
+  });
+
+  it("maps remote to true and hybrid to unset", () => {
+    expect(remotePreferenceToFilter("remote")).toBe(true);
+    expect(remotePreferenceToFilter("fully remote")).toBe(true);
+    expect(remotePreferenceToFilter("hybrid")).toBeUndefined();
+    expect(remotePreferenceToFilter("")).toBeUndefined();
   });
 });
 

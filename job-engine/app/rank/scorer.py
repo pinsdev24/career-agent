@@ -12,9 +12,11 @@ from typing import Any
 
 from app.config import Settings, get_settings
 from app.db.embeddings import embed_text_or_none
-from app.db.repository import JobRepository, _query_tokens, row_to_job_out
+from app.db.repository import JobRepository, _query_tokens, row_matches_filters, row_to_job_out
 from app.logging_setup import get_logger
 from app.models.schemas import JobListResponse, JobPostingOut, ScoreBreakdown
+from app.rank.geo import geo_match_score, remote_pref_to_filter
+from app.rank.query import build_recommend_query
 
 logger = get_logger(__name__)
 
@@ -162,8 +164,14 @@ class SearchIndex:
             except Exception as exc:
                 logger.warning("hybrid_rpc_failed", error=str(exc))
 
-        # 3) Absolute fallback — never return empty when catalog has jobs.
-        if not by_id:
+        # 3) Empty recall stays empty when the user asked for a region/remote
+        #    constraint. Never silently dump the unfiltered catalog (Stripe/NYC).
+        filters_on = (
+            filter_remote is not None
+            or bool((filter_location or "").strip())
+            or bool((filter_contract or "").strip())
+        )
+        if not by_id and not filters_on:
             try:
                 recent = await self.repo.list_recent_active(
                     limit=limit,
@@ -181,6 +189,13 @@ class SearchIndex:
                     }
             except Exception as exc:
                 logger.warning("recent_fallback_failed", error=str(exc))
+        elif not by_id and filters_on:
+            logger.info(
+                "recall_empty_held_filters",
+                query=query_text[:80],
+                location=filter_location,
+                remote=filter_remote,
+            )
 
         logger.info(
             "recall_done",
@@ -227,6 +242,7 @@ def score_job(
     dismissed: set[str],
     saved: set[str],
     query: str = "",
+    location_pref: str = "",
     settings: Settings | None = None,
 ) -> ScoreBreakdown:
     """Compute transparent weighted score breakdown."""
@@ -247,19 +263,22 @@ def score_job(
         novelty = 1.0
 
     query_score, query_reasons = _query_relevance(query, job) if query else (0.0, [])
+    geo_score, geo_reasons = geo_match_score(job.get("location"), location_pref)
 
     # When the user typed a query, lean hard on query relevance.
     if query.strip():
         weights = {
-            "query": 0.45,
-            "semantic": 0.20,
-            "skills": 0.15,
-            "recency": 0.10,
-            "source_trust": 0.05,
-            "novelty": 0.05,
+            "query": 0.40,
+            "geo": 0.15 if location_pref.strip() else 0.0,
+            "semantic": 0.18,
+            "skills": 0.12,
+            "recency": 0.08,
+            "source_trust": 0.04,
+            "novelty": 0.03,
         }
         parts = {
             "query": query_score,
+            "geo": geo_score,
             "semantic": max(0.0, min(float(semantic), 1.0)),
             "skills": skills_score,
             "recency": recency,
@@ -273,6 +292,7 @@ def score_job(
             "recency": settings.weight_recency,
             "source_trust": settings.weight_source_trust,
             "novelty": settings.weight_novelty,
+            "geo": 0.20 if location_pref.strip() else 0.0,
         }
         parts = {
             "semantic": max(0.0, min(float(semantic), 1.0)),
@@ -280,12 +300,13 @@ def score_job(
             "recency": recency,
             "source_trust": trust,
             "novelty": novelty,
+            "geo": geo_score,
         }
 
     total_w = sum(weights.values()) or 1.0
-    total = sum(parts[k] * (weights[k] / total_w) for k in parts)
+    total = sum(parts[k] * (weights[k] / total_w) for k in parts if k in weights)
 
-    reasons = list(query_reasons)
+    reasons = list(query_reasons) + list(geo_reasons)
     if matching:
         reasons.append(f"Skills match: {', '.join(matching[:5])}")
     if parts.get("semantic", 0) >= 0.55:
@@ -301,6 +322,7 @@ def score_job(
         recency=round(parts["recency"], 4),
         source_trust=round(parts["source_trust"], 4),
         novelty=round(parts["novelty"], 4),
+        geo=round(parts.get("geo", 0.0), 4),
         total=round(total * 100, 2),
         matching_skills=matching,
         reasons=reasons,
@@ -344,6 +366,10 @@ class Ranker:
         query: str,
         limit: int,
         cursor: str | None,
+        location_pref: str = "",
+        filter_remote: bool | None = None,
+        filter_location: str | None = None,
+        filter_contract: str | None = None,
     ) -> JobListResponse:
         job_ids = [str(r["job_id"]) for r in recalled if "_row" not in r]
         rows_by_id: dict[str, dict] = {}
@@ -362,6 +388,13 @@ class Ranker:
         for job_id, row in rows_by_id.items():
             if row.get("status") != "active" or job_id in dismissed:
                 continue
+            if not row_matches_filters(
+                row,
+                filter_remote=filter_remote,
+                filter_location=filter_location,
+                filter_contract=filter_contract,
+            ):
+                continue
             breakdown = score_job(
                 row,
                 semantic=semantic_by_id.get(job_id, 0.0),
@@ -369,6 +402,7 @@ class Ranker:
                 dismissed=dismissed,
                 saved=saved,
                 query=query,
+                location_pref=location_pref,
                 settings=self.settings,
             )
             scored.append(
@@ -402,8 +436,7 @@ class Ranker:
         cv_structured = profile.get("cv_structured") or {}
         cv_skills = list(cv_structured.get("skills") or [])
 
-        # Use job title for lexical matching — not the full skills dump.
-        query_text = (prefs.get("job_title") or "").strip() or "software engineer"
+        query_text = build_recommend_query(prefs, cv_structured)
 
         embedding = await self.repo.get_cv_embedding(user_id)
         if embedding is None:
@@ -417,84 +450,18 @@ class Ranker:
                 ).strip()
             )
 
-        filter_remote = None
-        remote_pref = (prefs.get("remote_preference") or "").lower()
-        if remote_pref in ("remote", "fully remote"):
-            filter_remote = True
+        filter_location = (prefs.get("location") or "").strip() or None
+        filter_remote = remote_pref_to_filter(prefs.get("remote_preference"))
+        filter_contract = (prefs.get("contract_type") or "").strip() or None
 
-        # Soft filters: try with prefs, then relax if empty.
         recalled = await self.index.recall(
             query_text=query_text,
             embedding=embedding,
             filter_remote=filter_remote,
-            filter_location=prefs.get("location"),
-            filter_contract=prefs.get("contract_type"),
+            filter_location=filter_location,
+            filter_contract=filter_contract,
             limit=80,
         )
-        if not recalled:
-            recalled = await self.index.recall(
-                query_text=query_text,
-                embedding=embedding,
-                filter_remote=None,
-                filter_location=None,
-                filter_contract=None,
-                limit=80,
-            )
-
-        signals = await self.repo.get_user_signals(user_id)
-        dismissed = {s["job_id"] for s in signals if s["signal"] == "dismiss"}
-        saved = {s["job_id"] for s in signals if s["signal"] == "save"}
-
-        return await self._finalize(
-            recalled,
-            cv_skills=cv_skills,
-            dismissed=dismissed,
-            saved=saved,
-            query=prefs.get("job_title") or "",
-            limit=limit,
-            cursor=cursor,
-        )
-
-    async def search(
-        self,
-        user_id: str,
-        *,
-        q: str = "",
-        location: str | None = None,
-        remote: bool | None = None,
-        limit: int = 20,
-        cursor: str | None = None,
-    ) -> JobListResponse:
-        profile = await self.repo.get_profile(user_id) or {}
-        cv_structured = profile.get("cv_structured") or {}
-        cv_skills = list(cv_structured.get("skills") or [])
-        query_text = (q or "").strip()
-
-        embedding = None
-        if query_text:
-            embedding = await embed_text_or_none(query_text)
-        if embedding is None:
-            embedding = await self.repo.get_cv_embedding(user_id)
-
-        recalled = await self.index.recall(
-            query_text=query_text,
-            embedding=embedding,
-            filter_remote=remote,
-            filter_location=location,
-            filter_contract=None,
-            limit=100,
-        )
-
-        # If hard filters wiped the set, relax them.
-        if not recalled and (remote is not None or location):
-            recalled = await self.index.recall(
-                query_text=query_text,
-                embedding=embedding,
-                filter_remote=None,
-                filter_location=None,
-                filter_contract=None,
-                limit=100,
-            )
 
         signals = await self.repo.get_user_signals(user_id)
         dismissed = {s["job_id"] for s in signals if s["signal"] == "dismiss"}
@@ -508,4 +475,62 @@ class Ranker:
             query=query_text,
             limit=limit,
             cursor=cursor,
+            location_pref=filter_location or "",
+            filter_remote=filter_remote,
+            filter_location=filter_location,
+            filter_contract=filter_contract,
+        )
+
+    async def search(
+        self,
+        user_id: str,
+        *,
+        q: str = "",
+        location: str | None = None,
+        remote: bool | None = None,
+        limit: int = 20,
+        cursor: str | None = None,
+    ) -> JobListResponse:
+        profile = await self.repo.get_profile(user_id) or {}
+        prefs = profile.get("search_preferences") or {}
+        cv_structured = profile.get("cv_structured") or {}
+        cv_skills = list(cv_structured.get("skills") or [])
+        query_text = (q or "").strip()
+
+        filter_location = (location or "").strip() or (prefs.get("location") or "").strip() or None
+        if remote is None:
+            filter_remote = remote_pref_to_filter(prefs.get("remote_preference"))
+        else:
+            filter_remote = remote
+
+        embedding = None
+        if query_text:
+            embedding = await embed_text_or_none(query_text)
+        if embedding is None:
+            embedding = await self.repo.get_cv_embedding(user_id)
+
+        recalled = await self.index.recall(
+            query_text=query_text,
+            embedding=embedding,
+            filter_remote=filter_remote,
+            filter_location=filter_location,
+            filter_contract=None,
+            limit=100,
+        )
+
+        signals = await self.repo.get_user_signals(user_id)
+        dismissed = {s["job_id"] for s in signals if s["signal"] == "dismiss"}
+        saved = {s["job_id"] for s in signals if s["signal"] == "save"}
+
+        return await self._finalize(
+            recalled,
+            cv_skills=cv_skills,
+            dismissed=dismissed,
+            saved=saved,
+            query=query_text,
+            limit=limit,
+            cursor=cursor,
+            location_pref=filter_location or "",
+            filter_remote=filter_remote,
+            filter_location=filter_location,
         )

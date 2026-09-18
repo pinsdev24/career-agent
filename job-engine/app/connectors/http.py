@@ -12,7 +12,7 @@ def build_http_client() -> httpx.AsyncClient:
     timeout = httpx.Timeout(settings.http_timeout_seconds)
     return httpx.AsyncClient(
         timeout=timeout,
-        headers={"User-Agent": "MACA-JobEngine/0.1 (+https://github.com/maca)"},
+        headers={"User-Agent": "Ariadne-JobEngine/0.1 (+https://github.com/pinsdev24/career-agent)"},
         follow_redirects=True,
     )
 

@@ -1,11 +1,11 @@
 # Job Engine
 
-Catalog + ranking microservice for MACA. This is **not** the apply path.
+Catalog + ranking microservice for **Ariadne**. This is **not** the apply path — Ariadne never auto-applies.
 
-CareerAgent owns application packets (cover letter + gap report + inbox).
+Ariadne owns application packets (cover letter + gap report + inbox).
 Job Engine owns company board sync, freshness, embeddings, and the ranked feed.
 
-The previous cut was incomplete: no packet loop, no durable applications table, and the frontend only linked out to `/pipeline/new`. This service is the catalog half of the Job OS.
+Discovery is **profile-driven** (target title + location + ATS hosts). `companies.seed.yaml` is a fixture to boot a catalog, not the product strategy.
 
 ## Stack
 
@@ -23,7 +23,7 @@ docker compose up --build
 
 - API: http://localhost:8001/docs
 - Worker: ARQ cron syncs seeded companies from `companies.seed.yaml`
-- Apply migrations: `004_job_engine_catalog.sql` and `005_job_os_applications.sql`
+- Apply migrations: `004_job_engine_catalog.sql`, `005_job_os_applications.sql`, and `006_job_engine_geo_filters.sql`
 
 ```bash
 # local without docker (Redis required)
