@@ -46,6 +46,16 @@ NYC = {
     "description_text": "Build payments in NYC",
 }
 
+AR_REMOTE = {
+    "id": "ar-1",
+    "title": "AI Engineer",
+    "company_name": "Domino",
+    "location": "Remote Argentina",
+    "remote": True,
+    "status": "active",
+    "description_text": "Remote.com Argentina hub",
+}
+
 BRU = {
     "id": "bru-1",
     "title": "Software Engineer",
@@ -85,3 +95,17 @@ async def test_belgium_aliases_can_recall_brussels():
     ids = {r["job_id"] for r in recalled}
     assert "bru-1" in ids
     assert "nyc-1" not in ids
+
+
+async def test_belgium_pref_does_not_recall_argentina_via_gent_substring():
+    repo = _FakeRepo([AR_REMOTE, BRU])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Ingénieur IA",
+        embedding=None,
+        filter_remote=None,
+        filter_location="Belgique",
+        filter_contract=None,
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "bru-1" in ids
+    assert "ar-1" not in ids
