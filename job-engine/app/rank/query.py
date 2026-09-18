@@ -60,6 +60,11 @@ def build_recommend_query(
     prefs = prefs or {}
     cv = cv_structured or {}
     title = _clean(prefs.get("job_title")) or _cv_title(cv)
+    roles = prefs.get("preferred_roles") or []
+    if isinstance(roles, list):
+        role_text = " ".join(_clean(r) for r in roles[:4] if r)
+    else:
+        role_text = ""
     skills = _cv_skills(cv)
-    parts = [p for p in (title, " ".join(skills)) if p]
+    parts = [p for p in (title, role_text, " ".join(skills)) if p]
     return " ".join(parts).strip()

@@ -76,7 +76,19 @@ function MetaBits({
   );
 }
 
+function whyLabel(
+  reason: string,
+  tJobs: (key: "why_location_match" | "why_location_match_detail") => string,
+  detail = false
+): string {
+  if (reason === "why_location_match" || reason.startsWith("Location matches")) {
+    return detail ? tJobs("why_location_match_detail") : tJobs("why_location_match");
+  }
+  return reason;
+}
+
 function WhyChips({ reasons }: { reasons: string[] }) {
+  const tJobs = useTranslations("Jobs");
   return (
     <div className="flex flex-wrap gap-1.5">
       {reasons.map((reason) => (
@@ -84,7 +96,7 @@ function WhyChips({ reasons }: { reasons: string[] }) {
           key={reason}
           className="rounded-md bg-[#F5F5F5] px-1.5 py-0.5 text-[11px] text-[#666] dark:bg-[#222] dark:text-[#aaa]"
         >
-          {reason}
+          {whyLabel(reason, tJobs)}
         </span>
       ))}
     </div>
@@ -325,7 +337,7 @@ export function JobCard({
           {display.why.length ? (
             <ul className="list-disc space-y-1 pl-4 text-[12px] leading-snug text-[#555] dark:text-[#bbb]">
               {display.why.map((reason) => (
-                <li key={reason}>{reason}</li>
+                <li key={reason}>{whyLabel(reason, tJobs, true)}</li>
               ))}
             </ul>
           ) : (

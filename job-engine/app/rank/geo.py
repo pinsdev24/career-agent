@@ -424,13 +424,33 @@ def location_matches(job_location: str | None, pref: str | None) -> bool:
     return False
 
 
-def geo_match_score(job_location: str | None, pref: str | None) -> tuple[float, list[str]]:
-    """0..1 geo contribution plus a short reason."""
+WHY_LOCATION_MATCH = "why_location_match"
+
+
+def geo_match_score(
+    job_location: str | None,
+    pref: str | None,
+    *,
+    job_country: str | None = None,
+    pref_countries: list[str] | None = None,
+    city_boost: bool = False,
+) -> tuple[float, list[str]]:
+    """0..1 geo contribution plus a short reason.
+
+    When structured pref countries are set, the chip is only emitted if the
+    posting country_code is in that list — never "Location matches X (WrongCountry)".
+    """
+    codes = [c.upper() for c in (pref_countries or []) if c]
+    if codes:
+        if job_country and job_country.upper() in codes:
+            score = 1.0 if not city_boost else 1.0
+            return score, [WHY_LOCATION_MATCH]
+        return 0.0, []
     if not (pref or "").strip():
         return 0.0, []
     if location_matches(job_location, pref):
-        label = (job_location or "").strip() or pref.strip()
-        return 1.0, [f'Location matches "{pref.strip()}" ({label})']
+        # Legacy free-text path. Structured countries should be used instead.
+        return 1.0, [WHY_LOCATION_MATCH]
     return 0.0, []
 
 

@@ -12,10 +12,17 @@ from typing import Any
 
 from app.config import Settings, get_settings
 from app.db.embeddings import embed_text_or_none
-from app.db.repository import JobRepository, _query_tokens, row_matches_filters, row_to_job_out
+from app.db.repository import JobRepository, _query_tokens, row_to_job_out
 from app.logging_setup import get_logger
 from app.models.schemas import JobListResponse, JobPostingOut, ScoreBreakdown
-from app.rank.geo import geo_match_score, remote_pref_to_filter
+from app.rank.countries import posting_country_code
+from app.rank.filters import (
+    CatalogFilters,
+    filters_from_prefs,
+    preferred_role_score,
+    row_matches_structured,
+)
+from app.rank.geo import geo_match_score
 from app.rank.query import build_recommend_query
 
 logger = get_logger(__name__)
@@ -85,8 +92,19 @@ class SearchIndex:
         filter_location: str | None,
         filter_contract: str | None,
         limit: int = 80,
+        filter_countries: list[str] | None = None,
+        filter_work_modes: list[str] | None = None,
+        filter_contract_types: list[str] | None = None,
+        filter_roles: list[str] | None = None,
+        catalog_filters: CatalogFilters | None = None,
     ) -> list[dict[str, Any]]:
         by_id: dict[str, dict[str, Any]] = {}
+        extra = {
+            "filter_countries": filter_countries,
+            "filter_work_modes": filter_work_modes,
+            "filter_contract_types": filter_contract_types,
+            "filter_roles": filter_roles,
+        }
 
         # 1) Lexical / recent — always runs so search works without embeddings.
         try:
@@ -97,6 +115,7 @@ class SearchIndex:
                     filter_remote=filter_remote,
                     filter_location=filter_location,
                     filter_contract=filter_contract,
+                    **extra,
                 )
             else:
                 lexical_rows = await self.repo.list_recent_active(
@@ -104,6 +123,7 @@ class SearchIndex:
                     filter_remote=filter_remote,
                     filter_location=filter_location,
                     filter_contract=filter_contract,
+                    **extra,
                 )
             for row in lexical_rows:
                 by_id[row["id"]] = {
@@ -126,6 +146,7 @@ class SearchIndex:
                     filter_remote=filter_remote,
                     filter_location=filter_location,
                     filter_contract=filter_contract,
+                    filter_countries=filter_countries,
                 )
                 if not hybrid:
                     hybrid = [
@@ -141,6 +162,7 @@ class SearchIndex:
                             filter_remote=filter_remote,
                             filter_location=filter_location,
                             filter_contract=filter_contract,
+                            filter_countries=filter_countries,
                         )
                     ]
                 for r in hybrid:
@@ -170,6 +192,11 @@ class SearchIndex:
             filter_remote is not None
             or bool((filter_location or "").strip())
             or bool((filter_contract or "").strip())
+            or bool(filter_countries)
+            or bool(filter_work_modes)
+            or bool(filter_contract_types)
+            or bool(filter_roles)
+            or (catalog_filters.hard_filters_on() if catalog_filters else False)
         )
         if not by_id and not filters_on:
             try:
@@ -195,6 +222,7 @@ class SearchIndex:
                 query=query_text[:80],
                 location=filter_location,
                 remote=filter_remote,
+                countries=filter_countries,
             )
 
         logger.info(
@@ -243,6 +271,9 @@ def score_job(
     saved: set[str],
     query: str = "",
     location_pref: str = "",
+    pref_countries: list[str] | None = None,
+    pref_cities: list[str] | None = None,
+    preferred_roles: list[str] | None = None,
     settings: Settings | None = None,
 ) -> ScoreBreakdown:
     """Compute transparent weighted score breakdown."""
@@ -263,15 +294,31 @@ def score_job(
         novelty = 1.0
 
     query_score, query_reasons = _query_relevance(query, job) if query else (0.0, [])
-    geo_score, geo_reasons = geo_match_score(job.get("location"), location_pref)
+    job_country = posting_country_code(job)
+    city_hit = False
+    if pref_cities:
+        blob = f"{job.get('city') or ''} {job.get('location') or ''}".lower()
+        city_hit = any(c.strip().lower() in blob for c in pref_cities if c)
+    geo_score, geo_reasons = geo_match_score(
+        job.get("location"),
+        location_pref,
+        job_country=job_country,
+        pref_countries=pref_countries,
+        city_boost=city_hit,
+    )
+    if city_hit and geo_score > 0:
+        geo_score = 1.0
+    role_score = preferred_role_score(job.get("title"), preferred_roles)
+    geo_on = bool(location_pref.strip() or pref_countries)
 
     # When the user typed a query, lean hard on query relevance.
     if query.strip():
         weights = {
             "query": 0.40,
-            "geo": 0.15 if location_pref.strip() else 0.0,
-            "semantic": 0.18,
-            "skills": 0.12,
+            "geo": 0.15 if geo_on else 0.0,
+            "role": 0.12 if preferred_roles else 0.0,
+            "semantic": 0.16,
+            "skills": 0.10,
             "recency": 0.08,
             "source_trust": 0.04,
             "novelty": 0.03,
@@ -279,6 +326,7 @@ def score_job(
         parts = {
             "query": query_score,
             "geo": geo_score,
+            "role": role_score,
             "semantic": max(0.0, min(float(semantic), 1.0)),
             "skills": skills_score,
             "recency": recency,
@@ -292,7 +340,8 @@ def score_job(
             "recency": settings.weight_recency,
             "source_trust": settings.weight_source_trust,
             "novelty": settings.weight_novelty,
-            "geo": 0.20 if location_pref.strip() else 0.0,
+            "geo": 0.20 if geo_on else 0.0,
+            "role": 0.18 if preferred_roles else 0.0,
         }
         parts = {
             "semantic": max(0.0, min(float(semantic), 1.0)),
@@ -301,6 +350,7 @@ def score_job(
             "source_trust": trust,
             "novelty": novelty,
             "geo": geo_score,
+            "role": role_score,
         }
 
     total_w = sum(weights.values()) or 1.0
@@ -370,6 +420,7 @@ class Ranker:
         filter_remote: bool | None = None,
         filter_location: str | None = None,
         filter_contract: str | None = None,
+        catalog_filters: CatalogFilters | None = None,
     ) -> JobListResponse:
         job_ids = [str(r["job_id"]) for r in recalled if "_row" not in r]
         rows_by_id: dict[str, dict] = {}
@@ -383,17 +434,17 @@ class Ranker:
             str(r["job_id"]): float(r.get("semantic_score") or r.get("hybrid_score") or 0)
             for r in recalled
         }
+        filters = catalog_filters or CatalogFilters(
+            location=filter_location,
+            remote=filter_remote,
+            contract=filter_contract,
+        )
 
         scored: list[tuple[float, JobPostingOut]] = []
         for job_id, row in rows_by_id.items():
             if row.get("status") != "active" or job_id in dismissed:
                 continue
-            if not row_matches_filters(
-                row,
-                filter_remote=filter_remote,
-                filter_location=filter_location,
-                filter_contract=filter_contract,
-            ):
+            if not row_matches_structured(row, filters):
                 continue
             breakdown = score_job(
                 row,
@@ -402,7 +453,10 @@ class Ranker:
                 dismissed=dismissed,
                 saved=saved,
                 query=query,
-                location_pref=location_pref,
+                location_pref=location_pref or (filters.location or ""),
+                pref_countries=filters.countries,
+                pref_cities=filters.cities,
+                preferred_roles=filters.roles,
                 settings=self.settings,
             )
             scored.append(
@@ -430,12 +484,23 @@ class Ranker:
         *,
         limit: int = 20,
         cursor: str | None = None,
+        override_countries: list[str] | None = None,
+        override_work_modes: list[str] | None = None,
+        override_contract_types: list[str] | None = None,
+        override_roles: list[str] | None = None,
     ) -> JobListResponse:
         profile = await self.repo.get_profile(user_id) or {}
         prefs = profile.get("search_preferences") or {}
         cv_structured = profile.get("cv_structured") or {}
         cv_skills = list(cv_structured.get("skills") or [])
 
+        filters = filters_from_prefs(
+            prefs,
+            override_countries=override_countries,
+            override_work_modes=override_work_modes,
+            override_contract_types=override_contract_types,
+            override_roles=override_roles,
+        )
         query_text = build_recommend_query(prefs, cv_structured)
 
         embedding = await self.repo.get_cv_embedding(user_id)
@@ -450,16 +515,17 @@ class Ranker:
                 ).strip()
             )
 
-        filter_location = (prefs.get("location") or "").strip() or None
-        filter_remote = remote_pref_to_filter(prefs.get("remote_preference"))
-        filter_contract = (prefs.get("contract_type") or "").strip() or None
-
         recalled = await self.index.recall(
             query_text=query_text,
             embedding=embedding,
-            filter_remote=filter_remote,
-            filter_location=filter_location,
-            filter_contract=filter_contract,
+            filter_remote=filters.remote,
+            filter_location=filters.location,
+            filter_contract=filters.contract,
+            filter_countries=filters.countries or None,
+            filter_work_modes=[m.value for m in filters.work_modes] or None,
+            filter_contract_types=[c.value for c in filters.contract_types] or None,
+            filter_roles=filters.roles or None,
+            catalog_filters=filters,
             limit=80,
         )
 
@@ -475,10 +541,11 @@ class Ranker:
             query=query_text,
             limit=limit,
             cursor=cursor,
-            location_pref=filter_location or "",
-            filter_remote=filter_remote,
-            filter_location=filter_location,
-            filter_contract=filter_contract,
+            location_pref=filters.location or "",
+            filter_remote=filters.remote,
+            filter_location=filters.location,
+            filter_contract=filters.contract,
+            catalog_filters=filters,
         )
 
     async def search(
@@ -490,6 +557,10 @@ class Ranker:
         remote: bool | None = None,
         limit: int = 20,
         cursor: str | None = None,
+        countries: list[str] | None = None,
+        work_modes: list[str] | None = None,
+        contract_types: list[str] | None = None,
+        roles: list[str] | None = None,
     ) -> JobListResponse:
         profile = await self.repo.get_profile(user_id) or {}
         prefs = profile.get("search_preferences") or {}
@@ -497,11 +568,15 @@ class Ranker:
         cv_skills = list(cv_structured.get("skills") or [])
         query_text = (q or "").strip()
 
-        filter_location = (location or "").strip() or (prefs.get("location") or "").strip() or None
-        if remote is None:
-            filter_remote = remote_pref_to_filter(prefs.get("remote_preference"))
-        else:
-            filter_remote = remote
+        filters = filters_from_prefs(
+            prefs,
+            override_countries=countries,
+            override_work_modes=work_modes,
+            override_contract_types=contract_types,
+            override_roles=roles,
+            override_location=location,
+            override_remote=remote,
+        )
 
         embedding = None
         if query_text:
@@ -512,9 +587,14 @@ class Ranker:
         recalled = await self.index.recall(
             query_text=query_text,
             embedding=embedding,
-            filter_remote=filter_remote,
-            filter_location=filter_location,
-            filter_contract=None,
+            filter_remote=filters.remote,
+            filter_location=filters.location,
+            filter_contract=filters.contract,
+            filter_countries=filters.countries or None,
+            filter_work_modes=[m.value for m in filters.work_modes] or None,
+            filter_contract_types=[c.value for c in filters.contract_types] or None,
+            filter_roles=filters.roles or None,
+            catalog_filters=filters,
             limit=100,
         )
 
@@ -530,7 +610,8 @@ class Ranker:
             query=query_text,
             limit=limit,
             cursor=cursor,
-            location_pref=filter_location or "",
-            filter_remote=filter_remote,
-            filter_location=filter_location,
+            location_pref=filters.location or "",
+            filter_remote=filters.remote,
+            filter_location=filters.location,
+            catalog_filters=filters,
         )

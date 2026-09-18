@@ -60,6 +60,17 @@ describe("isProfileReady", () => {
     expect(isProfileReady(ready)).toBe(true);
   });
 
+  it("is ready with structured countries instead of free-text location", () => {
+    expect(
+      isProfileReady(
+        profile({
+          cv_raw_text: "CV",
+          search_preferences: { job_title: "Engineer", countries: ["BE"] },
+        })
+      )
+    ).toBe(true);
+  });
+
   it("is ready with remote preference instead of location", () => {
     expect(
       isProfileReady(
@@ -121,6 +132,14 @@ describe("getFirstIncompleteSetupStep", () => {
         })
       )
     ).toBe(3);
+    expect(
+      getFirstIncompleteSetupStep(
+        profile({
+          cv_raw_text: "CV",
+          search_preferences: { job_title: "Engineer", countries: ["BE"] },
+        })
+      )
+    ).toBe(null);
     expect(
       getFirstIncompleteSetupStep(
         profile({

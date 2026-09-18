@@ -93,6 +93,15 @@ def test_geo_score_contributes_for_alias_hit():
     assert reasons
     miss, _ = geo_match_score("New York, NY", "Belgium")
     assert miss == 0.0
+    # Structured country gate: never claim Belgique matches Argentina.
+    gated, gated_reasons = geo_match_score(
+        "Argentina",
+        "Belgique",
+        job_country="AR",
+        pref_countries=["BE"],
+    )
+    assert gated == 0.0
+    assert gated_reasons == []
 
 
 def test_geo_chip_does_not_claim_belgique_match_for_argentina():

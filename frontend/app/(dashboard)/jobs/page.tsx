@@ -28,9 +28,13 @@ import {
   selectJobsChipKind,
   selectJobsEmptyKind,
 } from "@/lib/jobs-copy";
+import { JobsFilterBar, type JobsBarFilters } from "@/components/jobs-filter-bar";
+import { countryLabel } from "@/lib/geo-catalog";
+import { useLocale } from "next-intl";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");
+  const locale = useLocale();
   const router = useRouter();
   const { ready, loading: setupLoading, openWizard, profile } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
@@ -47,23 +51,51 @@ export default function JobsPage() {
     kind: "ok" | "error";
     text: string;
   } | null>(null);
+  const [bar, setBar] = useState<JobsBarFilters>({
+    countries: [],
+    workModes: [],
+    contractTypes: [],
+    roles: [],
+  });
+  const [applied, setApplied] = useState<JobsBarFilters>({
+    countries: [],
+    workModes: [],
+    contractTypes: [],
+    roles: [],
+  });
+  const [prefsSeeded, setPrefsSeeded] = useState(false);
 
   const targetTitle = profile?.search_preferences?.job_title?.trim() || "";
-  const prefLocation = profile?.search_preferences?.location?.trim() || "";
-  const prefRemote = remotePreferenceToFilter(
-    profile?.search_preferences?.remote_preference
+  const prefCountries = (profile?.search_preferences?.countries || []).map((c) =>
+    c.toUpperCase()
   );
+  const prefLocation =
+    profile?.search_preferences?.location?.trim() ||
+    prefCountries.map((code) => countryLabel(code, locale)).join(" · ");
+  const prefRemote = remotePreferenceToFilter(
+    profile?.search_preferences?.remote_preference,
+    profile?.search_preferences?.work_modes
+  );
+  const structuredOn =
+    applied.countries.length > 0 ||
+    applied.workModes.length > 0 ||
+    applied.contractTypes.length > 0 ||
+    applied.roles.length > 0 ||
+    prefCountries.length > 0 ||
+    Boolean(profile?.search_preferences?.work_modes?.length) ||
+    Boolean(profile?.search_preferences?.preferred_roles?.length);
   const copyCtx = {
     title: targetTitle,
     location: prefLocation,
     remote: prefRemote === true,
+    structuredFilters: structuredOn,
   };
   const chipKind = selectJobsChipKind(copyCtx);
   const emptyKind = selectJobsEmptyKind(copyCtx);
   const emptyKeys = jobsEmptyMessageKeys(emptyKind);
 
   const loadFeed = useCallback(
-    async (reset = true) => {
+    async (reset = true, filters = applied) => {
       if (reset) {
         setLoading(true);
         setError(null);
@@ -71,6 +103,12 @@ export default function JobsPage() {
         setLoadingMore(true);
       }
       try {
+        const filterPayload = {
+          countries: filters.countries,
+          workModes: filters.workModes,
+          contractTypes: filters.contractTypes,
+          roles: filters.roles,
+        };
         const res =
           mode === "search" && query.trim()
             ? await searchJobs({
@@ -78,8 +116,9 @@ export default function JobsPage() {
                 location: prefLocation || undefined,
                 remote: prefRemote,
                 cursor: reset ? null : cursor,
+                ...filterPayload,
               })
-            : await getRecommendedJobs(reset ? null : cursor);
+            : await getRecommendedJobs(reset ? null : cursor, 20, filterPayload);
         setItems((prev) => (reset ? res.items : [...prev, ...res.items]));
         setCursor(res.next_cursor ?? null);
         if (reset && res.items[0]) setSelected(res.items[0]);
@@ -92,13 +131,29 @@ export default function JobsPage() {
         setLoadingMore(false);
       }
     },
-    [cursor, mode, prefLocation, prefRemote, query, t]
+    [applied, cursor, mode, prefLocation, prefRemote, query, t]
   );
 
   useEffect(() => {
     void loadFeed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (prefsSeeded || !profile?.search_preferences) return;
+    const prefs = profile.search_preferences;
+    const next: JobsBarFilters = {
+      countries: (prefs.countries || []).map((c) => c.toUpperCase()),
+      workModes: prefs.work_modes || [],
+      contractTypes: prefs.contract_types || [],
+      roles: prefs.preferred_roles || [],
+    };
+    setBar(next);
+    setApplied(next);
+    setPrefsSeeded(true);
+    void loadFeed(true, next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefsSeeded, profile]);
 
   useEffect(() => {
     if (!ready || loading) return;
@@ -120,8 +175,17 @@ export default function JobsPage() {
             q: query.trim(),
             location: prefLocation || undefined,
             remote: prefRemote,
+            countries: applied.countries,
+            workModes: applied.workModes,
+            contractTypes: applied.contractTypes,
+            roles: applied.roles,
           })
-        : await getRecommendedJobs();
+        : await getRecommendedJobs(null, 20, {
+            countries: applied.countries,
+            workModes: applied.workModes,
+            contractTypes: applied.contractTypes,
+            roles: applied.roles,
+          });
       setItems(res.items);
       setCursor(res.next_cursor ?? null);
       setSelected(res.items[0] ?? null);
@@ -213,6 +277,27 @@ export default function JobsPage() {
         </Button>
       </form>
 
+      <JobsFilterBar
+        value={bar}
+        onChange={setBar}
+        onApply={() => {
+          setApplied(bar);
+          void loadFeed(true, bar);
+        }}
+        onClear={() => {
+          const prefs = profile?.search_preferences;
+          const next: JobsBarFilters = {
+            countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
+            workModes: prefs?.work_modes || [],
+            contractTypes: prefs?.contract_types || [],
+            roles: prefs?.preferred_roles || [],
+          };
+          setBar(next);
+          setApplied(next);
+          void loadFeed(true, next);
+        }}
+      />
+
       {ready && chipKind && items.length > 0 && !loading && (
         <p className="text-[12px] text-[#888]">
           {t(jobsChipMessageKey(chipKind), {
@@ -263,6 +348,23 @@ export default function JobsPage() {
               title: targetTitle,
               location: prefLocation,
             })}
+            actionLabel={emptyKind === "filters" ? t("empty_filters_cta") : undefined}
+            onAction={
+              emptyKind === "filters"
+                ? () => {
+                    const prefs = profile?.search_preferences;
+                    const next: JobsBarFilters = {
+                      countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
+                      workModes: prefs?.work_modes || [],
+                      contractTypes: prefs?.contract_types || [],
+                      roles: prefs?.preferred_roles || [],
+                    };
+                    setBar(next);
+                    setApplied(next);
+                    void loadFeed(true, next);
+                  }
+                : undefined
+            }
             secondaryHref="/pipeline/new"
             secondaryLabel={t("empty_warming_cta")}
           />

@@ -32,6 +32,10 @@ class _FakeRepo:
                 filter_remote=filters.get("filter_remote"),
                 filter_location=filters.get("filter_location"),
                 filter_contract=filters.get("filter_contract"),
+                filter_countries=filters.get("filter_countries"),
+                filter_work_modes=filters.get("filter_work_modes"),
+                filter_contract_types=filters.get("filter_contract_types"),
+                filter_roles=filters.get("filter_roles"),
             )
         ]
 
@@ -81,6 +85,35 @@ async def test_belgium_onsite_does_not_dump_nyc_majority():
     assert repo.calls
     assert all(c.get("filter_location") == "Belgium" for c in repo.calls)
     assert all(c.get("op") != "recent" or c.get("filter_location") == "Belgium" for c in repo.calls)
+
+
+AR = {
+    "id": "ar-1",
+    "title": "Software Engineer",
+    "company_name": "RemoteCo",
+    "location": "Argentina",
+    "country_code": "AR",
+    "remote": True,
+    "status": "active",
+    "description_text": "Remote Argentina hub",
+}
+
+
+async def test_be_country_code_does_not_dump_argentina():
+    repo = _FakeRepo([AR, BRU, NYC])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Ingénieur IA",
+        embedding=None,
+        filter_remote=None,
+        filter_location=None,
+        filter_contract=None,
+        filter_countries=["BE"],
+        limit=80,
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "bru-1" in ids
+    assert "ar-1" not in ids
+    assert "nyc-1" not in ids
 
 
 async def test_belgium_aliases_can_recall_brussels():

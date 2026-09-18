@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Briefcase,
   CheckCircle2,
@@ -23,6 +23,13 @@ import {
   type FirstRunStep,
   type RemotePreferenceOption,
 } from "@/lib/profile-ready";
+import { MultiSelect } from "@/components/multi-select";
+import {
+  COUNTRIES,
+  citiesForCountries,
+  countryLabel,
+  searchCities,
+} from "@/lib/geo-catalog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -56,10 +63,12 @@ export function FirstRunWizard({
   onFinished: () => void;
 }) {
   const t = useTranslations("FirstRun");
+  const locale = useLocale();
   const router = useRouter();
   const [step, setStep] = useState<FirstRunStep | "done">(1);
   const [jobTitle, setJobTitle] = useState("");
-  const [location, setLocation] = useState("");
+  const [countries, setCountries] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
   const [remote, setRemote] = useState<string>("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -68,8 +77,11 @@ export function FirstRunWizard({
 
   const syncFromProfile = useCallback((next: Profile | null) => {
     setJobTitle(next?.search_preferences?.job_title?.trim() || "");
-    setLocation(next?.search_preferences?.location?.trim() || "");
-    const remotePref = (next?.search_preferences?.remote_preference || "").trim();
+    const prefs = next?.search_preferences;
+    setCountries((prefs?.countries || []).map((c) => c.toUpperCase()));
+    setCities(prefs?.cities || []);
+    const modes = prefs?.work_modes || [];
+    const remotePref = (prefs?.remote_preference || modes[0] || "").trim();
     setRemote(remotePref);
   }, []);
 
@@ -133,10 +145,13 @@ export function FirstRunWizard({
   };
 
   const saveWhere = async () => {
-    const loc = location.trim();
     const remotePref = remote.trim();
-    if (!loc && !remotePref) {
+    if (!countries.length && !remotePref) {
       setError(t("step3_error"));
+      return;
+    }
+    if (remotePref === "onsite" && !countries.length) {
+      setError(t("step3_error_country"));
       return;
     }
     setSaving(true);
@@ -145,7 +160,9 @@ export function FirstRunWizard({
       const next = await updatePreferences(
         undefined,
         mergeSearchPreferences(profile?.search_preferences, {
-          location: loc,
+          countries,
+          cities: countries.length ? cities : [],
+          work_modes: remotePref ? [remotePref] : [],
           remote_preference: remotePref,
         })
       );
@@ -285,14 +302,41 @@ export function FirstRunWizard({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-[11px] text-[#888]">
-                  <MapPin className="h-3 w-3" /> {t("step3_location_label")}
+                  <MapPin className="h-3 w-3" /> {t("step3_countries_label")}
                 </Label>
-                <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder={t("step3_location_placeholder")}
-                  className="h-10 rounded-lg bg-[#FAFAFA] text-[13px] dark:bg-[#161616]"
-                  autoFocus
+                <MultiSelect
+                  values={countries}
+                  onChange={(next) => {
+                    setCountries(next);
+                    const allowed = new Set(citiesForCountries(next).map((c) => c.toLowerCase()));
+                    setCities((current) =>
+                      current.filter((city) => allowed.has(city.toLowerCase()))
+                    );
+                  }}
+                  options={COUNTRIES.map((c) => ({
+                    value: c.code,
+                    label: countryLabel(c.code, locale),
+                  }))}
+                  placeholder={t("step3_countries_placeholder")}
+                  hint={t("step3_countries_hint")}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[11px] text-[#888]">{t("step3_cities_label")}</Label>
+                <MultiSelect
+                  values={cities}
+                  onChange={setCities}
+                  options={searchCities("", countries).map((city) => ({
+                    value: city,
+                    label: city,
+                  }))}
+                  placeholder={
+                    countries.length
+                      ? t("step3_cities_placeholder")
+                      : t("step3_cities_empty_countries")
+                  }
+                  disabled={!countries.length}
+                  allowCustom
                 />
               </div>
               <div className="space-y-2">
