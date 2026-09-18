@@ -21,11 +21,18 @@ import { useFirstRun } from "@/components/first-run-provider";
 import { JobCard } from "@/components/job-card";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { remotePreferenceToFilter } from "@/lib/profile-ready";
+import {
+  jobsChipMessageKey,
+  jobsEmptyMessageKeys,
+  selectJobsChipKind,
+  selectJobsEmptyKind,
+} from "@/lib/jobs-copy";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");
   const router = useRouter();
-  const { ready, loading: setupLoading, openWizard } = useFirstRun();
+  const { ready, loading: setupLoading, openWizard, profile } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,6 +48,20 @@ export default function JobsPage() {
     text: string;
   } | null>(null);
 
+  const targetTitle = profile?.search_preferences?.job_title?.trim() || "";
+  const prefLocation = profile?.search_preferences?.location?.trim() || "";
+  const prefRemote = remotePreferenceToFilter(
+    profile?.search_preferences?.remote_preference
+  );
+  const copyCtx = {
+    title: targetTitle,
+    location: prefLocation,
+    remote: prefRemote === true,
+  };
+  const chipKind = selectJobsChipKind(copyCtx);
+  const emptyKind = selectJobsEmptyKind(copyCtx);
+  const emptyKeys = jobsEmptyMessageKeys(emptyKind);
+
   const loadFeed = useCallback(
     async (reset = true) => {
       if (reset) {
@@ -52,7 +73,12 @@ export default function JobsPage() {
       try {
         const res =
           mode === "search" && query.trim()
-            ? await searchJobs({ q: query.trim(), cursor: reset ? null : cursor })
+            ? await searchJobs({
+                q: query.trim(),
+                location: prefLocation || undefined,
+                remote: prefRemote,
+                cursor: reset ? null : cursor,
+              })
             : await getRecommendedJobs(reset ? null : cursor);
         setItems((prev) => (reset ? res.items : [...prev, ...res.items]));
         setCursor(res.next_cursor ?? null);
@@ -66,7 +92,7 @@ export default function JobsPage() {
         setLoadingMore(false);
       }
     },
-    [cursor, mode, query, t]
+    [cursor, mode, prefLocation, prefRemote, query, t]
   );
 
   useEffect(() => {
@@ -90,7 +116,11 @@ export default function JobsPage() {
     setError(null);
     try {
       const res = query.trim()
-        ? await searchJobs({ q: query.trim() })
+        ? await searchJobs({
+            q: query.trim(),
+            location: prefLocation || undefined,
+            remote: prefRemote,
+          })
         : await getRecommendedJobs();
       setItems(res.items);
       setCursor(res.next_cursor ?? null);
@@ -183,6 +213,15 @@ export default function JobsPage() {
         </Button>
       </form>
 
+      {ready && chipKind && items.length > 0 && !loading && (
+        <p className="text-[12px] text-[#888]">
+          {t(jobsChipMessageKey(chipKind), {
+            title: targetTitle,
+            location: prefLocation,
+          })}
+        </p>
+      )}
+
       {error && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
           {error}
@@ -216,8 +255,14 @@ export default function JobsPage() {
         ) : (
           <EmptyState
             icon={Briefcase}
-            title={t("empty_warming")}
-            description={t("empty_warming_hint")}
+            title={t(emptyKeys.title, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
+            description={t(emptyKeys.hint, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
             secondaryHref="/pipeline/new"
             secondaryLabel={t("empty_warming_cta")}
           />

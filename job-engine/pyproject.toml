@@ -8,7 +8,7 @@ packages = ["app"]
 [project]
 name = "job-engine"
 version = "0.1.0"
-description = "MACA Job Engine — personalized job catalog and recommendations"
+description = "Ariadne Job Engine — personalized job catalog and recommendations"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi==0.135.2",

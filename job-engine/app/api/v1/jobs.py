@@ -13,6 +13,8 @@ from app.logging_setup import get_logger
 from app.metrics import RECOMMEND_CACHE_HITS
 from app.models.schemas import JobListResponse, JobPostingOut, SignalRequest, SignalResponse
 from app.rank.scorer import Ranker, prefs_hash
+from app.workers.demand import demand_packs_from_profile
+from app.workers.queue import enqueue_job
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -20,6 +22,27 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 def _repo(supabase: AsyncClient) -> JobRepository:
     return JobRepository(supabase)
+
+
+async def _maybe_enqueue_discovery(
+    redis_client: redis.Redis,
+    user_id: str,
+    prefs: dict,
+    cv_structured: dict,
+) -> None:
+    """When geo/role recall is empty, kick profile-driven discovery (debounced)."""
+    queries = demand_packs_from_profile(prefs, cv_structured)
+    if not queries:
+        return
+    debounce_key = f"discover:{user_id}:{prefs_hash(prefs)}"
+    try:
+        already = await redis_client.get(debounce_key)
+        if already:
+            return
+        await redis_client.setex(debounce_key, 1800, "1")
+    except Exception as exc:
+        logger.warning("discover_debounce_failed", error=str(exc))
+    await enqueue_job("job_discover_tavily", queries)
 
 
 async def _cache_get(redis_client: redis.Redis, key: str) -> str | None:
@@ -65,6 +88,13 @@ async def recommend(
         return JobListResponse.model_validate_json(cached)
 
     result = await Ranker(repo).recommend(user["id"], limit=limit, cursor=cursor)
+    if not result.items:
+        await _maybe_enqueue_discovery(
+            redis_client,
+            user["id"],
+            prefs if isinstance(prefs, dict) else {},
+            profile.get("cv_structured") or {},
+        )
     await _cache_set(
         redis_client,
         cache_key,

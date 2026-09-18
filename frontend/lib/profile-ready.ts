@@ -109,3 +109,20 @@ export function isRemotePreferenceOption(
 ): value is RemotePreferenceOption {
   return (REMOTE_PREFERENCE_OPTIONS as readonly string[]).includes(value);
 }
+
+export function remotePreferenceToFilter(
+  value: string | null | undefined
+): boolean | undefined {
+  const normalized = (value || "").trim().toLowerCase();
+  if (normalized === "remote" || normalized === "fully remote") return true;
+  if (
+    normalized === "onsite" ||
+    normalized === "on-site" ||
+    normalized === "on site" ||
+    normalized === "office" ||
+    normalized === "in-office"
+  ) {
+    return false;
+  }
+  return undefined;
+}

@@ -57,6 +57,7 @@ class ScoreBreakdown(BaseModel):
     recency: float = 0.0
     source_trust: float = 0.0
     novelty: float = 0.0
+    geo: float = 0.0
     total: float = 0.0
     matching_skills: list[str] = Field(default_factory=list)
     reasons: list[str] = Field(default_factory=list)
