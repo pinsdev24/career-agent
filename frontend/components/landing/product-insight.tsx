@@ -86,13 +86,13 @@ export function ProductInsight() {
           <Shot
             src="/images/Screenshot-dashboard.png"
             alt={t("dashboard_alt")}
-            url={t("dashboard_url")}
+            url={t("dashboard_label")}
             className="relative z-10 w-[92%] lg:w-[88%]"
           />
           <Shot
             src="/images/Screenshot-hitl-cover-approval.png"
             alt={t("review_alt")}
-            url={t("review_url")}
+            url={t("review_label")}
             className="absolute right-0 -bottom-2 z-20 w-[68%] translate-y-4 rotate-[-2deg] lg:w-[62%] lg:translate-y-6"
           />
         </div>

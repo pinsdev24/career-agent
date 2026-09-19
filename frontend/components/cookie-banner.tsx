@@ -1,11 +1,13 @@
 "use client"
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Cookie, X, Shield, BarChart2 } from 'lucide-react'
 
 type ConsentState = 'pending' | 'accepted' | 'declined'
 
 export default function CookieBanner() {
+  const t = useTranslations('CookieBanner')
   const [consent, setConsent] = useState<ConsentState | null>(null)
   const [showDetails, setShowDetails] = useState(false)
 
@@ -31,7 +33,7 @@ export default function CookieBanner() {
       {visible && (
         <motion.div
           role="dialog"
-          aria-label="Cookie consent"
+          aria-label={t('aria')}
           aria-modal="false"
           initial={{ y: 32, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -39,33 +41,30 @@ export default function CookieBanner() {
           transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as const }}
           className="cookie-banner"
         >
-          {/* Top row */}
           <div className="cookie-banner__header">
             <div className="cookie-banner__icon-wrap">
               <Cookie size={16} strokeWidth={2} />
             </div>
-            <span className="cookie-banner__title">Cookie Preferences</span>
+            <span className="cookie-banner__title">{t('title')}</span>
             <button
               onClick={handleDecline}
-              aria-label="Close cookie banner"
+              aria-label={t('close')}
               className="cookie-banner__close"
             >
               <X size={14} />
             </button>
           </div>
 
-          {/* Body */}
           <p className="cookie-banner__body">
-            We use cookies to improve your navigation experience, remember your preferences and analyze how you interact with our platform.
+            {t('body')}
           </p>
 
-          {/* Expandable details */}
           <button
             className="cookie-banner__details-toggle"
             onClick={() => setShowDetails(v => !v)}
             aria-expanded={showDetails}
           >
-            {showDetails ? 'Hide details' : 'Learn more'} ↓
+            {showDetails ? t('hide_details') : t('learn_more')} ↓
           </button>
 
           <AnimatePresence>
@@ -80,34 +79,33 @@ export default function CookieBanner() {
                 <div className="cookie-banner__detail-row">
                   <Shield size={12} className="shrink-0 mt-0.5" />
                   <div>
-                    <strong>Essential</strong> — Required for basic site features like theme persistence and session management.
+                    <strong>{t('essential')}</strong> — {t('essential_desc')}
                   </div>
                 </div>
                 <div className="cookie-banner__detail-row">
                   <BarChart2 size={12} className="shrink-0 mt-0.5" />
                   <div>
-                    <strong>Performance</strong> — Helps us understand how users interact with the app to improve its speed and reliability.
+                    <strong>{t('performance')}</strong> — {t('performance_desc')}
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Actions */}
           <div className="cookie-banner__actions">
             <button
               id="cookie-decline"
               onClick={handleDecline}
               className="btn-secondary cookie-banner__btn-sm"
             >
-              Decline
+              {t('decline')}
             </button>
             <button
               id="cookie-accept"
               onClick={handleAccept}
               className="btn-primary cookie-banner__btn-sm"
             >
-              Accept all
+              {t('accept')}
             </button>
           </div>
         </motion.div>
