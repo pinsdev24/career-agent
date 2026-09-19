@@ -52,7 +52,7 @@ def _cors_headers_for(request: Request) -> dict[str, str]:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan — create shared resources on startup, clean up on shutdown."""
     settings = get_settings()
-    logger.info("Starting CareerAgent backend")
+    logger.info("Starting Ariadne backend")
 
     app.state.supabase = await create_supabase_client(settings)
     logger.info("Supabase client initialized")
@@ -79,12 +79,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     if app.state.redis is not None:
         await app.state.redis.aclose()
     await close_arq_pool()
-    logger.info("Shutting down CareerAgent backend")
+    logger.info("Shutting down Ariadne backend")
 
 
 app = FastAPI(
-    title="CareerAgent API",
-    description="Multi-Agent LLM Job Application Assistant",
+    title="Ariadne API",
+    description="Ranked jobs and cover-letter packets with human-in-the-loop review.",
     version="0.1.0",
     lifespan=lifespan,
 )

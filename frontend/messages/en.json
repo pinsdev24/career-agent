@@ -24,8 +24,8 @@
       "failed": "Authentication failed"
     },
     "sidebar": {
-      "title": "Escape the job search labyrinth.",
-      "subtitle": "Join Ariadne for clearer matches, tailored letters, and review before you submit.",
+      "title": "Escape the job-search maze.",
+      "subtitle": "Join Ariadne for clearer matches, tailored letters, and review before you apply on the ATS.",
       "hired": "Hired"
     }
   },
@@ -52,82 +52,54 @@
       "control": "Your control",
       "faq": "FAQ",
       "sign_in": "Sign in",
-      "start": "Start applying",
-      "dashboard": "Dashboard"
+      "start": "Create an account",
+      "dashboard": "Go to Home"
     },
     "hero": {
-      "eyebrow": "The career platform for ambitious people",
-      "title_line1": "The agent",
-      "title_prefix": "to",
+      "eyebrow": "Career matching with you in the loop",
+      "title_line1": "Ranked roles.",
+      "title_prefix": "Then",
       "title_words": [
-        "land",
-        "apply",
         "match",
-        "hire"
+        "draft",
+        "review",
+        "apply"
       ],
-      "subtitle": "Your toolkit to stop sending generic letters and start landing interviews. Securely analyze offers, match your skills, and ship applications that sound like you.",
-      "cta_primary": "Start free trial",
+      "subtitle": "Ariadne ranks ATS jobs against your CV, drafts a letter that sounds like you, and you submit on the employer’s site — we never apply for you.",
+      "cta_primary": "Create an account",
       "cta_secondary": "See how it works"
-    },
-    "marquee": [
-      {
-        "value": "24x",
-        "label": "faster applications"
-      },
-      {
-        "value": "94%",
-        "label": "match accuracy"
-      },
-      {
-        "value": "5 min",
-        "label": "to review a draft"
-      },
-      {
-        "value": "3",
-        "label": "interviews in week one"
-      }
-    ],
-    "stats": {
-      "applications": "Applications generated",
-      "applications_value": "2,400+",
-      "time_saved": "Avg. time saved",
-      "time_saved_value": "24x",
-      "match_rate": "Match accuracy",
-      "match_rate_value": "94%",
-      "satisfaction": "Satisfaction rate",
-      "satisfaction_value": "4.9/5"
     },
     "features": {
       "badge": "Capabilities",
-      "title": "Everything you need.",
-      "title_muted": "Nothing you don't.",
+      "title": "What you get.",
+      "title_muted": "Nothing fake.",
       "items": [
         {
           "n": "01",
           "title": "Semantic matching",
-          "desc": "Compare your CV to the job at a conceptual level — not keywords. Get a precise fit score and a clear list of gaps to close."
+          "desc": "Compare your CV to the role at a conceptual level — not keyword spam. See fit and gaps before you invest time."
         },
         {
           "n": "02",
           "title": "Sounds like you",
-          "desc": "The Writer Agent learns your tone from every review. After two applications, it writes like you — sharper, tighter, more compelling."
+          "desc": "The writer learns from your reviews. After a couple of letters, drafts get closer to your voice."
         },
         {
           "n": "03",
           "title": "Human in the loop",
-          "desc": "No black-box send. Every draft goes through your review before anything is finalized. Edit, rewrite, or approve."
+          "desc": "Every packet stops for your review. Edit, rewrite, or approve — then you apply on the ATS."
         },
         {
           "n": "04",
-          "title": "Explore mode",
-          "desc": "No job link? Scout searches the web for roles that actually match your profile, ranked by semantic fit."
+          "title": "Jobs feed first",
+          "desc": "Ranked roles from Greenhouse, Lever, Ashby, and Workable boards we can reach. Paste a URL when a board isn’t in the feed yet."
         }
       ]
     },
     "how_it_works": {
       "badge": "Process",
       "title": "Three steps.",
-      "title_muted": "Infinite interviews.",
+      "title_muted": "You stay in control.",
       "preview_title": "Agent Console",
       "preview_status": "Live",
       "preview_events": "{count} events",
@@ -137,12 +109,12 @@
           {
             "type": "info",
             "time": "14:02:11",
-            "text": "Pipeline initialized."
+            "text": "Pipeline started."
           },
           {
             "type": "agent_action",
             "time": "14:02:13",
-            "text": "Reading resume — 2 pages"
+            "text": "Reading resume"
           },
           {
             "type": "agent_action",
@@ -157,19 +129,19 @@
           {
             "type": "info",
             "time": "14:02:20",
-            "text": "18 skills mapped. Profile ready."
+            "text": "Profile ready."
           }
         ],
         [
           {
             "type": "info",
             "time": "14:08:02",
-            "text": "Scout: searching the open web"
+            "text": "Syncing Greenhouse, Lever, Ashby, Workable boards"
           },
           {
             "type": "agent_action",
             "time": "14:08:05",
-            "text": "Ranking roles by semantic fit"
+            "text": "Ranking roles from synced boards"
           },
           {
             "type": "agent_action",
@@ -184,7 +156,7 @@
           {
             "type": "info",
             "time": "14:08:13",
-            "text": "Match 94%. Shortlist ready."
+            "text": "Shortlist ready for review."
           }
         ],
         [
@@ -196,12 +168,7 @@
           {
             "type": "agent_action",
             "time": "14:14:34",
-            "text": "Critic scoring across 5 dimensions"
-          },
-          {
-            "type": "node_finish",
-            "time": "14:14:38",
-            "text": "Score 91/100 — new best draft"
+            "text": "Critic scoring the draft"
           },
           {
             "type": "info",
@@ -211,7 +178,7 @@
           {
             "type": "node_finish",
             "time": "14:14:40",
-            "text": "Letter ready to approve."
+            "text": "Letter ready to copy."
           }
         ]
       ],
@@ -219,17 +186,17 @@
         {
           "roman": "I",
           "title": "Upload your CV",
-          "desc": "Drop your resume once. Ariadne extracts skills, experience, and goals into a semantic profile that gets smarter over time."
+          "desc": "Drop a PDF once. Ariadne builds a profile used to rank roles and draft letters."
         },
         {
           "roman": "II",
-          "title": "Point at a role",
-          "desc": "Paste a job URL, or let Scout find matches. Agents research the company and map the gaps that actually matter."
+          "title": "Pick a ranked role",
+          "desc": "Browse Jobs matched to your target and countries — from ATS boards we sync, not a whole-web scrape."
         },
         {
           "roman": "III",
-          "title": "Review and send",
-          "desc": "Writer drafts. Critic scores. You approve. A tailored letter in minutes — with you still holding the pen."
+          "title": "Review, then apply on the ATS",
+          "desc": "Approve the letter, copy it, open the posting, and submit yourself."
         }
       ]
     },
@@ -237,91 +204,67 @@
       "badge": "Inside",
       "title": "The work,",
       "title_muted": "not the pitch.",
-      "subtitle": "Missions with match scores. Drafts beside the gaps. You always see why — and you always approve.",
-      "dashboard_label": "Missions",
-      "dashboard_url": "/dashboard",
-      "dashboard_caption": "Every pipeline in one list — match score, status, next action.",
-      "dashboard_alt": "Ariadne dashboard showing missions with match scores and review status",
-      "review_label": "Review",
-      "review_url": "/applications",
-      "review_caption": "Draft on the left. Gap analysis on the right. Approve, rewrite, or edit.",
-      "review_alt": "Cover letter review with gap analysis, matching skills, and approve or rewrite controls",
+      "subtitle": "Jobs with why-match. Drafts beside the gaps. You always see why — and you always approve before you apply.",
+      "dashboard_label": "Jobs",
+      "dashboard_caption": "Ranked roles in one list — fit, status, next action.",
+      "dashboard_alt": "Ariadne Jobs feed with match reasons and prepare packet",
+      "review_label": "Applications",
+      "review_caption": "Letter on the left. Gaps on the right. Approve, rewrite, or edit — then you submit on the ATS.",
+      "review_alt": "Application packet review with gap analysis and approve controls",
       "insights": [
         {
           "k": "Match",
-          "v": "Semantic fit on every role, not keyword noise."
+          "v": "Semantic fit on roles we can reach — not keyword noise."
         },
         {
           "k": "Status",
-          "v": "Review letter or completed — the next action is obvious."
+          "v": "Review packet or submitted — the next action is obvious."
         },
         {
           "k": "Control",
-          "v": "Nothing leaves without your rewrite or approval."
+          "v": "Nothing is sent for you. You apply on the employer’s site."
         }
       ]
     },
     "scout": {
-      "badge": "Explore",
-      "title": "Scout by",
-      "title_muted": "default.",
-      "subtitle": "No job link required. Scout searches the open web and ranks roles by semantic match, so you spend time interviewing — not hunting.",
-      "stat_sources_value": "Web",
-      "stat_sources": "Live discovery",
-      "stat_rank_value": "94%",
-      "stat_rank": "Match ranking",
-      "stat_refresh_value": "Auto",
-      "stat_refresh": "Fresh results",
-      "status": "Scout network",
-      "status_ok": "All operational",
+      "badge": "Boards",
+      "title": "ATS boards",
+      "title_muted": "we can reach.",
+      "subtitle": "The Jobs feed ranks roles from Greenhouse, Lever, Ashby, and Workable — not LinkedIn, Indeed, or a full-market scrape. Paste a supported URL to follow a new board.",
+      "paste_url": "Paste a job URL",
+      "source_kind": "ATS board",
+      "stat_sources_value": "4",
+      "stat_sources": "ATS connectors",
+      "stat_rank_value": "You",
+      "stat_rank": "Always review first",
+      "stat_refresh_value": "Sync",
+      "stat_refresh": "Boards update over time",
+      "status": "Board sync",
+      "status_ok": "Connectors ready",
       "sources": [
         {
-          "city": "LinkedIn",
-          "region": "Professional",
-          "ms": "96%"
+          "id": "greenhouse",
+          "name": "Greenhouse"
         },
         {
-          "city": "Welcome to the Jungle",
-          "region": "Europe",
-          "ms": "91%"
+          "id": "lever",
+          "name": "Lever"
         },
         {
-          "city": "Indeed",
-          "region": "Global",
-          "ms": "88%"
+          "id": "ashby",
+          "name": "Ashby"
         },
         {
-          "city": "Company careers",
-          "region": "Direct",
-          "ms": "93%"
-        },
-        {
-          "city": "Boards",
-          "region": "Niche",
-          "ms": "87%"
-        },
-        {
-          "city": "Your URL",
-          "region": "Manual",
-          "ms": "100%"
+          "id": "workable",
+          "name": "Workable"
         }
       ]
-    },
-    "metrics": {
-      "badge": "Live metrics",
-      "title": "Performance you",
-      "title_muted": "can measure.",
-      "live": "Live",
-      "applications": "Applications generated",
-      "uptime": "Drafts you still control",
-      "latency": "Average review time",
-      "countries": "Match accuracy"
     },
     "security": {
       "badge": "Security",
       "title": "Trust is",
       "title_muted": "non-negotiable.",
-      "subtitle": "Your CV and letters stay yours. Encryption, row-level access, and review-before-send are built into every layer — not bolted on.",
+      "subtitle": "Your CV and letters stay yours. Encryption, row-level access, and review-before-you-apply are built in.",
       "badges": [
         "Supabase Auth",
         "RLS",
@@ -335,11 +278,11 @@
         },
         {
           "title": "Row-level access",
-          "desc": "Every request is authenticated. You only ever see your own missions, drafts, and profile."
+          "desc": "Every request is authenticated. You only ever see your own jobs, packets, and profile."
         },
         {
-          "title": "You approve first",
-          "desc": "Nothing is sent on your behalf. Human-in-the-loop is the default, not an option."
+          "title": "You apply yourself",
+          "desc": "Ariadne never submits on your behalf. Human-in-the-loop is the default."
         },
         {
           "title": "Private by design",
@@ -351,7 +294,7 @@
       "badge": "Your control",
       "title": "Built with you.",
       "title_muted": "Not around you.",
-      "subtitle": "Agents do the research and the first draft. You keep the judgment — edit, rewrite, or approve before anything leaves your desk.",
+      "subtitle": "Agents research and draft. You keep judgment — edit, rewrite, or approve, then apply on the ATS.",
       "items": [
         {
           "title": "Tone memory",
@@ -359,7 +302,7 @@
         },
         {
           "title": "Gap reports",
-          "desc": "See exactly where you match and where you don't — then decide how to position it."
+          "desc": "See exactly where you match and where you don’t — then decide how to position it."
         },
         {
           "title": "Critic scores",
@@ -371,69 +314,49 @@
         }
       ]
     },
-    "testimonials": {
-      "badge": "What people say",
-      "result_label": "Key result",
-      "items": [
-        {
-          "quote": "I dropped my CV and Ariadne matched me with 5 roles I actually wanted. The cover letters were better than anything I'd written myself.",
-          "author": "Sarah J.",
-          "role": "Product Manager",
-          "result": "5 matched roles"
-        },
-        {
-          "quote": "After two applications, the agent started writing exactly like me — but sharper. The tone of voice memory is a game-changer.",
-          "author": "Michael T.",
-          "role": "Frontend Engineer",
-          "result": "Sounds like me"
-        },
-        {
-          "quote": "I used to spend 2 hours per application. Now it takes me 5 minutes to review and approve. I landed 3 interviews in my first week.",
-          "author": "Elena R.",
-          "role": "Data Scientist",
-          "result": "3 interviews, week one"
-        }
-      ]
-    },
     "faq": {
       "badge": "FAQ",
       "title": "Simple answers.",
       "title_muted": "No surprises.",
       "items": [
         {
-          "q": "Is Ariadne really free?",
-          "a": "Yes. You can generate applications for free with no credit card required. We offer premium tiers for high-volume users and advanced features."
+          "q": "Is Ariadne free?",
+          "a": "Yes. Create an account and use ranked jobs and packets. No credit card — this is not a free trial."
         },
         {
           "q": "Does it work for any industry?",
-          "a": "Absolutely. Semantic matching works across tech, finance, healthcare, consulting, creative roles, and more. It analyzes skills and context — not industry templates."
+          "a": "Semantic matching works on roles from ATS boards we can reach — Greenhouse, Lever, Ashby, and Workable — not every job on the web."
         },
         {
           "q": "Will the cover letters sound generic?",
-          "a": "No. The Writer Agent learns your tone from your feedback. After two or three reviews, it adapts to your voice."
+          "a": "No. The writer learns your tone from your reviews. After a couple of letters, drafts get closer to your voice."
         },
         {
           "q": "How is my data handled?",
-          "a": "Your CV and personal data are encrypted and never shared with third parties. We use Supabase authentication and row-level access policies."
+          "a": "Your CV and personal data are encrypted and never shared with third parties. We use Supabase authentication and row-level access."
         },
         {
-          "q": "Can I edit the generated letters?",
-          "a": "Of course. Every draft goes through your review — edit, request a rewrite, or approve before anything is finalized."
+          "q": "Do you apply for me?",
+          "a": "No. Ariadne never applies for you. You review the packet, then apply on the ATS yourself."
+        },
+        {
+          "q": "LinkedIn / Indeed?",
+          "a": "We don’t scrape them. We follow Greenhouse, Lever, Ashby, and Workable boards we can reach."
         }
       ]
     },
     "cta": {
-      "title": "Ready to land something great?",
-      "subtitle": "Join candidates who stopped guessing and started shipping applications that actually sound like them.",
-      "button": "Start applying free",
-      "secondary": "Go to dashboard",
-      "footer": "No credit card required"
+      "title": "Ready to browse roles that fit?",
+      "subtitle": "Create an account, finish a short setup, and review packets before you apply on the ATS.",
+      "button": "Create an account",
+      "secondary": "Go to Home",
+      "footer": "You always submit yourself"
     },
     "footer": {
-      "tagline": "The career lab for people who ship applications, not templates.",
+      "tagline": "Ranked ATS jobs, honest drafts, you apply.",
       "product": "Product",
       "product_features": "Features",
-      "product_explore": "Explore Mode",
+      "product_explore": "Paste a job URL",
       "product_how": "How it works",
       "product_inside": "Inside",
       "resources": "Resources",
@@ -606,7 +529,9 @@
     "start_btn": "Start from URL",
     "start_explore": "Start explore search",
     "error_url": "Paste a job URL to continue.",
-    "start_failed": "Could not start from this URL."
+    "start_failed": "Could not start from this URL.",
+    "url_seed_side_success": "Also following this company board for the Jobs feed.",
+    "url_seed_side_unsupported": "Letter can continue — this URL isn’t a board we seed into Jobs."
   },
   "MissionDetail": {
     "active_pipeline": "Active mission",
@@ -622,11 +547,9 @@
     "review_draft": "Review your letter",
     "review_desc": "Read it like a hiring manager would. Edit freely, ask for a rewrite, or approve.",
     "processing": "Working…",
-    "ready_to_send": "Your cover letter is ready to send.",
     "final_letter": "Final letter",
     "applied": "Applied!",
     "i_applied": "I applied",
-    "send": "Send",
     "copied": "Copied",
     "copy": "Copy",
     "target_role": "Target role",
@@ -641,7 +564,7 @@
       "matching": "Then we write the letter",
       "writing": "Then a quality check",
       "critiquing": "Then it’s your review",
-      "waiting_letter_review": "Then it’s ready to send",
+      "waiting_letter_review": "Then it’s ready to copy",
       "completed": "Copy it into the employer’s form yourself"
     },
     "insights": {
@@ -653,7 +576,7 @@
       "fit_mid": "A stretch on paper. Keep the letter honest about what you bring.",
       "fit_low": "A real stretch. Don’t overclaim the gaps below.",
       "fit_none": "Fit will appear once matching finishes.",
-      "quality_high": "Ready to send if it still sounds like you.",
+      "quality_high": "Ready to copy if it still sounds like you.",
       "quality_mid": "Solid draft — tighten anything that feels generic.",
       "quality_low": "Ask for a rewrite before you approve.",
       "quality_none": "Quality notes will appear after the review.",
@@ -684,7 +607,7 @@
       "writing": "Letter",
       "critiquing": "Quality",
       "waiting_letter_review": "Review",
-      "completed": "Send"
+      "completed": "Apply"
     },
     "stage": {
       "started": {
@@ -737,7 +660,8 @@
       "done_critique": "Finished the quality check",
       "done_route": "Chose the next step",
       "done_memory": "Updated what we know about you"
-    }
+    },
+    "ready_to_copy": "Your cover letter is ready to copy."
   },
   "LetterEditor": {
     "title": "Cover letter",
@@ -841,6 +765,21 @@
     "empty_warming": "Still finding roles that fit your profile.",
     "empty_warming_hint": "We only show roles we can rank for you — not a full-market sweep. Paste a URL if you already have a posting.",
     "empty_warming_cta": "Paste a job URL",
+    "paste_url_header": "Paste a job URL",
+    "paste_url_header_hint": "Follow a Greenhouse, Lever, Ashby, or Workable board",
+    "paste_url_detail_link": "Have a URL not in the feed?",
+    "url_seed_title": "Paste a job URL",
+    "url_seed_desc": "Greenhouse, Lever, Ashby, or Workable — we’ll follow that company board for everyone.",
+    "url_seed_placeholder": "https://boards.greenhouse.io/…",
+    "url_seed_submit": "Add board",
+    "url_seed_success": "Following this company — jobs will appear in the feed as we sync.",
+    "url_seed_success_named": "Following {company} — jobs will appear in the feed as we sync.",
+    "url_seed_already": "Already following this board — syncing latest jobs.",
+    "url_seed_unsupported": "That isn’t a Greenhouse, Lever, Ashby, or Workable URL we can follow.",
+    "url_seed_unsupported_hint": "You can still prepare a packet from many careers pages — board seed only works for those ATS.",
+    "url_seed_invalid": "Paste a full http(s) job or careers URL.",
+    "url_seed_error": "Couldn’t add that board. Try again in a moment.",
+    "url_seed_syncing": "Syncing board…",
     "empty_geo": "No strong matches in your region yet.",
     "empty_geo_hint": "We’re warming boards for {location}. Check back soon, or paste a job URL to add that board.",
     "empty_role": "No strong matches for {title} yet.",
@@ -888,7 +827,6 @@
     "packet_started": "Packet queued — opening Applications.",
     "save": "Save",
     "dismiss": "Skip",
-    "open_in_careeragent": "Have a URL not in the feed?",
     "url_not_in_feed": "Have a URL not in the feed?",
     "select_hint": "Select a role to see match reasons and the posting.",
     "deep_link_missing": "Offer not in your current feed.",
@@ -925,8 +863,8 @@
     "approve": "Approve letter",
     "rewrite": "Rewrite with feedback",
     "feedback_placeholder": "What should change?",
-    "mark_submitted": "Mark submitted",
-    "open_ats": "Open ATS",
+    "mark_submitted": "I submitted this",
+    "open_ats": "Open application page",
     "no_ats_url": "No application page on file.",
     "next_steps_title": "Next: apply yourself",
     "next_steps_hint": "Copy the letter, open the employer’s form, then mark it submitted. Ariadne never applies for you.",
@@ -938,5 +876,25 @@
     "generating_hint": "Matcher → letter → critic. Usually 30–90 seconds.",
     "retry": "Retry packet",
     "error_generic": "Could not load applications."
+  },
+  "CookieBanner": {
+    "aria": "Cookie consent",
+    "title": "Cookie preferences",
+    "close": "Close cookie banner",
+    "body": "We use cookies to remember your preferences and understand how you use Ariadne. You can decline non-essential cookies.",
+    "learn_more": "Learn more",
+    "hide_details": "Hide details",
+    "essential": "Essential",
+    "essential_desc": "Required for sign-in, theme, and language.",
+    "performance": "Performance",
+    "performance_desc": "Helps us see which flows break so we can fix them. Not used for ads.",
+    "decline": "Decline",
+    "accept": "Accept all"
+  },
+  "Metadata": {
+    "meta_title": "Ariadne — ranked ATS jobs, you apply",
+    "meta_description": "Match roles from Greenhouse, Lever, Ashby, and Workable boards we can reach. Draft with review. You submit on the ATS.",
+    "meta_og_title": "Ariadne",
+    "meta_og_description": "Ranked ATS jobs, honest drafts — you apply."
   }
 }

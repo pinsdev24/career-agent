@@ -4,6 +4,7 @@ from app.config import get_settings
 from app.connectors.tavily import TavilyDiscovery
 from app.db.repository import JobRepository
 from app.logging_setup import get_logger
+from app.quality.urls import ats_careers_url
 from app.workers.demand import demand_packs_from_profile
 
 logger = get_logger(__name__)
@@ -86,10 +87,10 @@ async def discover_via_tavily(
                 break
             row = await repo.upsert_company(
                 slug=slug,
-                name=slug.replace("-", " ").title(),
+                name=slug.replace("-", " ").replace("_", " ").replace(".", " ").title(),
                 ats_provider=provider,
                 board_token=slug,
-                careers_url=_careers_url(provider, slug),
+                careers_url=ats_careers_url(provider, slug),
             )
             company_id = row.get("id")
             if company_id:
@@ -116,13 +117,3 @@ async def discover_via_tavily(
         errors=len(errors),
     )
     return {"boards": len(new_company_ids), "company_ids": new_company_ids, "errors": errors}
-
-
-def _careers_url(provider: str, slug: str) -> str:
-    mapping = {
-        "greenhouse": f"https://boards.greenhouse.io/{slug}",
-        "lever": f"https://jobs.lever.co/{slug}",
-        "ashby": f"https://jobs.ashbyhq.com/{slug}",
-        "workable": f"https://apply.workable.com/{slug}",
-    }
-    return mapping.get(provider, "")

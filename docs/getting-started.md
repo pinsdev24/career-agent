@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide covers how to set up and run the CareerAgent project locally for development.
+This guide covers how to set up and run the Ariadne project locally for development.
 
 ## Prerequisites
 Ensure you have the following installed on your machine:

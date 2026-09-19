@@ -151,6 +151,20 @@ class JobRepository:
         rows = result.data or []
         return rows[0] if rows else None
 
+    async def get_company_by_board(
+        self, ats_provider: str, board_token: str
+    ) -> dict | None:
+        result = await (
+            self.db.table("companies")
+            .select("*")
+            .eq("ats_provider", ats_provider)
+            .eq("board_token", board_token)
+            .limit(1)
+            .execute()
+        )
+        rows = result.data or []
+        return rows[0] if rows else None
+
     async def count_active_companies(self) -> int:
         result = await (
             self.db.table("companies")
@@ -231,6 +245,7 @@ class JobRepository:
         ats_provider: str,
         board_token: str,
         careers_url: str | None = None,
+        is_active: bool | None = None,
     ) -> dict:
         payload = {
             "slug": slug.lower(),
@@ -240,6 +255,10 @@ class JobRepository:
             "careers_url": careers_url,
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
+        if is_active is not None:
+            payload["is_active"] = is_active
+            if is_active:
+                payload["inactive_reason"] = None
         result = await (
             self.db.table("companies")
             .upsert(payload, on_conflict="ats_provider,board_token")

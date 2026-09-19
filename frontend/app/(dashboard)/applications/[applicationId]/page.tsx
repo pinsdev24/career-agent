@@ -15,6 +15,7 @@ import { formatUnknownError } from "@/lib/api-base";
 import type { Application } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CompanyLogo } from "@/components/company-logo";
+import { HitlApplySteps } from "@/components/hitl-apply-steps";
 import { StatusPill } from "@/components/status-pill";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -293,70 +294,22 @@ export default function ApplicationDetailPage() {
         </div>
       )}
 
-      {app.status === "approved" ? (
-        <div className="space-y-4 rounded-2xl border border-[#EBEBEB] bg-white p-5 dark:border-[#333] dark:bg-[#111]">
-          <div>
-            <h2 className="text-[12px] font-semibold uppercase tracking-wide text-[#888]">
-              {t("next_steps_title")}
-            </h2>
-            <p className="mt-1 text-[13px] leading-relaxed text-[#666] dark:text-[#aaa]">
-              {t("next_steps_hint")}
-            </p>
-          </div>
-          <ol className="space-y-2">
-            <li className="flex items-center gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F5F5F5] text-[11px] font-semibold text-[#666] dark:bg-[#222] dark:text-[#aaa]">
-                1
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 flex-1 justify-start rounded-xl text-[13px]"
-                onClick={() => void copyLetter()}
-              >
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? t("copied") : t("copy_letter")}
-              </Button>
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F5F5F5] text-[11px] font-semibold text-[#666] dark:bg-[#222] dark:text-[#aaa]">
-                2
-              </span>
-              {applyUrl ? (
-                <a
-                  href={applyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-10 flex-1 items-center justify-start gap-2 rounded-xl border border-[#EBEBEB] px-4 text-[13px] font-medium hover:bg-[#FAFAFA] dark:border-[#333] dark:hover:bg-[#1a1a1a]"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  {t("open_ats")}
-                </a>
-              ) : (
-                <p className="text-[13px] text-[#888]">{t("no_ats_url")}</p>
-              )}
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F5F5F5] text-[11px] font-semibold text-[#666] dark:bg-[#222] dark:text-[#aaa]">
-                3
-              </span>
-              <Button
-                className="h-10 flex-1 justify-start rounded-xl text-[13px]"
-                disabled={saving}
-                onClick={() => void onSubmitted()}
-              >
-                {t("mark_submitted")}
-              </Button>
-            </li>
-          </ol>
-        </div>
+      {app.status === "approved" || app.status === "submitted" ? (
+        <HitlApplySteps
+          applyUrl={applyUrl}
+          copied={copied}
+          onCopy={() => void copyLetter()}
+          onMarkSubmitted={() => void onSubmitted()}
+          submitted={app.status === "submitted"}
+          submitting={saving}
+        />
       ) : (
         applyUrl && (
           <a
             href={applyUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-[#1a1a1a] px-3 text-[13px] font-medium text-white dark:bg-white dark:text-[#1a1a1a]"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#EBEBEB] px-3 text-[13px] font-medium hover:bg-[#FAFAFA] dark:border-[#333] dark:hover:bg-[#1a1a1a]"
           >
             {t("open_ats")}
             <ExternalLink className="h-3.5 w-3.5" />

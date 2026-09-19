@@ -3,18 +3,19 @@
 import Link from "next/link";
 import React from "react";
 import { useTranslations } from "next-intl";
-import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
 import { AnimatedWord } from "@/components/landing/animated-word";
+import { BoardsSync } from "@/components/landing/boards-sync";
 import { ControlVisual, MatchVisual, ScoutVisual, ToneVisual } from "@/components/landing/feature-visuals";
 import { GridBackground } from "@/components/landing/grid-background";
 import { LandingNavbar } from "@/components/landing/navbar";
 import { ParticleSphere } from "@/components/landing/particle-sphere";
 import { PipelinePreview } from "@/components/landing/pipeline-preview";
 import { ProductInsight } from "@/components/landing/product-insight";
-import { StatsMarquee } from "@/components/landing/stats-marquee";
 
 const FEATURE_VISUALS = [MatchVisual, ToneVisual, ControlVisual, ScoutVisual];
 
@@ -27,33 +28,17 @@ function SectionEyebrow({ children, inverted = false }: { children: React.ReactN
   );
 }
 
-function LiveClock() {
-  const [now, setNow] = React.useState("");
-
-  React.useEffect(() => {
-    const tick = () => setNow(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, []);
-
-  return <span className="font-mono text-sm text-muted-foreground tabular-nums">{now}</span>;
-}
-
 export default function LandingPage() {
   const t = useTranslations("Landing");
   const [activeStep, setActiveStep] = React.useState(0);
   const [openFaq, setOpenFaq] = React.useState<number | null>(0);
-  const [testimonial, setTestimonial] = React.useState(0);
 
   const words = t.raw("hero.title_words") as string[];
   const features = t.raw("features.items") as { n: string; title: string; desc: string }[];
   const steps = t.raw("how_it_works.steps") as { roman: string; title: string; desc: string }[];
-  const sources = t.raw("scout.sources") as { city: string; region: string; ms: string }[];
   const securityItems = t.raw("security.items") as { title: string; desc: string }[];
   const securityBadges = t.raw("security.badges") as string[];
   const controlItems = t.raw("control.items") as { title: string; desc: string }[];
-  const testimonials = t.raw("testimonials.items") as { quote: string; author: string; role: string; result: string }[];
   const faqs = t.raw("faq.items") as { q: string; a: string }[];
 
   React.useEffect(() => {
@@ -63,14 +48,11 @@ export default function LandingPage() {
     return () => window.clearInterval(id);
   }, [steps.length]);
 
-  const quote = testimonials[testimonial];
-
   return (
     <div id="top" className="min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
       <LandingNavbar />
 
       <main>
-        {/* Hero */}
         <section className="relative flex min-h-screen flex-col justify-center overflow-hidden">
           <GridBackground />
           <div className="pointer-events-none absolute top-1/2 right-0 h-[600px] w-[600px] -translate-y-1/2 opacity-40 lg:h-[800px] lg:w-[800px]">
@@ -108,12 +90,9 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-
-          <StatsMarquee />
         </section>
 
-        {/* Features */}
-        <section id="features" className="relative py-24 lg:py-32">
+        <section id="features" className="relative scroll-mt-28 border-t border-foreground/10 py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 lg:mb-24">
               <SectionEyebrow>{t("features.badge")}</SectionEyebrow>
@@ -152,8 +131,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How it works */}
-        <section id="how-it-works" className="relative overflow-hidden bg-foreground py-24 text-background lg:py-32">
+        <section id="how-it-works" className="relative scroll-mt-28 overflow-hidden bg-foreground py-24 text-background lg:py-32">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.03]"
             style={{
@@ -207,99 +185,8 @@ export default function LandingPage() {
         </section>
 
         <ProductInsight />
+        <BoardsSync />
 
-        {/* Scout */}
-        <section className="relative overflow-hidden py-24 lg:py-32">
-          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-            <div className="grid items-start gap-16 lg:grid-cols-2">
-              <div>
-                <SectionEyebrow>{t("scout.badge")}</SectionEyebrow>
-                <h2 className="font-display mb-8 text-4xl tracking-tight lg:text-6xl">
-                  {t("scout.title")}
-                  <br />
-                  <span className="text-muted-foreground">{t("scout.title_muted")}</span>
-                </h2>
-                <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
-                  {t("scout.subtitle")}
-                </p>
-                <div className="mt-12 grid grid-cols-3 gap-6">
-                  {[
-                    ["stat_sources_value", "stat_sources"],
-                    ["stat_rank_value", "stat_rank"],
-                    ["stat_refresh_value", "stat_refresh"],
-                  ].map(([value, label]) => (
-                    <div key={label}>
-                      <div className="font-display text-3xl tracking-tight">{t(`scout.${value}`)}</div>
-                      <div className="mt-1 text-sm text-muted-foreground">{t(`scout.${label}`)}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="border border-foreground/10">
-                <div className="flex items-center justify-between border-b border-foreground/10 px-5 py-4">
-                  <span className="font-mono text-xs text-muted-foreground">{t("scout.status")}</span>
-                  <span className="flex items-center gap-2 font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    {t("scout.status_ok")}
-                  </span>
-                </div>
-                <div>
-                  {sources.map((source) => (
-                    <div
-                      key={source.city}
-                      className="flex items-center justify-between border-b border-foreground/5 px-5 py-4 last:border-0"
-                    >
-                      <div>
-                        <div className="text-sm">{source.city}</div>
-                        <div className="font-mono text-[11px] text-muted-foreground">{source.region}</div>
-                      </div>
-                      <div className="font-mono text-sm tabular-nums">{source.ms}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Metrics */}
-        <section className="relative border-y border-foreground/10 py-24 lg:py-32">
-          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-            <div className="mb-16 flex flex-col justify-between gap-6 lg:mb-24 lg:flex-row lg:items-end">
-              <div>
-                <SectionEyebrow>{t("metrics.badge")}</SectionEyebrow>
-                <h2 className="font-display text-4xl tracking-tight lg:text-6xl">
-                  {t("metrics.title")}
-                  <br />
-                  <span className="text-muted-foreground">{t("metrics.title_muted")}</span>
-                </h2>
-              </div>
-              <div className="flex items-center gap-3 font-mono text-xs tracking-widest text-muted-foreground uppercase">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                {t("metrics.live")}
-                <span className="text-foreground/20">|</span>
-                <LiveClock />
-              </div>
-            </div>
-
-            <div className="grid gap-px bg-foreground/10 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                [t("stats.applications_value"), t("metrics.applications")],
-                ["100%", t("metrics.uptime")],
-                ["5 min", t("metrics.latency")],
-                [t("stats.match_rate_value"), t("metrics.countries")],
-              ].map(([value, label]) => (
-                <div key={label} className="bg-background p-8 lg:p-10">
-                  <div className="font-display text-4xl tracking-tight lg:text-5xl">{value}</div>
-                  <div className="mt-3 text-sm text-muted-foreground">{label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Security */}
         <section className="relative overflow-hidden bg-foreground/[0.02] py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 max-w-3xl lg:mb-24">
@@ -330,8 +217,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Control */}
-        <section id="control" className="relative overflow-hidden py-24 lg:py-32">
+        <section id="control" className="relative scroll-mt-28 overflow-hidden py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 max-w-3xl lg:mb-24">
               <SectionEyebrow>{t("control.badge")}</SectionEyebrow>
@@ -354,61 +240,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="relative border-t border-foreground/10 py-32 lg:py-40">
-          <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
-            <div className="mb-16 flex items-center justify-between">
-              <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">{t("testimonials.badge")}</span>
-              <span className="font-mono text-xs text-muted-foreground">
-                {String(testimonial + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
-              </span>
-            </div>
-
-            {quote && (
-              <div className="grid gap-12 lg:grid-cols-[1fr_auto] lg:items-end">
-                <blockquote className="font-serif max-w-4xl text-3xl leading-snug lg:text-5xl">
-                  “{quote.quote}”
-                </blockquote>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setTestimonial((i) => (i - 1 + testimonials.length) % testimonials.length)}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 hover:bg-foreground/5"
-                    aria-label="Previous testimonial"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTestimonial((i) => (i + 1) % testimonials.length)}
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-foreground/15 hover:bg-foreground/5"
-                    aria-label="Next testimonial"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {quote && (
-              <div className="mt-12 flex flex-col justify-between gap-8 border-t border-foreground/10 pt-8 sm:flex-row sm:items-end">
-                <div>
-                  <div className="font-medium">{quote.author}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{quote.role}</div>
-                </div>
-                <div>
-                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground uppercase">
-                    {t("testimonials.result_label")}
-                  </div>
-                  <div className="font-display mt-1 text-xl">{quote.result}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* FAQ */}
-        <section id="faq" className="relative border-t border-foreground/10 py-24 lg:py-32">
+        <section id="faq" className="relative scroll-mt-28 border-t border-foreground/10 py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 lg:mb-24">
               <SectionEyebrow>{t("faq.badge")}</SectionEyebrow>
@@ -426,20 +258,20 @@ export default function LandingPage() {
                     type="button"
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                     className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                    aria-expanded={openFaq === i}
                   >
                     <span className="font-display text-lg lg:text-xl">{item.q}</span>
                     <ChevronDown className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
                   </button>
-                  <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? "max-h-48 pb-6" : "max-h-0"}`}>
-                    <p className="leading-relaxed text-muted-foreground">{item.a}</p>
-                  </div>
+                  {openFaq === i && (
+                    <p className="pb-6 leading-relaxed text-muted-foreground">{item.a}</p>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA */}
         <section className="relative overflow-hidden py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="relative border border-foreground">
@@ -481,7 +313,7 @@ export default function LandingPage() {
           <div className="mb-16 grid gap-10 md:grid-cols-4">
             <div>
               <Link href="#top" className="flex items-center">
-                <span className="font-display text-xl tracking-tight">Ariadne</span>
+                <Logo className="scale-[0.92]" />
               </Link>
               <p className="mt-4 max-w-[240px] text-sm leading-relaxed text-muted-foreground">
                 {t("footer.tagline")}
@@ -493,7 +325,7 @@ export default function LandingPage() {
                 <li><Link href="#features" className="hover:text-foreground">{t("footer.product_features")}</Link></li>
                 <li><Link href="#how-it-works" className="hover:text-foreground">{t("footer.product_how")}</Link></li>
                 <li><Link href="#product" className="hover:text-foreground">{t("footer.product_inside")}</Link></li>
-                <li><Link href="#control" className="hover:text-foreground">{t("footer.product_explore")}</Link></li>
+                <li><Link href="#boards" className="hover:text-foreground">{t("footer.product_explore")}</Link></li>
               </ul>
             </div>
             <div>

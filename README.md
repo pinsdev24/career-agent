@@ -1,6 +1,6 @@
-# CareerAgent 🚀
+# Ariadne 🚀
 
-**CareerAgent** is an intelligent, agentic platform engineered to automatically extract your resume info, orchestrate research on specific job descriptions, analyze skill gaps, and autonomously draft highly personalized Cover Letters. 
+**Ariadne** is an intelligent, agentic platform engineered to extract your resume info, research job descriptions from ATS boards we can reach, analyze skill gaps, and draft personalized cover letters — you review, then you apply. 
 
 Powered by **LangGraph** on the backend and an immersive **Next.js** / **Shadcn UI** frontend, the system supports a true *Human-in-the-Loop* (HITL) review process so you always have the final say on the generated documents.
 
@@ -44,8 +44,8 @@ Powered by **LangGraph** on the backend and an immersive **Next.js** / **Shadcn 
 
 Clone the repository and jump into your development directory:
 ```bash
-git clone https://github.com/your-repo/CareerAgent.git
-cd CareerAgent
+git clone https://github.com/pinsdev24/career-agent.git
+cd career-agent
 ```
 
 ### 2. Backend Initialization (Python)

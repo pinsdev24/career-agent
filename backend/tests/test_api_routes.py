@@ -18,6 +18,21 @@ class TestHealthEndpoint:
         assert response.json() == {"status": "ok"}
 
 
+class TestOpenAPIMetadata:
+    """Landing PRD Cut 4 — OpenAPI /docs title is Ariadne, not CareerAgent."""
+
+    @pytest.mark.asyncio
+    async def test_openapi_title_is_ariadne(self, async_client) -> None:
+        response = await async_client.get("/openapi.json")
+        assert response.status_code == 200
+        info = response.json()["info"]
+        assert info["title"] == "Ariadne API"
+        assert "CareerAgent" not in info["title"]
+        assert "CareerAgent" not in (info.get("description") or "")
+        assert "MACA" not in (info.get("description") or "")
+        assert "ariadne.app" not in (info.get("description") or "")
+
+
 # ---------------------------------------------------------------------------
 # Profile endpoints
 # ---------------------------------------------------------------------------
@@ -83,7 +98,12 @@ class TestPipelineEndpoints:
             return_value=MagicMock(data=[{"id": "run-new-123"}])
         )
 
-        with patch("app.routers.pipeline.enqueue_job", new_callable=AsyncMock):
+        with (
+            patch("app.routers.pipeline.enqueue_job", new_callable=AsyncMock),
+            patch(
+                "app.routers.pipeline.seed_board_from_url", new_callable=AsyncMock
+            ) as seed,
+        ):
             response = await async_client.post(
                 "/pipeline/start",
                 json={"entry_mode": "url", "offer_url": "https://example.com/job/1"},
@@ -93,6 +113,32 @@ class TestPipelineEndpoints:
         data = response.json()
         assert "id" in data
         assert data["status"] == "started"
+        seed.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_start_pipeline_non_ats_url_still_starts(
+        self, async_client, mock_supabase: MagicMock
+    ) -> None:
+        mock_supabase.table.return_value.insert.return_value.execute = AsyncMock(
+            return_value=MagicMock(data=[{"id": "run-new-456"}])
+        )
+        with (
+            patch("app.routers.pipeline.enqueue_job", new_callable=AsyncMock),
+            patch(
+                "app.routers.pipeline.seed_board_from_url",
+                new=AsyncMock(side_effect=RuntimeError("seed boom")),
+            ),
+        ):
+            response = await async_client.post(
+                "/pipeline/start",
+                json={
+                    "entry_mode": "url",
+                    "offer_url": "https://www.linkedin.com/jobs/view/123",
+                },
+                headers={"Authorization": FAKE_TOKEN},
+            )
+        assert response.status_code == 200
+        assert response.json()["status"] == "started"
 
     @pytest.mark.asyncio
     async def test_get_run_requires_auth(self, async_client) -> None:

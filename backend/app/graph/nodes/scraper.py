@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 from app.config import get_settings
 from app.exceptions import OfferUnavailableError
 from app.models.state import AgentState
+from app.tools.ats_extract import fallback_ats_text, fetch_ats_job, parse_ats_job_url
 from app.tools.retry import async_retry
 from app.tools.tavily_tools import extract_url
 from app.graph.pubsub import log_emitter
@@ -29,6 +30,39 @@ logger = logging.getLogger(__name__)
 async def _extract_offer_url(url: str) -> dict:
     """Retry-wrapped Tavily URL extraction."""
     return await extract_url(url)
+
+
+ATS_TAVILY_SOFT = (
+    "Could not load the full job description from this ATS page. "
+    "Letter can continue from the board metadata — it may be thinner."
+)
+
+
+async def _load_offer_text(url: str) -> tuple[dict, str | None]:
+    """Prefer ATS JSON APIs; never hard-fail solely because Tavily blocked an ATS URL."""
+    ref = parse_ats_job_url(url)
+    if ref:
+        ats = await fetch_ats_job(url)
+        if ats and (ats.get("raw_content") or "").strip():
+            return ats, None
+        try:
+            return await _extract_offer_url(url), None
+        except Exception as exc:
+            logger.warning(
+                "Scraper: Tavily fallback skipped for ATS url=%s error=%s",
+                url[:120],
+                exc,
+            )
+            if ats and (ats.get("raw_content") or "").strip():
+                return ats, ATS_TAVILY_SOFT
+            return {
+                "url": url,
+                "raw_content": fallback_ats_text(ref, url),
+                "source": "ats_url_only",
+                "provider": ref.provider,
+                "company": None,
+            }, ATS_TAVILY_SOFT
+    return await _extract_offer_url(url), None
 
 
 @async_retry(max_retries=2, backoff_base=1.0)
@@ -160,10 +194,12 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
     """Extract and structure a job offer from its URL.
 
     Pipeline:
-    1. Tavily extract API (raw content with HTTP validation)
-    2. Regex pre-check for unavailable positions (skip LLM if obvious)
-    3. LLM structured extraction with fast_model (cost-efficient)
-    4. Post-extraction availability validation
+    1. ATS JSON API when the URL is Greenhouse/Lever/Ashby/Workable
+       (Tavily is not required to seed or load those JDs)
+    2. Tavily extract only for non-ATS hosts, or as a last resort
+    3. Regex pre-check for unavailable positions (skip LLM if obvious)
+    4. LLM structured extraction with fast_model (cost-efficient)
+    5. Post-extraction availability validation
     """
     offer_url = state.get("offer_url")
     if not offer_url:
@@ -177,11 +213,11 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
     logger.info("Scraper: extracting %s for run=%s", offer_url, run_id)
     await log_emitter.emit(run_id, {"type": "info", "message": "Scraper: Extracting content from URL..."})
 
-    # Step 1: Extract raw content via Tavily (retried, with HTTP validation)
+    # Step 1: ATS connector first; Tavily only if the host is not a known ATS
     try:
-        extracted = await _extract_offer_url(offer_url)
+        extracted, soft_warning = await _load_offer_text(offer_url)
     except Exception as exc:
-        logger.error("Scraper: Tavily extraction failed for run=%s: %s", run_id, exc)
+        logger.error("Scraper: extraction failed for run=%s: %s", run_id, exc)
         await log_emitter.emit(run_id, {"type": "error", "message": f"Scraper: Failed to extract URL content — {exc}"})
         return {
             "status": "failed",
@@ -193,10 +229,22 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         }
 
     raw_content = extracted.get("raw_content", "")
+    # Soft-continue only when Tavily was skipped/blocked for a known ATS URL.
+    ats_soft = extracted.get("source") == "ats_url_only" or bool(soft_warning)
+    if extracted.get("source") == "ats":
+        await log_emitter.emit(
+            run_id,
+            {
+                "type": "info",
+                "message": f"Scraper: Loaded job from {extracted.get('provider') or 'ATS'} board API (no Tavily).",
+            },
+        )
+    if soft_warning:
+        await log_emitter.emit(run_id, {"type": "info", "message": f"Scraper: {soft_warning}"})
 
     # Step 2: Regex pre-check for obviously unavailable positions
     is_avail, unavail_reason = _check_content_availability(raw_content)
-    if not is_avail:
+    if not is_avail and not ats_soft:
         logger.warning(
             "Scraper: position unavailable (pre-check) for run=%s: %s",
             run_id, unavail_reason,
@@ -246,7 +294,7 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
         )
 
     # Step 4: Post-extraction availability check (LLM detected unavailable)
-    if not structured.is_available:
+    if not structured.is_available and not ats_soft:
         reason = structured.unavailable_reason or "Position no longer available"
         logger.warning(
             "Scraper: LLM detected unavailable position for run=%s: %s",
@@ -270,18 +318,29 @@ async def scraper_node(state: AgentState, config: RunnableConfig) -> AgentState:
     # Build the selected_offer dict with rich company info
     company_info_dict = structured.company_info.model_dump()
 
+    title = structured.title
+    company = structured.company_info.name
+    if (not title or title == "Unknown") and extracted.get("title"):
+        title = extracted["title"]
+    if (not company or company.lower() in {"unknown", "greenhouse", "lever", "ashby", "workable"}) and extracted.get(
+        "company"
+    ):
+        company = extracted["company"]
+        company_info_dict["name"] = company
+
     selected_offer = {
         "id": str(uuid.uuid4()),
-        "title": structured.title,
-        "company": structured.company_info.name,  # Backward-compat flat field
+        "title": title,
+        "company": company,  # Backward-compat flat field
         "company_info": company_info_dict,
         "url": offer_url,
-        "location": structured.location,
+        "location": structured.location or extracted.get("location"),
         "contact_email": structured.contact_email,
         "snippet": raw_content[:300],
         "pre_score": 0,
         "raw_text": raw_content,
         "structured": structured.model_dump(),
+        "soft_warning": soft_warning,
     }
 
     logger.info(

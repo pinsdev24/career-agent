@@ -1,6 +1,6 @@
 # System Architecture
 
-CareerAgent employs a modern, decoupled architecture designed for performance, security, and scalability. It splits responsibilities between a React-based frontend, a Python/FastAPI backend orchestrating LangGraph workflows, and a Supabase-managed PostgreSQL database.
+Ariadne employs a modern, decoupled architecture designed for performance, security, and scalability. It splits responsibilities between a React-based frontend, a Python/FastAPI backend orchestrating LangGraph workflows, and a Supabase-managed PostgreSQL database.
 
 ## High-Level Architecture
 

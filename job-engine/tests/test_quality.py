@@ -3,6 +3,7 @@
 from app.quality.gates import is_closed_job_text, passes_content_gates
 from app.quality.urls import (
     extract_ats_board_slug,
+    extract_ats_job_ref,
     is_aggregator_url,
     is_valid_job_url,
 )
@@ -28,8 +29,48 @@ def test_extract_board_slug():
         "greenhouse",
         "stripe",
     )
+    assert extract_ats_board_slug("https://job-boards.greenhouse.io/datadog/jobs/9") == (
+        "greenhouse",
+        "datadog",
+    )
+    assert extract_ats_board_slug("https://boards.greenhouse.io/stripe") == (
+        "greenhouse",
+        "stripe",
+    )
+    assert extract_ats_board_slug(
+        "https://boards.greenhouse.io/embed/job_board?for=notion"
+    ) == ("greenhouse", "notion")
     assert extract_ats_board_slug("https://jobs.lever.co/netlify/abc") == ("lever", "netlify")
     assert extract_ats_board_slug("https://jobs.ashbyhq.com/ramp/xyz") == ("ashby", "ramp")
+    assert extract_ats_board_slug(
+        "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+    ) == ("ashby", "mistral.ai")
+    assert extract_ats_board_slug("https://jobs.ashbyhq.com/mistral.ai") == (
+        "ashby",
+        "mistral.ai",
+    )
+    assert extract_ats_board_slug(
+        "https://job-boards.greenhouse.io/datacamp/jobs/7481117"
+    ) == ("greenhouse", "datacamp")
+    assert extract_ats_board_slug("https://apply.workable.com/acme/j/ABC123") == (
+        "workable",
+        "acme",
+    )
+    assert extract_ats_job_ref(
+        "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+    ) == ("ashby", "mistral.ai", "50c74749-9fbc-471f-a647-f6cd22423ccf")
+    assert extract_ats_job_ref(
+        "https://job-boards.greenhouse.io/datacamp/jobs/7481117"
+    ) == ("greenhouse", "datacamp", "7481117")
+
+
+def test_extract_board_slug_rejects_non_ats():
+    assert extract_ats_board_slug("https://www.linkedin.com/jobs/view/123") is None
+    assert extract_ats_board_slug("https://www.indeed.com/viewjob?jk=abc") is None
+    assert extract_ats_board_slug("https://acme.jobs.personio.de/job/123") is None
+    assert extract_ats_board_slug("https://example.com/careers/eng") is None
+    assert extract_ats_board_slug("https://boards.greenhouse.io/embed/job_board") is None
+    assert extract_ats_board_slug("") is None
 
 
 def test_closed_job_detection():

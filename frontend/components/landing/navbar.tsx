@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LanguageToggle } from "@/components/language-toggle";
+import { Logo } from "@/components/logo";
 
 const NAV_LINKS = [
   { href: "#features", key: "features" },
@@ -40,7 +41,7 @@ export function LandingNavbar() {
       <nav className="mx-auto max-w-[1200px] rounded-2xl border border-foreground/10 bg-background/80 shadow-lg backdrop-blur-xl">
         <div className={`flex items-center justify-between px-6 transition-all duration-500 lg:px-8 ${scrolled ? "h-12" : "h-14"}`}>
           <Link href="#top" className="flex items-center" onClick={() => setMobileOpen(false)}>
-            <span className="font-display text-xl tracking-tight">Ariadne</span>
+            <Logo className="scale-[0.92]" />
           </Link>
 
           <div className="hidden items-center gap-8 lg:gap-12 md:flex">

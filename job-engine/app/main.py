@@ -108,7 +108,7 @@ async def request_metrics(request: Request, call_next):
     label_path = path
     if path.startswith("/v1/jobs/") and path.count("/") >= 3:
         parts = path.split("/")
-        if len(parts) >= 4 and parts[3] not in ("recommend", "search"):
+        if len(parts) >= 4 and parts[3] not in ("recommend", "search", "seed"):
             label_path = "/v1/jobs/{id}" + ("/signals" if path.endswith("/signals") else "")
     REQUEST_COUNT.labels(request.method, label_path, str(response.status_code)).inc()
     REQUEST_LATENCY.labels(request.method, label_path).observe(elapsed)

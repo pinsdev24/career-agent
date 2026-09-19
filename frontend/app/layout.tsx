@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from "@/components/theme-provider";
 import CookieBanner from "@/components/cookie-banner";
@@ -25,11 +25,30 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Ariadne — AI Career Labyrinth Navigator",
-  description:
-    "Navigate your career labyrinth. Multi-agent LLM system that analyzes your CV, matches job offers, and accelerates your hiring potential.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "Metadata" });
+  const title = t("meta_title");
+  const description = t("meta_description");
+  const ogTitle = t("meta_og_title");
+  const ogDescription = t("meta_og_description");
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      locale,
+      type: "website",
+    },
+    twitter: {
+      card: "summary",
+      title: ogTitle,
+      description: ogDescription,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

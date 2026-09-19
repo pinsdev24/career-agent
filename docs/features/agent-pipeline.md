@@ -1,6 +1,6 @@
 # The Agent Pipeline
 
-At the core of CareerAgent is a sophisticated multi-agent system orchestrated by [LangGraph](https://python.langchain.com/docs/langgraph). The pipeline utilizes a State Machine architecture to coordinate specialized AI agents, process data, and halt for necessary user input.
+At the core of Ariadne is a sophisticated multi-agent system orchestrated by [LangGraph](https://python.langchain.com/docs/langgraph). The pipeline utilizes a State Machine architecture to coordinate specialized AI agents, process data, and halt for necessary user input.
 
 ## Pipeline State
 
