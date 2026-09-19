@@ -54,6 +54,7 @@ export default function JobsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<JobPosting | null>(null);
+  const [deepLinkMissing, setDeepLinkMissing] = useState(false);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"recommend" | "search">("recommend");
   const [packetBusy, setPacketBusy] = useState(false);
@@ -120,6 +121,7 @@ export default function JobsPage() {
   const selectJob = useCallback(
     (job: JobPosting, history: "push" | "replace" = "push") => {
       setSelected(job);
+      setDeepLinkMissing(false);
       setActionMessage(null);
       writeJobQuery(job.id, history);
     },
@@ -158,9 +160,11 @@ export default function JobsPage() {
         if (reset) {
           const result = resolveJobSelection(res.items, requestedJobId);
           if (result.status === "matched" || result.status === "default") {
+            setDeepLinkMissing(false);
             setSelected(result.selected);
           } else {
-            setSelected(result.fallback);
+            setDeepLinkMissing(false);
+            setSelected(null);
           }
         }
       } catch (err) {
@@ -217,6 +221,7 @@ export default function JobsPage() {
     const result = resolveJobSelection(items, requestedJobId, selected?.id);
 
     if (result.status === "default") {
+      setDeepLinkMissing(false);
       setSelected((current) =>
         current?.id === result.selected?.id ? current : result.selected
       );
@@ -224,6 +229,7 @@ export default function JobsPage() {
     }
 
     if (result.status === "matched") {
+      setDeepLinkMissing(false);
       setSelected((current) =>
         current?.id === result.selected.id ? current : result.selected
       );
@@ -231,9 +237,8 @@ export default function JobsPage() {
     }
 
     if (failedFetchId.current === result.id) {
-      setSelected((current) =>
-        current?.id === result.fallback?.id ? current : result.fallback
-      );
+      setDeepLinkMissing(true);
+      setSelected(null);
       return;
     }
 
@@ -242,21 +247,21 @@ export default function JobsPage() {
       try {
         const fetched = await getJob(result.id);
         if (cancelled) return;
+        setDeepLinkMissing(false);
         setItems((prev) => includeFetchedJob(prev, fetched));
         setSelected(fetched);
       } catch {
         if (cancelled) return;
         failedFetchId.current = result.id;
-        setActionMessage({ kind: "error", text: t("offer_not_in_feed") });
-        setSelected(result.fallback);
-        writeJobQuery(null, "replace");
+        setDeepLinkMissing(true);
+        setSelected(null);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [items, loading, requestedJobId, selected?.id, t, writeJobQuery]);
+  }, [items, loading, requestedJobId, selected?.id]);
 
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -286,9 +291,11 @@ export default function JobsPage() {
       setCursor(res.next_cursor ?? null);
       const result = resolveJobSelection(res.items, requestedJobId);
       if (result.status === "matched" || result.status === "default") {
+        setDeepLinkMissing(false);
         setSelected(result.selected);
       } else {
-        setSelected(result.fallback);
+        setDeepLinkMissing(false);
+        setSelected(null);
       }
       setMode(query.trim() ? "search" : "recommend");
     } catch (err) {
@@ -416,15 +423,6 @@ export default function JobsPage() {
         </div>
       )}
 
-      {!error &&
-        actionMessage?.kind === "error" &&
-        items.length === 0 &&
-        !loading && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
-            {actionMessage.text}
-          </div>
-        )}
-
       {loading ? (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="space-y-2">
@@ -511,7 +509,16 @@ export default function JobsPage() {
           </div>
 
           <aside className="h-fit overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111] lg:sticky lg:top-6">
-            {selected && selectedGate ? (
+            {deepLinkMissing ? (
+              <div className="space-y-2 px-5 py-16 text-center">
+                <p className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                  {t("deep_link_missing")}
+                </p>
+                <p className="text-[13px] text-[#888]">
+                  {t("deep_link_missing_hint")}
+                </p>
+              </div>
+            ) : selected && selectedGate ? (
               <JobCard
                 variant="detail"
                 display={postingToDisplay(selected)}
