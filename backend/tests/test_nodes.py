@@ -125,13 +125,13 @@ class TestScraperNode:
     async def test_scraper_extracts_and_structures_offer(
         self, sample_agent_state: dict, mock_runnable_config: dict
     ) -> None:
-        from app.graph.nodes.scraper import scraper_node, StructuredOffer
+        from app.graph.nodes.scraper import CompanyInfo, scraper_node, StructuredOffer
 
         mock_raw = "Backend Engineer at TechCorp. Python, FastAPI required. Paris, CDI."
 
         mock_structured = StructuredOffer(
             title="Backend Engineer",
-            company="TechCorp",
+            company_info=CompanyInfo(name="TechCorp"),
             location="Paris",
             contract_type="CDI",
             remote="hybrid",

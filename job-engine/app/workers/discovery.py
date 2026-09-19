@@ -87,7 +87,7 @@ async def discover_via_tavily(
                 break
             row = await repo.upsert_company(
                 slug=slug,
-                name=slug.replace("-", " ").title(),
+                name=slug.replace("-", " ").replace("_", " ").replace(".", " ").title(),
                 ats_provider=provider,
                 board_token=slug,
                 careers_url=ats_careers_url(provider, slug),

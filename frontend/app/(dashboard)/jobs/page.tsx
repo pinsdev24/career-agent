@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Briefcase, Loader2, Search } from "lucide-react";
+import { Briefcase, Link2, Loader2, Search } from "lucide-react";
 import type { JobPosting } from "@/lib/job-engine-types";
 import {
   getJob,
@@ -370,7 +370,25 @@ export default function JobsPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col gap-5">
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader
+        title={t("title")}
+        subtitle={t("subtitle")}
+        actions={
+          <Button
+            type="button"
+            variant="outline"
+            className="h-9 rounded-lg px-4 text-[13px]"
+            onClick={() => {
+              const el = document.getElementById("jobs-url-seed-chrome");
+              el?.scrollIntoView({ behavior: "smooth", block: "center" });
+              el?.focus();
+            }}
+          >
+            <Link2 className="h-4 w-4" />
+            {t("url_seed_title")}
+          </Button>
+        }
+      />
 
       <form onSubmit={onSearch} className="flex gap-2">
         <div className="relative flex-1">
@@ -386,6 +404,10 @@ export default function JobsPage() {
           {t("search")}
         </Button>
       </form>
+
+      <div className="rounded-2xl border border-[#EBEBEB] bg-white px-4 py-3 dark:border-[#333] dark:bg-[#111]">
+        <JobsUrlSeed compact inputId="jobs-url-seed-chrome" />
+      </div>
 
       <JobsFilterBar
         value={bar}
@@ -477,7 +499,7 @@ export default function JobsPage() {
                 : undefined
             }
           >
-            <JobsUrlSeed />
+            <JobsUrlSeed inputId="jobs-url-seed-empty" />
           </EmptyState>
         )
       ) : (
@@ -532,12 +554,15 @@ export default function JobsPage() {
                 signalBusy={signalBusy}
                 actionMessage={actionMessage}
                 footerNote={
-                  <Link
-                    href="/pipeline/new"
-                    className="block pt-1 text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
-                  >
-                    {t("url_not_in_feed")}
-                  </Link>
+                  <div className="space-y-2 pt-1">
+                    <JobsUrlSeed compact inputId="jobs-url-seed-detail" />
+                    <Link
+                      href="/pipeline/new"
+                      className="block text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
+                    >
+                      {t("url_not_in_feed")}
+                    </Link>
+                  </div>
                 }
               />
             ) : (

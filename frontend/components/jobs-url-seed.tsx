@@ -25,7 +25,13 @@ function isHttpUrl(value: string): boolean {
   }
 }
 
-export function JobsUrlSeed({ compact = false }: { compact?: boolean }) {
+export function JobsUrlSeed({
+  compact = false,
+  inputId = "jobs-url-seed",
+}: {
+  compact?: boolean;
+  inputId?: string;
+}) {
   const t = useTranslations("Jobs");
   const [url, setUrl] = useState("");
   const [status, setStatus] = useState<SeedStatus>("idle");
@@ -60,14 +66,14 @@ export function JobsUrlSeed({ compact = false }: { compact?: boolean }) {
       className={compact ? "space-y-2 text-left" : "mx-auto mt-5 w-full max-w-md space-y-2 text-left"}
     >
       <div>
-        <label htmlFor="jobs-url-seed" className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+        <label htmlFor={inputId} className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
           {t("url_seed_title")}
         </label>
         <p className="mt-0.5 text-[12px] leading-relaxed text-[#888]">{t("url_seed_desc")}</p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Input
-          id="jobs-url-seed"
+          id={inputId}
           type="url"
           value={url}
           onChange={(e) => {

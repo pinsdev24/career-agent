@@ -23,7 +23,7 @@ async def seed_company_from_url(repo: JobRepository, url: str) -> dict:
 
     provider, slug = parsed
     existing = await repo.get_company_by_board(provider, slug)
-    name = (existing or {}).get("name") or slug.replace("-", " ").title()
+    name = (existing or {}).get("name") or slug.replace("-", " ").replace("_", " ").replace(".", " ").title()
     row = await repo.upsert_company(
         slug=slug,
         name=name,
