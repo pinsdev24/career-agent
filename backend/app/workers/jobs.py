@@ -18,6 +18,7 @@ from app.db.applications import (
 )
 from app.graph.pubsub import log_emitter
 from app.graph.runner import resume_pipeline, run_pipeline
+from app.tools.ats_extract import backfill_ats_description
 from app.tools.supabase_ops import get_profile
 from app.workers.packet import run_packet_graph
 
@@ -50,6 +51,7 @@ async def generate_packet_job(
         )
         return {"ok": False, "error": "profile_unavailable"}
 
+    posting = await backfill_ats_description(posting)
     selected_offer = posting_to_selected_offer(posting)
     existing = await latest_packet(supabase, application_id)
 

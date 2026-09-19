@@ -233,6 +233,25 @@ describe("Jobs Cut 2 URL-seed copy", () => {
     const { default: fr } = await import("../messages/fr.json");
     const { default: nl } = await import("../messages/nl.json");
     expect(en.Jobs.empty_warming_cta).toBe("Paste a job URL");
+    expect(en.Jobs.paste_url_header).toBe("Paste a job URL");
+    expect(en.Jobs.paste_url_header_hint).toBe(
+      "Follow a Greenhouse, Lever, Ashby, or Workable board"
+    );
+    expect(en.Jobs.paste_url_detail_link).toBe("Have a URL not in the feed?");
+    expect(fr.Jobs.paste_url_header).toBe("Coller une URL d’offre");
+    expect(fr.Jobs.paste_url_header_hint).toBe(
+      "Suivre un board Greenhouse, Lever, Ashby ou Workable"
+    );
+    expect(fr.Jobs.paste_url_detail_link).toBe(
+      "Vous avez une URL absente du flux ?"
+    );
+    expect(nl.Jobs.paste_url_header).toBe("Plak een job-URL");
+    expect(nl.Jobs.paste_url_header_hint).toBe(
+      "Volg een Greenhouse-, Lever-, Ashby- of Workable-board"
+    );
+    expect(nl.Jobs.paste_url_detail_link).toBe(
+      "Heb je een URL die niet in de feed staat?"
+    );
     for (const key of JOBS_SEED_KEYS) {
       expect(en.Jobs[key], `en ${key}`).toBe(EN_JOBS[key]);
       expect(fr.Jobs[key], `fr ${key}`).toBe(FR_JOBS[key]);
@@ -272,10 +291,19 @@ describe("Jobs Cut 2 URL-seed copy", () => {
     const { default: en } = await import("../messages/en.json");
     const { default: fr } = await import("../messages/fr.json");
     const { default: nl } = await import("../messages/nl.json");
+    const PASTE_IA = [
+      "paste_url_header",
+      "paste_url_header_hint",
+      "paste_url_detail_link",
+      "empty_warming_cta",
+    ] as const;
     const blob = [
       ...JOBS_SEED_KEYS.map((key) => String(en.Jobs[key])),
       ...JOBS_SEED_KEYS.map((key) => String(fr.Jobs[key])),
       ...JOBS_SEED_KEYS.map((key) => String(nl.Jobs[key])),
+      ...PASTE_IA.map((key) => String(en.Jobs[key])),
+      ...PASTE_IA.map((key) => String(fr.Jobs[key])),
+      ...PASTE_IA.map((key) => String(nl.Jobs[key])),
       en.NewMission.url_seed_side_success,
       en.NewMission.url_seed_side_unsupported,
       fr.NewMission.url_seed_side_success,

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timezone
 from html import unescape
+from urllib.parse import quote
 import re
 
 import httpx
@@ -31,7 +32,7 @@ class AshbyConnector:
         etag: str | None = None,
     ) -> tuple[list[CanonicalJob], str | None, bool]:
         # Public board API used by jobs.ashbyhq.com embeds
-        url = f"https://api.ashbyhq.com/posting-api/job-board/{board_token}"
+        url = f"https://api.ashbyhq.com/posting-api/job-board/{quote(board_token, safe='._-')}"
         headers = {"If-None-Match": etag} if etag else None
         body, resp_headers, status = await get_json(
             self.client,

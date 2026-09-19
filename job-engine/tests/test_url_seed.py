@@ -106,6 +106,56 @@ async def test_job_seed_url_enqueues_sync(monkeypatch):
     assert {e[1][0] for e in syncs} == {result["company_id"]}
 
 
+MISTRAL_ASHBY = (
+    "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+)
+DATACAMP_GH = "https://job-boards.greenhouse.io/datacamp/jobs/7481117"
+
+
+async def test_seed_dotted_ashby_slug_upserts_and_is_idempotent():
+    repo = _FakeRepo()
+    first = await seed_company_from_url(repo, MISTRAL_ASHBY)
+    second = await seed_company_from_url(repo, MISTRAL_ASHBY)
+    assert first["ok"] is True
+    assert first["provider"] == "ashby"
+    assert first["slug"] == "mistral.ai"
+    assert first["created"] is True
+    assert first["company_id"] == "co-ashby-mistral.ai"
+    assert first["name"] == "Mistral Ai"
+    assert repo.companies[0]["board_token"] == "mistral.ai"
+    assert repo.companies[0]["careers_url"] == "https://jobs.ashbyhq.com/mistral.ai"
+    assert second["ok"] and second["created"] is False
+    assert second["company_id"] == first["company_id"]
+    assert len(repo.companies) == 1
+
+
+async def test_seed_greenhouse_job_boards_datacamp():
+    repo = _FakeRepo()
+    result = await seed_company_from_url(repo, DATACAMP_GH)
+    assert result["ok"] is True
+    assert result["provider"] == "greenhouse"
+    assert result["slug"] == "datacamp"
+    assert repo.companies[0]["careers_url"] == "https://boards.greenhouse.io/datacamp"
+
+
+async def test_job_seed_url_dotted_ashby_enqueues_sync(monkeypatch):
+    repo = _FakeRepo()
+    enqueued: list[tuple] = []
+
+    async def _enqueue(name, *args):
+        enqueued.append((name, args))
+        return "job-sync-mistral"
+
+    monkeypatch.setattr("app.workers.settings.enqueue_job", _enqueue)
+    result = await job_seed_url({"repo": repo}, MISTRAL_ASHBY)
+    assert result["ok"] is True
+    assert result["sync_enqueued"] is True
+    assert result["slug"] == "mistral.ai"
+    assert result["company_id"] == "co-ashby-mistral.ai"
+    syncs = [e for e in enqueued if e[0] == "job_sync_company"]
+    assert {e[1][0] for e in syncs} == {result["company_id"]}
+
+
 async def test_job_seed_url_non_ats_does_not_enqueue(monkeypatch):
     repo = _FakeRepo()
     enqueued: list[tuple] = []

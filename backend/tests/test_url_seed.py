@@ -28,6 +28,30 @@ async def test_seed_board_enqueues_job_engine_job() -> None:
 
 
 @pytest.mark.asyncio
+async def test_seed_board_enqueues_dotted_ashby_without_tavily() -> None:
+    pool = MagicMock()
+    pool.enqueue_job = AsyncMock(return_value=MagicMock(job_id="jid"))
+    pool.aclose = AsyncMock()
+
+    with (
+        patch("app.tools.job_engine_seed.get_settings") as settings,
+        patch("app.tools.job_engine_seed.create_pool", new=AsyncMock(return_value=pool)),
+        patch("app.tools.tavily_tools.extract_url", new=AsyncMock()) as tavily,
+    ):
+        settings.return_value.redis_url = "redis://localhost:6379"
+        await seed_board_from_url(
+            "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+        )
+
+    pool.enqueue_job.assert_awaited_once()
+    args, kwargs = pool.enqueue_job.await_args
+    assert args[0] == "job_seed_url"
+    assert "mistral.ai" in args[1]
+    assert kwargs["_job_id"].startswith("url-seed:")
+    tavily.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_seed_board_skips_non_ats() -> None:
     with patch("app.tools.job_engine_seed.create_pool", new=AsyncMock()) as create:
         await seed_board_from_url("https://www.linkedin.com/jobs/view/123")

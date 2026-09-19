@@ -274,6 +274,10 @@ class TestExtractCompanyFromUrl:
         url = "https://jobs.ashbyhq.com/picknik/2e9bb093-e8ed-458d-887c-b56882b19749"
         assert _extract_company_from_url(url) == "Picknik"
 
+    def test_ashby_dotted_org_slug(self) -> None:
+        url = "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+        assert _extract_company_from_url(url) == "Mistral Ai"
+
     def test_workable(self) -> None:
         url = "https://apply.workable.com/notion/j/ABC123/"
         assert _extract_company_from_url(url) == "Notion"
@@ -337,6 +341,12 @@ class TestExtractSeedableAtsSlug:
             "ashby",
             "ramp",
         )
+        assert extract_seedable_ats_slug(
+            "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
+        ) == ("ashby", "mistral.ai")
+        assert extract_seedable_ats_slug(
+            "https://job-boards.greenhouse.io/datacamp/jobs/7481117"
+        ) == ("greenhouse", "datacamp")
         assert extract_seedable_ats_slug("https://apply.workable.com/acme/j/1") == (
             "workable",
             "acme",

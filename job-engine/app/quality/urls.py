@@ -1,7 +1,7 @@
 """URL quality gates — aggregator denylist and ATS posting predicates."""
 
 import re
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 # Domains / patterns that are almost never direct apply pages.
 AGGREGATOR_DENYLIST = (
@@ -105,6 +105,8 @@ def is_valid_job_url(url: str) -> bool:
 
 _RESERVED_BOARD_SLUGS = frozenset({"embed", "embed2", "jobs", "api", "www", "app", "j"})
 SEEDABLE_ATS_PROVIDERS = frozenset({"greenhouse", "lever", "ashby", "workable"})
+# Ashby orgs like mistral.ai use a dotted board slug — dots are valid, not hosts.
+_BOARD_SLUG_RE = re.compile(r"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$", re.IGNORECASE)
 
 
 def ats_careers_url(provider: str, slug: str) -> str:
@@ -118,17 +120,65 @@ def ats_careers_url(provider: str, slug: str) -> str:
     return mapping.get(provider, "")
 
 
+def normalize_board_slug(slug: str | None) -> str:
+    """Lowercase, unquote, and strip a board token (keeps dots)."""
+    return unquote((slug or "").strip()).lower()
+
+
 def _is_board_slug(slug: str) -> bool:
-    token = (slug or "").strip().lower()
-    return len(token) >= 2 and token not in _RESERVED_BOARD_SLUGS
+    token = normalize_board_slug(slug)
+    return (
+        len(token) >= 2
+        and token not in _RESERVED_BOARD_SLUGS
+        and bool(_BOARD_SLUG_RE.fullmatch(token))
+    )
+
+
+def _job_id_from_parts(provider: str, parts: list[str]) -> str | None:
+    """Posting id after the board slug, when the URL is a job (not a board root)."""
+    if len(parts) < 2:
+        return None
+    rest = [unquote(p) for p in parts[1:]]
+    if provider == "greenhouse":
+        if len(rest) >= 2 and rest[0].lower() == "jobs" and rest[1]:
+            return rest[1]
+        return None
+    if provider == "workable":
+        if len(rest) >= 2 and rest[0].lower() in {"j", "jobs"} and rest[1]:
+            return rest[1]
+        return rest[0] if rest[0].lower() not in _RESERVED_BOARD_SLUGS else None
+    token = rest[0]
+    if token.lower() in _RESERVED_BOARD_SLUGS:
+        return None
+    return token
+
+
+def extract_ats_job_ref(url: str) -> tuple[str, str, str | None] | None:
+    """Return (provider, board_slug, job_id|None) for seedable ATS URLs.
+
+    ``job_id`` is set for posting URLs (including Ashby dotted slugs) and is
+    None for board roots / Greenhouse ``?for=`` embeds.
+    """
+    parsed = extract_ats_board_slug(url)
+    if not parsed:
+        return None
+    provider, slug = parsed
+    text = url.strip()
+    if "://" not in text:
+        text = "https://" + text
+    parts = [p for p in urlparse(text).path.split("/") if p]
+    if parts and normalize_board_slug(parts[0]) == slug:
+        return (provider, slug, _job_id_from_parts(provider, parts))
+    return (provider, slug, None)
 
 
 def extract_ats_board_slug(url: str) -> tuple[str, str] | None:
     """Return (provider, board_slug) when URL encodes an ATS company board.
 
     Accepts job posting URLs and board roots for Greenhouse, Lever, Ashby, and
-    Workable. Greenhouse embed boards use ``?for=``. Personio, Indeed, LinkedIn,
-    and other hosts return None (no fake company).
+    Workable. Greenhouse embed boards use ``?for=``. Dotted Ashby slugs such as
+    ``mistral.ai`` are valid. Personio, Indeed, LinkedIn, and other hosts
+    return None (no fake company).
     """
     if not url or not isinstance(url, str):
         return None
@@ -148,7 +198,7 @@ def extract_ats_board_slug(url: str) -> tuple[str, str] | None:
         provider = "greenhouse"
         for_token = (query.get("for") or [None])[0]
         if for_token and _is_board_slug(for_token):
-            return (provider, for_token.strip().lower())
+            return (provider, normalize_board_slug(for_token))
     elif "lever.co" in host:
         provider = "lever"
     elif "ashbyhq.com" in host:
@@ -160,7 +210,7 @@ def extract_ats_board_slug(url: str) -> tuple[str, str] | None:
 
     if not parts:
         return None
-    slug = parts[0].lower()
+    slug = normalize_board_slug(parts[0])
     if not _is_board_slug(slug):
         return None
     return (provider, slug)
