@@ -101,7 +101,7 @@ describe("Landing Cut 3 — HITL in-app voice", () => {
     }
     expect(en.MissionDetail.ready_to_copy).toBe("Your cover letter is ready to copy.");
     expect(fr.MissionDetail.ready_to_copy).toBe(
-      "Votre lettre de motivation est prête à copier."
+      "Votre lettre est prête à être copiée."
     );
     expect(nl.MissionDetail.ready_to_copy).toBe(
       "Je sollicitatiebrief is klaar om te kopiëren."
@@ -119,22 +119,22 @@ describe("Landing Cut 3 — HITL in-app voice", () => {
 
     expect(enHint.completed).toBe("Copy it into the employer’s form yourself");
     expect(frHint.completed).toBe(
-      "Copiez-la vous-même dans le formulaire de l'employeur"
+      "Copiez-la dans le formulaire de l’employeur"
     );
     expect(nlHint.completed).toBe("Kopieer hem zelf in het formulier van de werkgever");
 
-    expect(enSteps.completed).toBe("Copy");
-    expect(frSteps.completed).toBe("Copier");
-    expect(nlSteps.completed).toBe("Kopiëren");
+    expect(enSteps.completed).toBe("Apply");
+    expect(frSteps.completed).toBe("Postuler");
+    expect(nlSteps.completed).toBe("Solliciteren");
 
     expect(en.LetterEditor.helper).toBe(
-      "Approve when it sounds like you. Then copy it into the ATS — Ariadne never sends it."
+      "Approve when it sounds like you. Notes go to the writer — never to the employer."
     );
     expect(fr.LetterEditor.helper).toBe(
-      "Approuvez quand ça sonne comme vous. Ensuite, copiez-la dans l’ATS — Ariadne ne l’envoie jamais."
+      "Approuvez quand ça vous ressemble. Les notes vont à l’écrivain — jamais à l’employeur."
     );
     expect(nl.LetterEditor.helper).toBe(
-      "Keur goed als het als jij klinkt. Kopieer daarna naar de ATS — Ariadne verstuurt nooit."
+      "Keur goed als het als jij klinkt. Notities gaan naar de writer — nooit naar de werkgever."
     );
     expect(en.LetterEditor.approve).toBe("Approve letter");
     expect(fr.LetterEditor.approve).toBe("Approuver la lettre");
@@ -144,14 +144,14 @@ describe("Landing Cut 3 — HITL in-app voice", () => {
   it("keeps Applications copy_letter / open_ats / mark_submitted as the HITL verbs", async () => {
     const { en, fr, nl } = await loadAll();
     expect(en.Applications.copy_letter).toBe("Copy letter");
-    expect(en.Applications.open_ats).toBe("Open ATS");
-    expect(en.Applications.mark_submitted).toBe("Mark submitted");
+    expect(en.Applications.open_ats).toBe("Open application page");
+    expect(en.Applications.mark_submitted).toBe("I submitted this");
     expect(fr.Applications.copy_letter).toBe("Copier la lettre");
-    expect(fr.Applications.open_ats).toBe("Ouvrir l'ATS");
-    expect(fr.Applications.mark_submitted).toBe("Marquer comme postulé");
+    expect(fr.Applications.open_ats).toBe("Ouvrir la page de candidature");
+    expect(fr.Applications.mark_submitted).toBe("J’ai postulé ceci");
     expect(nl.Applications.copy_letter).toBe("Brief kopiëren");
-    expect(nl.Applications.open_ats).toBe("ATS openen");
-    expect(nl.Applications.mark_submitted).toBe("Markeren als ingediend");
+    expect(nl.Applications.open_ats).toBe("Sollicitatiepagina openen");
+    expect(nl.Applications.mark_submitted).toBe("Ik heb dit ingediend");
   });
 
   it("MissionDetail completed chrome uses Copy letter, not Send", () => {

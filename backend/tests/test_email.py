@@ -15,7 +15,7 @@ def test_french_and_dutch_subjects():
     fr_subject, fr_html = packet_ready_email("fr", "https://app.example/run")
     nl_subject, nl_html = packet_ready_email("nl", "https://app.example/run")
     assert fr_subject == "Ariadne — votre dossier est prêt à relire"
-    assert nl_subject == "Ariadne — je packet is klaar om te reviewen"
+    assert nl_subject == "Ariadne — je packet is klaar voor review"
     assert "postulez vous-même" in fr_html
     assert "dien zelf in" in nl_html
 

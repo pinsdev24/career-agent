@@ -565,7 +565,7 @@
       "writing": "Ensuite, un contrôle qualité",
       "critiquing": "Ensuite, c'est votre relecture",
       "waiting_letter_review": "Ensuite, elle est prête à copier",
-      "completed": "Copiez-la vous-même dans le formulaire de l'employeur"
+      "completed": "Copiez-la dans le formulaire de l’employeur"
     },
     "insights": {
       "brief": "Avant d'approuver",
@@ -607,7 +607,7 @@
       "writing": "Lettre",
       "critiquing": "Qualité",
       "waiting_letter_review": "Relecture",
-      "completed": "Copier"
+      "completed": "Postuler"
     },
     "stage": {
       "started": {
@@ -661,7 +661,7 @@
       "done_route": "Étape suivante choisie",
       "done_memory": "Mémoire mise à jour"
     },
-    "ready_to_copy": "Votre lettre de motivation est prête à copier."
+    "ready_to_copy": "Votre lettre est prête à être copiée."
   },
   "LetterEditor": {
     "title": "Lettre de motivation",
@@ -670,7 +670,7 @@
     "placeholder": "Le brouillon apparaîtra ici.",
     "notes_label": "Une réécriture ?",
     "feedback_placeholder": "ex. commencer par le travail RAG, ne pas revendiquer 5 ans de ML en production…",
-    "helper": "Approuvez quand ça sonne comme vous. Ensuite, copiez-la dans l’ATS — Ariadne ne l’envoie jamais.",
+    "helper": "Approuvez quand ça vous ressemble. Les notes vont à l’écrivain — jamais à l’employeur.",
     "rewrite": "Réécrire",
     "approve": "Approuver la lettre"
   },
@@ -863,8 +863,8 @@
     "approve": "Approuver la lettre",
     "rewrite": "Réécrire avec un commentaire",
     "feedback_placeholder": "Que faut-il changer ?",
-    "mark_submitted": "Marquer comme postulé",
-    "open_ats": "Ouvrir l'ATS",
+    "mark_submitted": "J’ai postulé ceci",
+    "open_ats": "Ouvrir la page de candidature",
     "no_ats_url": "Aucune page de candidature enregistrée.",
     "next_steps_title": "Ensuite : postulez vous-même",
     "next_steps_hint": "Copiez la lettre, ouvrez le formulaire de l'employeur, puis marquez comme postulé. Ariadne ne postule jamais à votre place.",

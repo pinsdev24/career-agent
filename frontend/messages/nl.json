@@ -607,7 +607,7 @@
       "writing": "Brief",
       "critiquing": "Kwaliteit",
       "waiting_letter_review": "Review",
-      "completed": "Kopiëren"
+      "completed": "Solliciteren"
     },
     "stage": {
       "started": {
@@ -670,7 +670,7 @@
     "placeholder": "Het concept verschijnt hier.",
     "notes_label": "Een herschrijving?",
     "feedback_placeholder": "bijv. begin met het RAG-werk, claim geen 5 jaar production ML…",
-    "helper": "Keur goed als het als jij klinkt. Kopieer daarna naar de ATS — Ariadne verstuurt nooit.",
+    "helper": "Keur goed als het als jij klinkt. Notities gaan naar de writer — nooit naar de werkgever.",
     "rewrite": "Herschrijven",
     "approve": "Brief goedkeuren"
   },
@@ -863,8 +863,8 @@
     "approve": "Brief goedkeuren",
     "rewrite": "Herschrijven met feedback",
     "feedback_placeholder": "Wat moet er veranderen?",
-    "mark_submitted": "Markeren als ingediend",
-    "open_ats": "ATS openen",
+    "mark_submitted": "Ik heb dit ingediend",
+    "open_ats": "Sollicitatiepagina openen",
     "no_ats_url": "Geen sollicitatiepagina bekend.",
     "next_steps_title": "Volgende: zelf solliciteren",
     "next_steps_hint": "Kopieer de brief, open het formulier van de werkgever, en markeer als ingediend. Ariadne solliciteert nooit namens jou.",

@@ -607,7 +607,7 @@
       "writing": "Letter",
       "critiquing": "Quality",
       "waiting_letter_review": "Review",
-      "completed": "Copy"
+      "completed": "Apply"
     },
     "stage": {
       "started": {
@@ -670,7 +670,7 @@
     "placeholder": "The draft will appear here.",
     "notes_label": "Want a rewrite?",
     "feedback_placeholder": "e.g. lead with the RAG work, don’t claim 5 years of production ML…",
-    "helper": "Approve when it sounds like you. Then copy it into the ATS — Ariadne never sends it.",
+    "helper": "Approve when it sounds like you. Notes go to the writer — never to the employer.",
     "rewrite": "Rewrite",
     "approve": "Approve letter"
   },
@@ -863,8 +863,8 @@
     "approve": "Approve letter",
     "rewrite": "Rewrite with feedback",
     "feedback_placeholder": "What should change?",
-    "mark_submitted": "Mark submitted",
-    "open_ats": "Open ATS",
+    "mark_submitted": "I submitted this",
+    "open_ats": "Open application page",
     "no_ats_url": "No application page on file.",
     "next_steps_title": "Next: apply yourself",
     "next_steps_hint": "Copy the letter, open the employer’s form, then mark it submitted. Ariadne never applies for you.",

@@ -24,8 +24,8 @@ PACKET_READY_COPY: dict[str, dict[str, str]] = {
         "signoff": "Ariadne",
     },
     "nl": {
-        "subject": "Ariadne — je packet is klaar om te reviewen",
-        "heading": "Je packet is klaar om te reviewen",
+        "subject": "Ariadne — je packet is klaar voor review",
+        "heading": "Je packet is klaar voor review",
         "body": (
             "Ariadne schreef een brief in jouw toon. Kopieer hem, open de ATS van de werkgever "
             "en dien zelf in — wij solliciteren nooit voor jou."
