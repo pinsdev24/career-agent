@@ -1,5 +1,6 @@
 """Pipeline router — start runs and check status."""
 
+import asyncio
 import logging
 import uuid
 from typing import Annotated
@@ -17,6 +18,7 @@ from app.models.schemas import (
     PipelineStatusResponse,
 )
 from app.rate_limit import rate_limit_pipeline_start
+from app.tools.job_engine_seed import seed_board_from_url
 from app.tools.supabase_ops import create_pipeline_run, get_pipeline_run, get_user_runs
 from app.workers import enqueue_job
 
@@ -61,6 +63,13 @@ async def start_pipeline(
         str(data.offer_url) if data.offer_url else None,
         _job_id=f"pipeline:{run_id}",
     )
+
+    # Cut 2: grow the shared catalog from a pasted ATS URL. Soft-fail — letter path continues.
+    if data.offer_url:
+        try:
+            await asyncio.wait_for(seed_board_from_url(str(data.offer_url)), timeout=2.0)
+        except Exception as exc:
+            logger.warning("url_seed_side_effect_failed run=%s error=%s", run_id, exc)
 
     logger.info("Pipeline run %s created and queued", run_id)
 

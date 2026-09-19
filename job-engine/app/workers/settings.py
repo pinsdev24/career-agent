@@ -13,6 +13,7 @@ from app.workers.discovery import discover_via_tavily
 from app.workers.embed import embed_pending_jobs
 from app.workers.freshness import revalidate_stale_jobs
 from app.workers.queue import QUEUE_NAME, enqueue_job
+from app.workers.seed import seed_company_from_url
 from app.workers.sync import seed_companies_from_yaml, sync_company_board
 
 logger = get_logger(__name__)
@@ -88,6 +89,16 @@ async def job_sync_company(ctx: dict, company_id: str) -> dict:
     return await sync_company_board(repo, ctx["redis"], company, ctx["http"])
 
 
+async def job_seed_url(ctx: dict, url: str) -> dict:
+    """Upsert a company from a pasted ATS URL, then enqueue board sync."""
+    result = await seed_company_from_url(ctx["repo"], url)
+    company_id = result.get("company_id")
+    if result.get("ok") and company_id:
+        job_id = await enqueue_job("job_sync_company", company_id)
+        result["sync_enqueued"] = bool(job_id)
+    return result
+
+
 class WorkerSettings:
     """ARQ worker configuration."""
 
@@ -97,6 +108,7 @@ class WorkerSettings:
         job_revalidate_stale,
         job_discover_tavily,
         job_sync_company,
+        job_seed_url,
     ]
     cron_jobs = [
         cron(sync_all_companies, hour={0, 6, 12, 18}, minute=15),

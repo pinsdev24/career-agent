@@ -11,10 +11,18 @@ from app.db.repository import JobRepository, row_to_job_out
 from app.dependencies import get_current_user, get_redis, get_supabase_client
 from app.logging_setup import get_logger
 from app.metrics import RECOMMEND_CACHE_HITS
-from app.models.schemas import JobListResponse, JobPostingOut, SignalRequest, SignalResponse
+from app.models.schemas import (
+    JobListResponse,
+    JobPostingOut,
+    SeedUrlRequest,
+    SeedUrlResponse,
+    SignalRequest,
+    SignalResponse,
+)
 from app.rank.scorer import Ranker, prefs_hash
 from app.workers.demand import demand_packs_from_profile
 from app.workers.queue import enqueue_job
+from app.workers.seed import seed_company_from_url
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
@@ -156,6 +164,25 @@ async def search(
         contract_types=_csv_list(contract_types),
         roles=_csv_list(roles),
     )
+
+
+@router.post("/seed", response_model=SeedUrlResponse)
+async def seed_from_url(
+    body: SeedUrlRequest,
+    user: Annotated[dict, Depends(get_current_user)],
+    supabase: Annotated[AsyncClient, Depends(get_supabase_client)],
+) -> SeedUrlResponse:
+    """Upsert an ATS board from a pasted URL and enqueue an immediate sync.
+
+    Soft-fails for non-ATS hosts (Indeed, LinkedIn, Personio, …) without
+    inserting a company. Auth is required; this grows the shared catalog.
+    """
+    _ = user
+    result = await seed_company_from_url(_repo(supabase), body.url)
+    if result.get("ok") and result.get("company_id"):
+        job_id = await enqueue_job("job_sync_company", result["company_id"])
+        result["sync_enqueued"] = bool(job_id)
+    return SeedUrlResponse(**result)
 
 
 @router.get("/{job_id}", response_model=JobPostingOut)

@@ -24,6 +24,7 @@ import { createApplication } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
 import { evaluatePrepareGate, postingToDisplay } from "@/lib/offer-display";
 import { EmptyState } from "@/components/empty-state";
+import { JobsUrlSeed } from "@/components/jobs-url-seed";
 import { useFirstRun } from "@/components/first-run-provider";
 import { JobCard } from "@/components/job-card";
 import { PageHeader } from "@/components/page-header";
@@ -475,9 +476,9 @@ export default function JobsPage() {
                   }
                 : undefined
             }
-            secondaryHref="/pipeline/new"
-            secondaryLabel={t("empty_warming_cta")}
-          />
+          >
+            <JobsUrlSeed />
+          </EmptyState>
         )
       ) : (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:min-h-0">

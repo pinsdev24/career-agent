@@ -152,6 +152,142 @@ describe("Jobs EN paste-ready copy", () => {
   });
 });
 
+describe("Jobs Cut 2 URL-seed copy", () => {
+  const JOBS_SEED_KEYS = [
+    "url_seed_title",
+    "url_seed_desc",
+    "url_seed_placeholder",
+    "url_seed_submit",
+    "url_seed_success",
+    "url_seed_success_named",
+    "url_seed_already",
+    "url_seed_unsupported",
+    "url_seed_unsupported_hint",
+    "url_seed_invalid",
+    "url_seed_error",
+    "url_seed_syncing",
+  ] as const;
+
+  const EN_JOBS = {
+    url_seed_title: "Paste a job URL",
+    url_seed_desc:
+      "Greenhouse, Lever, Ashby, or Workable — we’ll follow that company board for everyone.",
+    url_seed_placeholder: "https://boards.greenhouse.io/…",
+    url_seed_submit: "Add board",
+    url_seed_success:
+      "Following this company — jobs will appear in the feed as we sync.",
+    url_seed_success_named:
+      "Following {company} — jobs will appear in the feed as we sync.",
+    url_seed_already: "Already following this board — syncing latest jobs.",
+    url_seed_unsupported:
+      "That isn’t a Greenhouse, Lever, Ashby, or Workable URL we can follow.",
+    url_seed_unsupported_hint:
+      "You can still prepare a packet from many careers pages — board seed only works for those ATS.",
+    url_seed_invalid: "Paste a full http(s) job or careers URL.",
+    url_seed_error: "Couldn’t add that board. Try again in a moment.",
+    url_seed_syncing: "Syncing board…",
+  };
+
+  const FR_JOBS = {
+    url_seed_title: "Coller une URL d’offre",
+    url_seed_desc:
+      "Greenhouse, Lever, Ashby ou Workable — on suivra ce board pour tout le monde.",
+    url_seed_placeholder: "https://boards.greenhouse.io/…",
+    url_seed_submit: "Ajouter le board",
+    url_seed_success:
+      "Entreprise suivie — les offres apparaîtront dans le flux au fur et à mesure du sync.",
+    url_seed_success_named:
+      "Suivi de {company} — les offres apparaîtront dans le flux au sync.",
+    url_seed_already: "Board déjà suivi — sync des dernières offres.",
+    url_seed_unsupported:
+      "Ce n’est pas une URL Greenhouse, Lever, Ashby ou Workable que nous pouvons suivre.",
+    url_seed_unsupported_hint:
+      "Vous pouvez quand même préparer un dossier depuis beaucoup de pages carrières — le seed de board ne marche que pour ces ATS.",
+    url_seed_invalid: "Collez une URL http(s) complète d’offre ou de carrières.",
+    url_seed_error: "Impossible d’ajouter ce board. Réessayez dans un instant.",
+    url_seed_syncing: "Sync du board…",
+  };
+
+  const NL_JOBS = {
+    url_seed_title: "Plak een job-URL",
+    url_seed_desc:
+      "Greenhouse, Lever, Ashby of Workable — we volgen dat company-board voor iedereen.",
+    url_seed_placeholder: "https://boards.greenhouse.io/…",
+    url_seed_submit: "Board toevoegen",
+    url_seed_success:
+      "Dit bedrijf wordt gevolgd — jobs verschijnen in de feed tijdens de sync.",
+    url_seed_success_named:
+      "{company} wordt gevolgd — jobs verschijnen in de feed tijdens de sync.",
+    url_seed_already: "Board wordt al gevolgd — laatste jobs synchroniseren.",
+    url_seed_unsupported:
+      "Dat is geen Greenhouse-, Lever-, Ashby- of Workable-URL die we kunnen volgen.",
+    url_seed_unsupported_hint:
+      "Je kunt nog steeds een packet voorbereiden vanaf veel careers-pagina’s — board-seed werkt alleen voor die ATS.",
+    url_seed_invalid: "Plak een volledige http(s) job- of careers-URL.",
+    url_seed_error: "Kon dat board niet toevoegen. Probeer zo opnieuw.",
+    url_seed_syncing: "Board synchroniseren…",
+  };
+
+  it("keeps exact EN/FR/NL Jobs url_seed_* strings", async () => {
+    const { default: en } = await import("../messages/en.json");
+    const { default: fr } = await import("../messages/fr.json");
+    const { default: nl } = await import("../messages/nl.json");
+    expect(en.Jobs.empty_warming_cta).toBe("Paste a job URL");
+    for (const key of JOBS_SEED_KEYS) {
+      expect(en.Jobs[key], `en ${key}`).toBe(EN_JOBS[key]);
+      expect(fr.Jobs[key], `fr ${key}`).toBe(FR_JOBS[key]);
+      expect(nl.Jobs[key], `nl ${key}`).toBe(NL_JOBS[key]);
+    }
+    expect(en.Jobs).not.toHaveProperty("seed_success");
+    expect(en.Jobs).not.toHaveProperty("seed_fail");
+    expect(en.Jobs).not.toHaveProperty("seed_letter");
+    expect(en.Jobs).not.toHaveProperty("seed_placeholder");
+  });
+
+  it("keeps exact NewMission pipeline side-effect strings", async () => {
+    const { default: en } = await import("../messages/en.json");
+    const { default: fr } = await import("../messages/fr.json");
+    const { default: nl } = await import("../messages/nl.json");
+    expect(en.NewMission.url_seed_side_success).toBe(
+      "Also following this company board for the Jobs feed."
+    );
+    expect(en.NewMission.url_seed_side_unsupported).toBe(
+      "Letter can continue — this URL isn’t a board we seed into Jobs."
+    );
+    expect(fr.NewMission.url_seed_side_success).toBe(
+      "Board aussi suivi pour le flux Jobs."
+    );
+    expect(fr.NewMission.url_seed_side_unsupported).toBe(
+      "La lettre peut continuer — cette URL n’est pas un board que nous ajoutons à Jobs."
+    );
+    expect(nl.NewMission.url_seed_side_success).toBe(
+      "Ook dit company-board volgen voor de Jobs-feed."
+    );
+    expect(nl.NewMission.url_seed_side_unsupported).toBe(
+      "Brief kan doorgaan — deze URL is geen board dat we in Jobs zetten."
+    );
+  });
+
+  it("does not ship banned product names in Cut 2 seed copy", async () => {
+    const { default: en } = await import("../messages/en.json");
+    const { default: fr } = await import("../messages/fr.json");
+    const { default: nl } = await import("../messages/nl.json");
+    const blob = [
+      ...JOBS_SEED_KEYS.map((key) => String(en.Jobs[key])),
+      ...JOBS_SEED_KEYS.map((key) => String(fr.Jobs[key])),
+      ...JOBS_SEED_KEYS.map((key) => String(nl.Jobs[key])),
+      en.NewMission.url_seed_side_success,
+      en.NewMission.url_seed_side_unsupported,
+      fr.NewMission.url_seed_side_success,
+      fr.NewMission.url_seed_side_unsupported,
+      nl.NewMission.url_seed_side_success,
+      nl.NewMission.url_seed_side_unsupported,
+    ].join("\n");
+    expect(blob).not.toMatch(/CareerAgent|MACA|ariadne\.app/i);
+    expect(blob).not.toMatch(/full-market search/i);
+  });
+});
+
 describe("Jobs FR/NL paste-ready copy", () => {
   it("keeps exact FR strings", async () => {
     const { default: fr } = await import("../messages/fr.json");

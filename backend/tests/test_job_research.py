@@ -12,7 +12,11 @@ All functions are pure / deterministic — no mocking required.
 import pytest
 
 from app.graph.nodes.scraper import _check_content_availability
-from app.graph.nodes.scout import _extract_company_from_url, _is_snippet_available
+from app.graph.nodes.scout import (
+    _extract_company_from_url,
+    _is_snippet_available,
+    extract_seedable_ats_slug,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -309,6 +313,42 @@ class TestExtractCompanyFromUrl:
     def test_empty_url_returns_unknown(self) -> None:
         result = _extract_company_from_url("")
         assert isinstance(result, str)
+
+
+class TestExtractSeedableAtsSlug:
+    """Cut 2: Scout URL parsing feeds Job Engine seed (GH/Lever/Ashby/Workable)."""
+
+    def test_greenhouse_job_url(self) -> None:
+        assert extract_seedable_ats_slug(
+            "https://boards.greenhouse.io/stripe/jobs/12345"
+        ) == ("greenhouse", "stripe")
+
+    def test_greenhouse_embed_for_param(self) -> None:
+        assert extract_seedable_ats_slug(
+            "https://boards.greenhouse.io/embed/job_board?for=notion"
+        ) == ("greenhouse", "notion")
+
+    def test_lever_ashby_workable(self) -> None:
+        assert extract_seedable_ats_slug("https://jobs.lever.co/figma/abc") == (
+            "lever",
+            "figma",
+        )
+        assert extract_seedable_ats_slug("https://jobs.ashbyhq.com/ramp/xyz") == (
+            "ashby",
+            "ramp",
+        )
+        assert extract_seedable_ats_slug("https://apply.workable.com/acme/j/1") == (
+            "workable",
+            "acme",
+        )
+
+    def test_rejects_personio_indeed_linkedin_smartrecruiters(self) -> None:
+        assert extract_seedable_ats_slug("https://www.linkedin.com/jobs/view/1") is None
+        assert extract_seedable_ats_slug("https://www.indeed.com/viewjob?jk=a") is None
+        assert extract_seedable_ats_slug("https://acme.jobs.personio.de/job/1") is None
+        assert extract_seedable_ats_slug(
+            "https://careers.smartrecruiters.com/Datadog/743999"
+        ) is None
 
 
 # ---------------------------------------------------------------------------

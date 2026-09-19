@@ -1,6 +1,6 @@
 "use client";
 
-import type { ComponentType } from "react";
+import type { ComponentType, ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ export function EmptyState({
   onAction,
   secondaryHref,
   secondaryLabel,
+  children,
   className,
 }: {
   icon: ComponentType<{ className?: string }>;
@@ -24,6 +25,7 @@ export function EmptyState({
   onAction?: () => void;
   secondaryHref?: string;
   secondaryLabel?: string;
+  children?: ReactNode;
   className?: string;
 }) {
   return (
@@ -64,6 +66,7 @@ export function EmptyState({
           {secondaryLabel}
         </Link>
       )}
+      {children}
     </div>
   );
 }
