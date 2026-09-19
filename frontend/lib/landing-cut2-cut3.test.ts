@@ -61,17 +61,56 @@ describe("Landing Cut 2 — brand chrome", () => {
     });
   });
 
-  it("locks NL Auth.sidebar.subtitle and keeps cookie i18n keys in all locales", async () => {
+  it("locks NL Auth.sidebar.subtitle and launch CookieBanner EN/FR/NL", async () => {
     const { en, fr, nl } = await loadAll();
     expect(nl.Auth.sidebar.subtitle).toBe(
       "Ariadne voor duidelijkere matches, brieven op jouw toon, en review voordat je op de ATS solliciteert."
     );
-    const cookieKeys = Object.keys(en.CookieBanner).sort();
-    expect(Object.keys(fr.CookieBanner).sort()).toEqual(cookieKeys);
-    expect(Object.keys(nl.CookieBanner).sort()).toEqual(cookieKeys);
-    expect(en.CookieBanner.title).toBe("Cookie preferences");
-    expect(fr.CookieBanner.title).toBe("Préférences cookies");
-    expect(nl.CookieBanner.title).toBe("Cookievoorkeuren");
+    expect(en.CookieBanner).toEqual({
+      aria: "Cookie consent",
+      title: "Cookie preferences",
+      close: "Close cookie banner",
+      body: "We use cookies to remember your preferences and understand how you use Ariadne. You can decline non-essential cookies.",
+      learn_more: "Learn more",
+      hide_details: "Hide details",
+      essential: "Essential",
+      essential_desc: "Required for sign-in, theme, and language.",
+      performance: "Performance",
+      performance_desc:
+        "Helps us see which flows break so we can fix them. Not used for ads.",
+      decline: "Decline",
+      accept: "Accept all",
+    });
+    expect(fr.CookieBanner).toEqual({
+      aria: "Consentement aux cookies",
+      title: "Préférences cookies",
+      close: "Fermer le bandeau cookies",
+      body: "Nous utilisons des cookies pour mémoriser vos préférences et comprendre comment vous utilisez Ariadne. Vous pouvez refuser les cookies non essentiels.",
+      learn_more: "En savoir plus",
+      hide_details: "Masquer les détails",
+      essential: "Essentiels",
+      essential_desc: "Indispensables pour la connexion, le thème et la langue.",
+      performance: "Performance",
+      performance_desc:
+        "Nous aide à voir quels parcours cassent pour les corriger. Pas de publicité.",
+      decline: "Refuser",
+      accept: "Tout accepter",
+    });
+    expect(nl.CookieBanner).toEqual({
+      aria: "Cookie-toestemming",
+      title: "Cookievoorkeuren",
+      close: "Cookiebanner sluiten",
+      body: "We gebruiken cookies om je voorkeuren te onthouden en te begrijpen hoe je Ariadne gebruikt. Je kunt niet-essentiële cookies weigeren.",
+      learn_more: "Meer informatie",
+      hide_details: "Details verbergen",
+      essential: "Essentieel",
+      essential_desc: "Nodig voor inloggen, thema en taal.",
+      performance: "Prestaties",
+      performance_desc:
+        "Helpt ons te zien welke flows stukgaan zodat we ze kunnen fiksen. Niet voor ads.",
+      decline: "Weigeren",
+      accept: "Alles accepteren",
+    });
   });
 
   it("landing nav and footer import the shared Logo component", () => {
@@ -80,11 +119,17 @@ describe("Landing Cut 2 — brand chrome", () => {
       "utf8"
     );
     const landing = readFileSync(join(frontendRoot, "app/[locale]/page.tsx"), "utf8");
+    const sidebar = readFileSync(
+      join(frontendRoot, "components/sidebar.tsx"),
+      "utf8"
+    );
     const layout = readFileSync(join(frontendRoot, "app/layout.tsx"), "utf8");
     expect(navbar).toMatch(/from ["']@\/components\/logo["']/);
     expect(landing).toMatch(/from ["']@\/components\/logo["']/);
+    expect(sidebar).toMatch(/from ["']@\/components\/logo["']/);
     expect(navbar).toMatch(/<Logo/);
     expect(landing).toMatch(/<Logo/);
+    expect(sidebar).toMatch(/<Logo/);
     expect(layout).toMatch(/generateMetadata/);
     expect(layout).toMatch(/namespace: ["']Metadata["']/);
     expect(layout).not.toMatch(/Labyrinth Navigator/);
@@ -152,6 +197,17 @@ describe("Landing Cut 3 — HITL in-app voice", () => {
     expect(nl.Applications.copy_letter).toBe("Brief kopiëren");
     expect(nl.Applications.open_ats).toBe("Sollicitatiepagina openen");
     expect(nl.Applications.mark_submitted).toBe("Ik heb dit ingediend");
+  });
+
+  it("locks packet-ready email subjects", () => {
+    const emailCopy = readFileSync(
+      join(frontendRoot, "../backend/app/tools/email_copy.py"),
+      "utf8"
+    );
+    expect(emailCopy).toContain('"Ariadne — your packet is ready to review"');
+    expect(emailCopy).toContain('"Ariadne — votre dossier est prêt à relire"');
+    expect(emailCopy).toContain('"Ariadne — je packet is klaar voor review"');
+    expect(emailCopy).not.toMatch(/Career Labyrinth|CareerAgent/);
   });
 
   it("MissionDetail completed chrome uses Copy letter, not Send", () => {
