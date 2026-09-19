@@ -22,7 +22,33 @@ _BOARD_SLUG_RE = re.compile(r"^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$", re.IGNORECAS
 _HTML_TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
 
-SEEDABLE_ATS_PROVIDERS = frozenset({"greenhouse", "lever", "ashby", "workable"})
+SEEDABLE_ATS_PROVIDERS = frozenset(
+    {"greenhouse", "lever", "ashby", "workable", "teamtailor"}
+)
+_TEAMTAILOR_RESERVED = frozenset(
+    {
+        "www",
+        "app",
+        "api",
+        "jobs",
+        "career",
+        "careers",
+        "support",
+        "help",
+        "blog",
+        "mail",
+        "email",
+        "status",
+        "assets",
+        "cdn",
+        "login",
+        "admin",
+        "signup",
+        "go",
+        "embed",
+    }
+)
+_JOBS_ID_RE = re.compile(r"/jobs/(\d+)", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -66,6 +92,15 @@ def _job_id_from_parts(provider: str, parts: list[str]) -> str | None:
         if len(rest) >= 2 and rest[0].lower() in {"j", "jobs"} and rest[1]:
             return rest[1]
         return rest[0] if rest[0].lower() not in _RESERVED_BOARD_SLUGS else None
+    if provider == "teamtailor":
+        for i, part in enumerate(parts):
+            if unquote(part).lower() != "jobs":
+                continue
+            if i + 1 >= len(parts):
+                return None
+            token = unquote(parts[i + 1]).strip()
+            return token or None
+        return None
     token = rest[0]
     if token.lower() in _RESERVED_BOARD_SLUGS:
         return None
@@ -73,10 +108,11 @@ def _job_id_from_parts(provider: str, parts: list[str]) -> str | None:
 
 
 def parse_ats_job_url(url: str | None) -> AtsJobRef | None:
-    """Parse Greenhouse / Lever / Ashby / Workable job or board URLs.
+    """Parse Greenhouse / Lever / Ashby / Workable / Teamtailor job or board URLs.
 
-    Dotted Ashby org slugs (``mistral.ai``) are accepted. Returns None for
-    Indeed, LinkedIn, Personio, and other non-seedable hosts.
+    Dotted Ashby org slugs (``mistral.ai``) are accepted. Teamtailor slugs come
+    from ``{slug}.teamtailor.com`` (custom career domains are not resolved).
+    Returns None for Indeed, LinkedIn, Personio, and other non-seedable hosts.
     """
     if not url or not isinstance(url, str):
         return None
@@ -103,6 +139,18 @@ def parse_ats_job_url(url: str | None) -> AtsJobRef | None:
         provider = "ashby"
     elif "workable.com" in host:
         provider = "workable"
+    elif "teamtailor.com" in host:
+        provider = "teamtailor"
+        suffix = "teamtailor.com"
+        if host == suffix or not host.endswith("." + suffix):
+            return None
+        label = host[: -(len(suffix) + 1)]
+        if "." in label:
+            label = label.rsplit(".", 1)[-1]
+        if label in _TEAMTAILOR_RESERVED or not is_board_slug(label):
+            return None
+        slug = normalize_board_slug(label)
+        return AtsJobRef(provider, slug, _job_id_from_parts(provider, parts))
     else:
         return None
 
@@ -281,6 +329,64 @@ def _from_workable_job(job: dict, ref: AtsJobRef, url: str, company: str) -> dic
     }
 
 
+def _from_teamtailor_item(item: dict, ref: AtsJobRef, url: str, company: str) -> dict:
+    jobposting = item.get("_jobposting") if isinstance(item.get("_jobposting"), dict) else {}
+    title = str(jobposting.get("title") or item.get("title") or "Untitled").strip()
+    location = None
+    loc = jobposting.get("jobLocation")
+    places = loc if isinstance(loc, list) else [loc] if isinstance(loc, dict) else []
+    for place in places:
+        if not isinstance(place, dict):
+            continue
+        addr = place.get("address")
+        if not isinstance(addr, dict):
+            continue
+        city = str(addr.get("addressLocality") or "").strip()
+        country = str(addr.get("addressCountry") or "").strip()
+        if city and country and city.lower() != country.lower():
+            location = f"{city}, {country}"
+        else:
+            location = city or country or None
+        if location:
+            break
+    description = _strip_html(
+        str(jobposting.get("description") or item.get("content_html") or "")
+    )
+    apply_url = str(item.get("url") or url)
+    return {
+        "url": url,
+        "raw_content": format_job_text(
+            title=title,
+            company=company,
+            location=location,
+            description=description or title,
+            apply_url=apply_url,
+        ),
+        "source": "ats",
+        "provider": ref.provider,
+        "title": title,
+        "company": company,
+        "location": location,
+    }
+
+
+def _teamtailor_item_ids(item: dict) -> list[str]:
+    ids: list[str] = []
+    jobposting = item.get("_jobposting") if isinstance(item.get("_jobposting"), dict) else {}
+    ident = jobposting.get("identifier")
+    if isinstance(ident, dict) and ident.get("value") is not None:
+        ids.append(str(ident["value"]))
+    elif isinstance(ident, (str, int)):
+        ids.append(str(ident))
+    if item.get("id"):
+        ids.append(str(item["id"]))
+    url = str(item.get("url") or "")
+    match = _JOBS_ID_RE.search(url)
+    if match:
+        ids.append(match.group(1))
+    return ids
+
+
 async def fetch_ats_job(url: str) -> dict | None:
     """Load JD text from the public ATS JSON API. None if host is not ATS or fetch fails."""
     ref = parse_ats_job_url(url)
@@ -362,6 +468,33 @@ async def fetch_ats_job(url: str) -> dict | None:
                 picked = jobs[0] if isinstance(jobs[0], dict) else None
             if picked:
                 return _from_workable_job(picked, ref, url, str(company))
+        elif ref.provider == "teamtailor":
+            body = await _get_json(f"https://{token}.teamtailor.com/jobs.json")
+            items = body.get("items", []) if isinstance(body, dict) else []
+            company = (
+                (body.get("title") if isinstance(body, dict) else None)
+                or humanize_board_slug(ref.slug)
+            )
+            picked = None
+            job_token = (ref.job_id or "").lower()
+            numeric = job_token.split("-", 1)[0] if job_token else ""
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                candidates = [c.lower() for c in _teamtailor_item_ids(item)]
+                item_url = str(item.get("url") or "").lower()
+                if ref.job_id and (
+                    job_token in candidates
+                    or numeric in candidates
+                    or (numeric and numeric in item_url)
+                    or job_token in item_url
+                ):
+                    picked = item
+                    break
+            if picked is None and items and not ref.job_id:
+                picked = items[0] if isinstance(items[0], dict) else None
+            if picked:
+                return _from_teamtailor_item(picked, ref, url, str(company))
     except Exception as exc:
         logger.warning(
             "ats_extract_failed provider=%s slug=%s job_id=%s error=%s",

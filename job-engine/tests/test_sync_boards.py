@@ -80,6 +80,32 @@ async def test_http_404_deactivates_immediately(monkeypatch):
     assert result["errors"]
 
 
+async def test_http_404_deactivates_teamtailor(monkeypatch):
+    repo = _FakeRepo()
+
+    class _NotFoundTeamtailor:
+        provider = "teamtailor"
+
+        async def fetch_jobs(self, token, *, etag=None):
+            request = httpx.Request("GET", "https://ghost.teamtailor.com/jobs.json")
+            response = httpx.Response(404, request=request)
+            raise httpx.HTTPStatusError("not found", request=request, response=response)
+
+    monkeypatch.setattr("app.workers.sync.get_connector", lambda *_: _NotFoundTeamtailor())
+    monkeypatch.setattr("app.workers.sync.TokenBucket", lambda *a, **k: _ImmediateBucket())
+    company = {
+        "id": "c-tt",
+        "ats_provider": "teamtailor",
+        "board_token": "ghost",
+        "slug": "ghost",
+    }
+    result = await sync_company_board(repo, None, company, None)
+    assert repo.deactivated == [("c-tt", "http_404")]
+    assert result["errors"]
+    assert repo.finished[-1]["meta"]["provider"] == "teamtailor"
+    assert repo.finished[-1]["meta"]["board_token"] == "ghost"
+
+
 class _ImmediateBucket:
     async def acquire(self):
         return None

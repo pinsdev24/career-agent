@@ -1,20 +1,14 @@
 """Ashby public job board API connector."""
 
 from datetime import datetime, timezone
-from html import unescape
 from urllib.parse import quote
-import re
 
 import httpx
 
 from app.connectors.http import get_json
+from app.connectors.text import strip_html
 from app.models.schemas import AtsProvider, CanonicalJob
 from app.normalize.posting import build_canonical_job
-
-
-def _strip_html(html: str) -> str:
-    text = re.sub(r"<[^>]+>", " ", html or "")
-    return unescape(re.sub(r"\s+", " ", text)).strip()
 
 
 class AshbyConnector:
@@ -50,7 +44,7 @@ class AshbyConnector:
             job_id = str(job.get("id") or "")
             if not job_id:
                 continue
-            description = _strip_html(
+            description = strip_html(
                 job.get("descriptionPlain")
                 or job.get("descriptionHtml")
                 or job.get("description")

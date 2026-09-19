@@ -823,6 +823,7 @@
     "source_lever": "Lever",
     "source_ashby": "Ashby",
     "source_workable": "Workable",
+    "source_teamtailor": "Teamtailor",
     "source_web": "Web",
     "packet_started": "Packet queued — opening Applications.",
     "save": "Save",

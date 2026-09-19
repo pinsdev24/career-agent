@@ -137,7 +137,15 @@ def _clean_discovered_title(title: str, company: str | None = None) -> str:
 
 def _canonical_company_name(company: str, url: str) -> str:
     name = (company or "").strip()
-    if not name or name.lower() in {"unknown", "greenhouse", "lever", "ashby", "workable", "linkedin"}:
+    if not name or name.lower() in {
+        "unknown",
+        "greenhouse",
+        "lever",
+        "ashby",
+        "workable",
+        "teamtailor",
+        "linkedin",
+    }:
         return _extract_company_from_url(url)
     if "." in name and " " not in name:
         from_url = _extract_company_from_url(url)
@@ -162,10 +170,11 @@ _ATS_DOMAIN_MAP: dict[str, int] = {
 }
 
 def extract_seedable_ats_slug(url: str) -> tuple[str, str] | None:
-    """Return (provider, board_slug) for Greenhouse/Lever/Ashby/Workable only.
+    """Return (provider, board_slug) for Greenhouse/Lever/Ashby/Workable/Teamtailor.
 
     Used as Cut 2 URL-seed input. Dotted Ashby slugs (``mistral.ai``) are
-    valid. Personio, Indeed, LinkedIn, SmartRecruiters, and Jobvite return None.
+    valid. Teamtailor uses ``{slug}.teamtailor.com``. Personio, Indeed,
+    LinkedIn, SmartRecruiters, and Jobvite return None.
     """
     from app.tools.ats_extract import parse_ats_job_url
 
@@ -208,7 +217,7 @@ def _extract_company_from_url(url: str) -> str:
         domain_parts = host.split(".")
         if len(domain_parts) >= 2:
             # Skip common subdomains
-            skip = {"careers", "jobs", "apply", "hire", "recruiting", "talent", "work"}
+            skip = {"careers", "jobs", "apply", "hire", "recruiting", "talent", "work", "teamtailor"}
             for part in domain_parts:
                 if part not in skip and part not in {"com", "org", "io", "co", "net", "fr", "de", "uk"}:
                     return part.replace("-", " ").title()

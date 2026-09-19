@@ -38,7 +38,7 @@ async def get_json(
     response = await client.get(url, headers=headers, params=params)
     if response.status_code in (429, 500, 502, 503, 504):
         raise RetryableHTTPError(f"HTTP {response.status_code} for {url}")
-    response.raise_for_status()
     if response.status_code == 304:
         return {}, response.headers, 304
+    response.raise_for_status()
     return response.json(), response.headers, response.status_code

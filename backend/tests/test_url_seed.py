@@ -52,6 +52,28 @@ async def test_seed_board_enqueues_dotted_ashby_without_tavily() -> None:
 
 
 @pytest.mark.asyncio
+async def test_seed_board_enqueues_teamtailor() -> None:
+    pool = MagicMock()
+    pool.enqueue_job = AsyncMock(return_value=MagicMock(job_id="jid"))
+    pool.aclose = AsyncMock()
+
+    with (
+        patch("app.tools.job_engine_seed.get_settings") as settings,
+        patch("app.tools.job_engine_seed.create_pool", new=AsyncMock(return_value=pool)),
+    ):
+        settings.return_value.redis_url = "redis://localhost:6379"
+        await seed_board_from_url(
+            "https://oatly.teamtailor.com/jobs/8399088-national-account-manager"
+        )
+
+    pool.enqueue_job.assert_awaited_once()
+    args, kwargs = pool.enqueue_job.await_args
+    assert args[0] == "job_seed_url"
+    assert "oatly.teamtailor.com" in args[1]
+    assert kwargs["_job_id"].startswith("url-seed:")
+
+
+@pytest.mark.asyncio
 async def test_seed_board_skips_non_ats() -> None:
     with patch("app.tools.job_engine_seed.create_pool", new=AsyncMock()) as create:
         await seed_board_from_url("https://www.linkedin.com/jobs/view/123")

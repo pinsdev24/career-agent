@@ -3,6 +3,7 @@
 from tavily import AsyncTavilyClient
 
 from app.config import get_settings
+from app.connectors.registry import tavily_include_domains
 from app.logging_setup import get_logger
 from app.quality.gates import passes_content_gates
 from app.quality.urls import (
@@ -26,13 +27,7 @@ class TavilyDiscovery:
 
     async def search(self, query: str, max_results: int = 15) -> list[dict]:
         """Search ATS domains; filter aggregators and weak snippets."""
-        include_domains = [
-            "boards.greenhouse.io",
-            "job-boards.greenhouse.io",
-            "jobs.lever.co",
-            "jobs.ashbyhq.com",
-            "apply.workable.com",
-        ]
+        include_domains = tavily_include_domains()
         response = await self.client.search(
             query=query,
             max_results=max_results,

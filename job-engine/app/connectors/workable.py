@@ -1,19 +1,13 @@
 """Workable public widget jobs API connector."""
 
 from datetime import datetime, timezone
-from html import unescape
-import re
 
 import httpx
 
 from app.connectors.http import get_json
+from app.connectors.text import strip_html
 from app.models.schemas import AtsProvider, CanonicalJob
 from app.normalize.posting import build_canonical_job
-
-
-def _strip_html(html: str) -> str:
-    text = re.sub(r"<[^>]+>", " ", html or "")
-    return unescape(re.sub(r"\s+", " ", text)).strip()
 
 
 class WorkableConnector:
@@ -46,7 +40,7 @@ class WorkableConnector:
             job_id = str(job.get("id") or job.get("shortcode") or "")
             if not job_id:
                 continue
-            description = _strip_html(
+            description = strip_html(
                 job.get("description") or job.get("full_description") or ""
             )
             # Widget list often has short descriptions; detail URL still useful

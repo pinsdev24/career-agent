@@ -1,19 +1,13 @@
 """Greenhouse boards API connector."""
 
 from datetime import datetime, timezone
-from html import unescape
-import re
 
 import httpx
 
 from app.connectors.http import get_json
+from app.connectors.text import strip_html
 from app.models.schemas import AtsProvider, CanonicalJob
 from app.normalize.posting import build_canonical_job
-
-
-def _strip_html(html: str) -> str:
-    text = re.sub(r"<[^>]+>", " ", html or "")
-    return unescape(re.sub(r"\s+", " ", text)).strip()
 
 
 class GreenhouseConnector:
@@ -60,7 +54,7 @@ class GreenhouseConnector:
             offices = job.get("offices") or []
             if not location and offices:
                 location = offices[0].get("name")
-            content = _strip_html(job.get("content") or "")
+            content = strip_html(job.get("content") or "")
             absolute_url = job.get("absolute_url") or (
                 f"https://boards.greenhouse.io/{board_token}/jobs/{job_id}"
             )

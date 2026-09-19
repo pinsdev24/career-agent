@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from app.config import Settings, get_settings
+from app.connectors.registry import source_trust_map
 from app.db.embeddings import embed_text_or_none
 from app.db.repository import JobRepository, _query_tokens, row_to_job_out
 from app.logging_setup import get_logger
@@ -28,10 +29,7 @@ from app.rank.query import build_recommend_query
 logger = get_logger(__name__)
 
 SOURCE_TRUST = {
-    "greenhouse": 1.0,
-    "lever": 1.0,
-    "ashby": 1.0,
-    "workable": 0.95,
+    **source_trust_map(),
     "tavily": 0.7,
 }
 

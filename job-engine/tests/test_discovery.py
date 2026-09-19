@@ -45,6 +45,8 @@ class _FakeTavily:
     async def discover_boards(self, query: str):
         if "belgium" in query.lower() or "bruxelles" in query.lower():
             return [("greenhouse", "showpad"), ("lever", "collibra")]
+        if "teamtailor.com" in query.lower() or "argentina" in query.lower():
+            return [("teamtailor", "oatly")]
         return [("greenhouse", "stripe")]
 
 
@@ -94,3 +96,28 @@ async def test_discover_worker_enqueues_sync_immediately(monkeypatch):
     assert result["company_ids"]
     syncs = [e for e in enqueued if e[0] == "job_sync_company"]
     assert {e[1][0] for e in syncs} == set(result["company_ids"])
+
+
+async def test_discovery_upserts_teamtailor_from_profile_countries(monkeypatch):
+    repo = _FakeRepo()
+    repo.intents = [
+        {
+            "search_preferences": {
+                "job_title": "Backend Engineer",
+                "countries": ["AR"],
+            },
+            "cv_structured": {},
+        }
+    ]
+    monkeypatch.setattr(
+        "app.workers.discovery.TavilyDiscovery", lambda: _FakeTavily()
+    )
+    result = await discover_via_tavily(repo)
+    assert "new-oatly" in result["company_ids"]
+    row = next(c for c in repo.companies if c.get("board_token") == "oatly")
+    assert row["ats_provider"] == "teamtailor"
+    assert row["careers_url"] == "https://oatly.teamtailor.com"
+    queries = (repo.runs[-1].get("meta") or {}).get("queries") or []
+    blob = " ".join(queries).lower()
+    assert "belgium" not in blob
+    assert "site:teamtailor.com" in blob

@@ -19,6 +19,10 @@ def test_valid_ats_urls():
     assert is_valid_job_url("https://boards.greenhouse.io/stripe/jobs/12345")
     assert is_valid_job_url("https://jobs.lever.co/netlify/abc-def")
     assert is_valid_job_url("https://jobs.ashbyhq.com/ramp/uuid-here")
+    assert is_valid_job_url(
+        "https://acme.teamtailor.com/jobs/1234567-backend-engineer"
+    )
+    assert not is_valid_job_url("https://acme.teamtailor.com/jobs")
     assert not is_valid_job_url("https://boards.greenhouse.io/stripe")
     assert not is_valid_job_url("https://www.linkedin.com/jobs/search/?keywords=eng")
     assert not is_valid_job_url("https://www.indeed.com/jobs?q=engineer")
@@ -56,12 +60,30 @@ def test_extract_board_slug():
         "workable",
         "acme",
     )
+    assert extract_ats_board_slug("https://acme.teamtailor.com/jobs") == (
+        "teamtailor",
+        "acme",
+    )
+    assert extract_ats_board_slug(
+        "https://acme.teamtailor.com/jobs/1234567-backend-engineer"
+    ) == ("teamtailor", "acme")
+    assert extract_ats_board_slug(
+        "https://oatly.teamtailor.com/en-GB/jobs/8399088-national-account-manager"
+    ) == ("teamtailor", "oatly")
     assert extract_ats_job_ref(
         "https://jobs.ashbyhq.com/mistral.ai/50c74749-9fbc-471f-a647-f6cd22423ccf"
     ) == ("ashby", "mistral.ai", "50c74749-9fbc-471f-a647-f6cd22423ccf")
     assert extract_ats_job_ref(
         "https://job-boards.greenhouse.io/datacamp/jobs/7481117"
     ) == ("greenhouse", "datacamp", "7481117")
+    assert extract_ats_job_ref(
+        "https://acme.teamtailor.com/jobs/1234567-backend-engineer"
+    ) == ("teamtailor", "acme", "1234567-backend-engineer")
+    assert extract_ats_job_ref("https://acme.teamtailor.com/jobs") == (
+        "teamtailor",
+        "acme",
+        None,
+    )
 
 
 def test_extract_board_slug_rejects_non_ats():
@@ -69,6 +91,9 @@ def test_extract_board_slug_rejects_non_ats():
     assert extract_ats_board_slug("https://www.indeed.com/viewjob?jk=abc") is None
     assert extract_ats_board_slug("https://acme.jobs.personio.de/job/123") is None
     assert extract_ats_board_slug("https://example.com/careers/eng") is None
+    assert extract_ats_board_slug("https://careers.acme.com/jobs/123") is None
+    assert extract_ats_board_slug("https://www.teamtailor.com/") is None
+    assert extract_ats_board_slug("https://app.teamtailor.com/jobs/1") is None
     assert extract_ats_board_slug("https://boards.greenhouse.io/embed/job_board") is None
     assert extract_ats_board_slug("") is None
 

@@ -12,7 +12,14 @@ Discovery is **profile-driven** (target title + location + ATS hosts). `companie
 - FastAPI (`/v1`) — recommend, search, signals
 - ARQ + Redis — ATS board sync, Tavily discovery, freshness, embeddings
 - Supabase Postgres + pgvector + `tsvector` — hybrid search
-- Official ATS JSON APIs — Greenhouse, Lever, Ashby, Workable
+- Official ATS JSON APIs — Greenhouse, Lever, Ashby, Workable, Teamtailor
+
+Teamtailor boards are ``https://{slug}.teamtailor.com/jobs.json``. URL seed
+accepts ``*.teamtailor.com`` job/board URLs. Custom career domains
+(``careers.example.com``) often serve the same JSON feed but do **not** encode
+the board token — we do not HTML-crawl or CNAME-resolve those hosts. Paste the
+``*.teamtailor.com`` URL. Discovery ``site:`` packs include every registered
+ATS host and use the user's profile countries (any ISO), not a Belgium-only list.
 
 ## Quick start
 

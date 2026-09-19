@@ -1,19 +1,13 @@
 """Lever postings API connector."""
 
 from datetime import datetime, timezone
-from html import unescape
-import re
 
 import httpx
 
 from app.connectors.http import get_json
+from app.connectors.text import strip_html
 from app.models.schemas import AtsProvider, CanonicalJob
 from app.normalize.posting import build_canonical_job
-
-
-def _strip_html(html: str) -> str:
-    text = re.sub(r"<[^>]+>", " ", html or "")
-    return unescape(re.sub(r"\s+", " ", text)).strip()
 
 
 class LeverConnector:
@@ -49,11 +43,11 @@ class LeverConnector:
             if not job_id:
                 continue
             lists = job.get("lists") or []
-            desc_parts = [_strip_html(job.get("descriptionPlain") or job.get("description") or "")]
+            desc_parts = [strip_html(job.get("descriptionPlain") or job.get("description") or "")]
             for block in lists:
-                desc_parts.append(_strip_html(block.get("text") or ""))
+                desc_parts.append(strip_html(block.get("text") or ""))
                 for item in block.get("content") or []:
-                    desc_parts.append(_strip_html(item))
+                    desc_parts.append(strip_html(item))
             description = " ".join(p for p in desc_parts if p)
             categories = job.get("categories") or {}
             location = categories.get("location") or job.get("workplaceType")
