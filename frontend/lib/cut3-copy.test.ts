@@ -57,6 +57,9 @@ const JOBS_KEYS = [
   "empty_filters_cta",
   "why_location_match",
   "why_location_match_detail",
+  "deep_link_missing",
+  "deep_link_missing_hint",
+  "deep_link_missing_toast",
 ] as const;
 
 const EN = {
@@ -118,6 +121,10 @@ const EN = {
     empty_filters_cta: "Clear filters",
     why_location_match: "Location fit",
     why_location_match_detail: "Matches your countries",
+    deep_link_missing: "Offer not in your current feed.",
+    deep_link_missing_hint:
+      "It may have dropped off recommend or doesn’t match filters. Browse the list or clear filters.",
+    deep_link_missing_toast: "That offer isn’t in your current feed.",
   },
 };
 
@@ -181,6 +188,10 @@ const FR = {
     empty_filters_cta: "Effacer les filtres",
     why_location_match: "Adéquation lieu",
     why_location_match_detail: "Correspond à vos pays",
+    deep_link_missing: "Offre absente de votre flux actuel.",
+    deep_link_missing_hint:
+      "Elle a peut‑être quitté les recommandations ou ne passe pas les filtres. Parcourez la liste ou élargissez les filtres.",
+    deep_link_missing_toast: "Cette offre n’est pas dans votre flux actuel.",
   },
 };
 
@@ -245,6 +256,10 @@ const NL = {
     empty_filters_cta: "Filters wissen",
     why_location_match: "Locatiefit",
     why_location_match_detail: "Past bij jouw landen",
+    deep_link_missing: "Aanbod staat niet in je huidige feed.",
+    deep_link_missing_hint:
+      "Het is mogelijk uit recommend verdwenen of past niet bij je filters. Blader de lijst of verruim filters.",
+    deep_link_missing_toast: "Dat aanbod staat niet in je huidige feed.",
   },
 };
 

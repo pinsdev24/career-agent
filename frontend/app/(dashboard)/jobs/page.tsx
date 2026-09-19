@@ -1,17 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Briefcase, Loader2, Search } from "lucide-react";
 import type { JobPosting } from "@/lib/job-engine-types";
 import {
+  getJob,
   getRecommendedJobs,
   searchJobs,
   sendJobSignal,
   JobEngineError,
 } from "@/lib/job-engine";
+import {
+  includeFetchedJob,
+  mergeJobQuery,
+  readJobQueryId,
+  resolveJobSelection,
+} from "@/lib/jobs-selection";
 import { Button } from "@/components/ui/button";
 import { createApplication } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
@@ -36,6 +43,10 @@ export default function JobsPage() {
   const t = useTranslations("Jobs");
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedJobId = readJobQueryId(searchParams.get("job"));
+  const search = searchParams.toString();
+  const failedFetchId = useRef<string | null>(null);
   const { ready, loading: setupLoading, openWizard, profile } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -43,6 +54,7 @@ export default function JobsPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<JobPosting | null>(null);
+  const [deepLinkMissing, setDeepLinkMissing] = useState(false);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"recommend" | "search">("recommend");
   const [packetBusy, setPacketBusy] = useState(false);
@@ -92,6 +104,30 @@ export default function JobsPage() {
   const emptyKind = selectJobsEmptyKind(copyCtx);
   const emptyKeys = jobsEmptyMessageKeys(emptyKind);
 
+  const writeJobQuery = useCallback(
+    (jobId: string | null, history: "push" | "replace") => {
+      const next = mergeJobQuery(search, jobId);
+      const current = search ? `/jobs?${search}` : "/jobs";
+      if (next === current) return;
+      if (history === "push") {
+        router.push(next, { scroll: false });
+      } else {
+        router.replace(next, { scroll: false });
+      }
+    },
+    [router, search]
+  );
+
+  const selectJob = useCallback(
+    (job: JobPosting, history: "push" | "replace" = "push") => {
+      setSelected(job);
+      setDeepLinkMissing(false);
+      setActionMessage(null);
+      writeJobQuery(job.id, history);
+    },
+    [writeJobQuery]
+  );
+
   const loadFeed = useCallback(
     async (reset = true, filters = applied) => {
       if (reset) {
@@ -121,7 +157,16 @@ export default function JobsPage() {
             : await getRecommendedJobs(reset ? null : cursor, 20, filterPayload);
         setItems((prev) => (reset ? res.items : [...prev, ...res.items]));
         setCursor(res.next_cursor ?? null);
-        if (reset && res.items[0]) setSelected(res.items[0]);
+        if (reset) {
+          const result = resolveJobSelection(res.items, requestedJobId);
+          if (result.status === "matched" || result.status === "default") {
+            setDeepLinkMissing(false);
+            setSelected(result.selected);
+          } else {
+            setDeepLinkMissing(false);
+            setSelected(null);
+          }
+        }
       } catch (err) {
         const message =
           err instanceof JobEngineError ? err.message : t("error_generic");
@@ -131,7 +176,7 @@ export default function JobsPage() {
         setLoadingMore(false);
       }
     },
-    [applied, cursor, mode, prefLocation, prefRemote, query, t]
+    [applied, cursor, mode, prefLocation, prefRemote, query, requestedJobId, t]
   );
 
   useEffect(() => {
@@ -164,6 +209,60 @@ export default function JobsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
+  useEffect(() => {
+    if (failedFetchId.current && failedFetchId.current !== requestedJobId) {
+      failedFetchId.current = null;
+    }
+  }, [requestedJobId]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const result = resolveJobSelection(items, requestedJobId, selected?.id);
+
+    if (result.status === "default") {
+      setDeepLinkMissing(false);
+      setSelected((current) =>
+        current?.id === result.selected?.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (result.status === "matched") {
+      setDeepLinkMissing(false);
+      setSelected((current) =>
+        current?.id === result.selected.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (failedFetchId.current === result.id) {
+      setDeepLinkMissing(true);
+      setSelected(null);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const fetched = await getJob(result.id);
+        if (cancelled) return;
+        setDeepLinkMissing(false);
+        setItems((prev) => includeFetchedJob(prev, fetched));
+        setSelected(fetched);
+      } catch {
+        if (cancelled) return;
+        failedFetchId.current = result.id;
+        setDeepLinkMissing(true);
+        setSelected(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items, loading, requestedJobId, selected?.id]);
+
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setMode(query.trim() ? "search" : "recommend");
@@ -190,7 +289,14 @@ export default function JobsPage() {
           });
       setItems(res.items);
       setCursor(res.next_cursor ?? null);
-      setSelected(res.items[0] ?? null);
+      const result = resolveJobSelection(res.items, requestedJobId);
+      if (result.status === "matched" || result.status === "default") {
+        setDeepLinkMissing(false);
+        setSelected(result.selected);
+      } else {
+        setDeepLinkMissing(false);
+        setSelected(null);
+      }
       setMode(query.trim() ? "search" : "recommend");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("error_generic"));
@@ -235,9 +341,10 @@ export default function JobsPage() {
       if (type === "dismiss") {
         const remaining = items.filter((j) => j.id !== job.id);
         setItems(remaining);
-        setSelected((current) =>
-          current?.id === job.id ? remaining[0] ?? null : current
-        );
+        const next =
+          selected?.id === job.id ? remaining[0] ?? null : selected;
+        setSelected(next);
+        writeJobQuery(next?.id ?? null, "replace");
         setActionMessage({ kind: "ok", text: t("dismissed") });
       } else {
         setActionMessage({ kind: "ok", text: t("saved") });
@@ -381,10 +488,7 @@ export default function JobsPage() {
                 variant="list"
                 display={postingToDisplay(job)}
                 selected={selected?.id === job.id}
-                onClick={() => {
-                  setSelected(job);
-                  setActionMessage(null);
-                }}
+                onClick={() => selectJob(job)}
               />
             ))}
 
@@ -405,7 +509,16 @@ export default function JobsPage() {
           </div>
 
           <aside className="h-fit overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111] lg:sticky lg:top-6">
-            {selected && selectedGate ? (
+            {deepLinkMissing ? (
+              <div className="space-y-2 px-5 py-16 text-center">
+                <p className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                  {t("deep_link_missing")}
+                </p>
+                <p className="text-[13px] text-[#888]">
+                  {t("deep_link_missing_hint")}
+                </p>
+              </div>
+            ) : selected && selectedGate ? (
               <JobCard
                 variant="detail"
                 display={postingToDisplay(selected)}

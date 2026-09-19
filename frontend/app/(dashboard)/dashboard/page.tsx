@@ -20,6 +20,7 @@ import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeTime } from "@/lib/company";
 import { postingToDisplay } from "@/lib/offer-display";
+import { jobsHref } from "@/lib/jobs-selection";
 import {
   ArrowUpRight,
   Inbox,
@@ -199,7 +200,7 @@ export default function DashboardPage() {
               <JobCard
                 key={job.id}
                 variant="tile"
-                href="/jobs"
+                href={jobsHref(job.id)}
                 display={postingToDisplay(job)}
               />
             ))}
