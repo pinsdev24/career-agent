@@ -1,48 +1,60 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import {
-  Briefcase,
-  ExternalLink,
-  Loader2,
-  MapPin,
-  Search,
-  Bookmark,
-  X,
-  Sparkles,
-  Banknote,
-  Clock,
-} from "lucide-react";
+import { Briefcase, Loader2, Search } from "lucide-react";
 import type { JobPosting } from "@/lib/job-engine-types";
 import {
+  getJob,
   getRecommendedJobs,
   searchJobs,
   sendJobSignal,
   JobEngineError,
 } from "@/lib/job-engine";
+import {
+  includeFetchedJob,
+  mergeJobQuery,
+  readJobQueryId,
+  resolveJobSelection,
+} from "@/lib/jobs-selection";
 import { Button } from "@/components/ui/button";
 import { createApplication } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
-import { stripHtml } from "@/lib/utils";
-import { formatRelativeTime } from "@/lib/company";
-import { CompanyLogo } from "@/components/company-logo";
-import { MatchScore } from "@/components/match-score";
+import { evaluatePrepareGate, postingToDisplay } from "@/lib/offer-display";
 import { EmptyState } from "@/components/empty-state";
+import { useFirstRun } from "@/components/first-run-provider";
+import { JobCard } from "@/components/job-card";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { remotePreferenceToFilter } from "@/lib/profile-ready";
+import {
+  jobsChipMessageKey,
+  jobsEmptyMessageKeys,
+  selectJobsChipKind,
+  selectJobsEmptyKind,
+} from "@/lib/jobs-copy";
+import { JobsFilterBar, type JobsBarFilters } from "@/components/jobs-filter-bar";
+import { countryLabel } from "@/lib/geo-catalog";
+import { useLocale } from "next-intl";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");
+  const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedJobId = readJobQueryId(searchParams.get("job"));
+  const search = searchParams.toString();
+  const failedFetchId = useRef<string | null>(null);
+  const { ready, loading: setupLoading, openWizard, profile } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<JobPosting | null>(null);
+  const [deepLinkMissing, setDeepLinkMissing] = useState(false);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"recommend" | "search">("recommend");
   const [packetBusy, setPacketBusy] = useState(false);
@@ -51,9 +63,73 @@ export default function JobsPage() {
     kind: "ok" | "error";
     text: string;
   } | null>(null);
+  const [bar, setBar] = useState<JobsBarFilters>({
+    countries: [],
+    workModes: [],
+    contractTypes: [],
+    roles: [],
+  });
+  const [applied, setApplied] = useState<JobsBarFilters>({
+    countries: [],
+    workModes: [],
+    contractTypes: [],
+    roles: [],
+  });
+  const [prefsSeeded, setPrefsSeeded] = useState(false);
+
+  const targetTitle = profile?.search_preferences?.job_title?.trim() || "";
+  const prefCountries = (profile?.search_preferences?.countries || []).map((c) =>
+    c.toUpperCase()
+  );
+  const prefLocation =
+    profile?.search_preferences?.location?.trim() ||
+    prefCountries.map((code) => countryLabel(code, locale)).join(" · ");
+  const prefRemote = remotePreferenceToFilter(
+    profile?.search_preferences?.remote_preference,
+    profile?.search_preferences?.work_modes
+  );
+  const uiFiltersOn =
+    applied.countries.length > 0 ||
+    applied.workModes.length > 0 ||
+    applied.contractTypes.length > 0 ||
+    applied.roles.length > 0;
+  const copyCtx = {
+    title: targetTitle,
+    location: prefLocation,
+    remote: prefRemote === true,
+    structuredFilters: uiFiltersOn,
+    uiFiltersActive: uiFiltersOn,
+  };
+  const chipKind = selectJobsChipKind(copyCtx);
+  const emptyKind = selectJobsEmptyKind(copyCtx);
+  const emptyKeys = jobsEmptyMessageKeys(emptyKind);
+
+  const writeJobQuery = useCallback(
+    (jobId: string | null, history: "push" | "replace") => {
+      const next = mergeJobQuery(search, jobId);
+      const current = search ? `/jobs?${search}` : "/jobs";
+      if (next === current) return;
+      if (history === "push") {
+        router.push(next, { scroll: false });
+      } else {
+        router.replace(next, { scroll: false });
+      }
+    },
+    [router, search]
+  );
+
+  const selectJob = useCallback(
+    (job: JobPosting, history: "push" | "replace" = "push") => {
+      setSelected(job);
+      setDeepLinkMissing(false);
+      setActionMessage(null);
+      writeJobQuery(job.id, history);
+    },
+    [writeJobQuery]
+  );
 
   const loadFeed = useCallback(
-    async (reset = true) => {
+    async (reset = true, filters = applied) => {
       if (reset) {
         setLoading(true);
         setError(null);
@@ -61,13 +137,36 @@ export default function JobsPage() {
         setLoadingMore(true);
       }
       try {
+        const filterPayload = {
+          countries: filters.countries,
+          workModes: filters.workModes,
+          contractTypes: filters.contractTypes,
+          roles: filters.roles,
+        };
         const res =
           mode === "search" && query.trim()
-            ? await searchJobs({ q: query.trim(), cursor: reset ? null : cursor })
-            : await getRecommendedJobs(reset ? null : cursor);
+            ? await searchJobs({
+                q: query.trim(),
+                location: filters.countries.length
+                  ? prefLocation || undefined
+                  : undefined,
+                remote: filters.workModes.length ? prefRemote : undefined,
+                cursor: reset ? null : cursor,
+                ...filterPayload,
+              })
+            : await getRecommendedJobs(reset ? null : cursor, 20, filterPayload);
         setItems((prev) => (reset ? res.items : [...prev, ...res.items]));
         setCursor(res.next_cursor ?? null);
-        if (reset && res.items[0]) setSelected(res.items[0]);
+        if (reset) {
+          const result = resolveJobSelection(res.items, requestedJobId);
+          if (result.status === "matched" || result.status === "default") {
+            setDeepLinkMissing(false);
+            setSelected(result.selected);
+          } else {
+            setDeepLinkMissing(false);
+            setSelected(null);
+          }
+        }
       } catch (err) {
         const message =
           err instanceof JobEngineError ? err.message : t("error_generic");
@@ -77,13 +176,92 @@ export default function JobsPage() {
         setLoadingMore(false);
       }
     },
-    [cursor, mode, query, t]
+    [applied, cursor, mode, prefLocation, prefRemote, query, requestedJobId, t]
   );
 
   useEffect(() => {
+    if (setupLoading || prefsSeeded) return;
+    if (profile?.search_preferences) {
+      const prefs = profile.search_preferences;
+      const next: JobsBarFilters = {
+        countries: (prefs.countries || []).map((c) => c.toUpperCase()),
+        workModes: prefs.work_modes || [],
+        contractTypes: prefs.contract_types || [],
+        roles: prefs.preferred_roles || [],
+      };
+      setBar(next);
+      setApplied(next);
+      setPrefsSeeded(true);
+      void loadFeed(true, next);
+      return;
+    }
+    setPrefsSeeded(true);
     void loadFeed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setupLoading, prefsSeeded, profile]);
+
+  useEffect(() => {
+    if (!ready || loading) return;
+    if (items.length === 0 && mode === "recommend") {
+      void loadFeed(true);
+    }
+    // Refresh recommend after first-run completes on this page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
+
+  useEffect(() => {
+    if (failedFetchId.current && failedFetchId.current !== requestedJobId) {
+      failedFetchId.current = null;
+    }
+  }, [requestedJobId]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const result = resolveJobSelection(items, requestedJobId, selected?.id);
+
+    if (result.status === "default") {
+      setDeepLinkMissing(false);
+      setSelected((current) =>
+        current?.id === result.selected?.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (result.status === "matched") {
+      setDeepLinkMissing(false);
+      setSelected((current) =>
+        current?.id === result.selected.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (failedFetchId.current === result.id) {
+      setDeepLinkMissing(true);
+      setSelected(null);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const fetched = await getJob(result.id);
+        if (cancelled) return;
+        setDeepLinkMissing(false);
+        setItems((prev) => includeFetchedJob(prev, fetched));
+        setSelected(fetched);
+      } catch {
+        if (cancelled) return;
+        failedFetchId.current = result.id;
+        setDeepLinkMissing(true);
+        setSelected(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items, loading, requestedJobId, selected?.id]);
 
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,11 +270,33 @@ export default function JobsPage() {
     setError(null);
     try {
       const res = query.trim()
-        ? await searchJobs({ q: query.trim() })
-        : await getRecommendedJobs();
+        ? await searchJobs({
+            q: query.trim(),
+            location: applied.countries.length
+              ? prefLocation || undefined
+              : undefined,
+            remote: applied.workModes.length ? prefRemote : undefined,
+            countries: applied.countries,
+            workModes: applied.workModes,
+            contractTypes: applied.contractTypes,
+            roles: applied.roles,
+          })
+        : await getRecommendedJobs(null, 20, {
+            countries: applied.countries,
+            workModes: applied.workModes,
+            contractTypes: applied.contractTypes,
+            roles: applied.roles,
+          });
       setItems(res.items);
       setCursor(res.next_cursor ?? null);
-      setSelected(res.items[0] ?? null);
+      const result = resolveJobSelection(res.items, requestedJobId);
+      if (result.status === "matched" || result.status === "default") {
+        setDeepLinkMissing(false);
+        setSelected(result.selected);
+      } else {
+        setDeepLinkMissing(false);
+        setSelected(null);
+      }
       setMode(query.trim() ? "search" : "recommend");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("error_generic"));
@@ -106,6 +306,12 @@ export default function JobsPage() {
   };
 
   const onPreparePacket = async (job: JobPosting) => {
+    const gate = evaluatePrepareGate({
+      status: job.status,
+      applyUrl: job.apply_url,
+      descriptionText: job.description_text,
+    });
+    if (!gate.allowed) return;
     setPacketBusy(true);
     setActionMessage(null);
     try {
@@ -135,9 +341,10 @@ export default function JobsPage() {
       if (type === "dismiss") {
         const remaining = items.filter((j) => j.id !== job.id);
         setItems(remaining);
-        setSelected((current) =>
-          current?.id === job.id ? remaining[0] ?? null : current
-        );
+        const next =
+          selected?.id === job.id ? remaining[0] ?? null : selected;
+        setSelected(next);
+        writeJobQuery(next?.id ?? null, "replace");
         setActionMessage({ kind: "ok", text: t("dismissed") });
       } else {
         setActionMessage({ kind: "ok", text: t("saved") });
@@ -152,9 +359,12 @@ export default function JobsPage() {
     }
   };
 
-  const selectedDescription = stripHtml(selected?.description_text || "");
-  const selectedScore = selected
-    ? selected.score ?? selected.score_breakdown?.total
+  const selectedGate = selected
+    ? evaluatePrepareGate({
+        status: selected.status,
+        applyUrl: selected.apply_url,
+        descriptionText: selected.description_text,
+      })
     : null;
 
   return (
@@ -176,6 +386,37 @@ export default function JobsPage() {
         </Button>
       </form>
 
+      <JobsFilterBar
+        value={bar}
+        onChange={setBar}
+        onApply={() => {
+          setApplied(bar);
+          setPrefsSeeded(true);
+          void loadFeed(true, bar);
+        }}
+        onClear={() => {
+          const next: JobsBarFilters = {
+            countries: [],
+            workModes: [],
+            contractTypes: [],
+            roles: [],
+          };
+          setBar(next);
+          setApplied(next);
+          setPrefsSeeded(true);
+          void loadFeed(true, next);
+        }}
+      />
+
+      {ready && chipKind && items.length > 0 && !loading && (
+        <p className="text-[12px] text-[#888]">
+          {t(jobsChipMessageKey(chipKind), {
+            title: targetTitle,
+            location: prefLocation,
+          })}
+        </p>
+      )}
+
       {error && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
           {error}
@@ -192,84 +433,64 @@ export default function JobsPage() {
           <Skeleton className="hidden h-[520px] rounded-2xl lg:block" />
         </div>
       ) : items.length === 0 ? (
-        <EmptyState
-          icon={Briefcase}
-          title={t("empty")}
-          description={t("empty_hint")}
-          actionHref="/profile"
-          actionLabel={t("empty_cta")}
-        />
+        setupLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[88px] w-full rounded-2xl" />
+            ))}
+          </div>
+        ) : !ready ? (
+          <EmptyState
+            icon={Briefcase}
+            title={t("empty")}
+            description={t("empty_hint")}
+            actionLabel={t("empty_cta")}
+            onAction={openWizard}
+          />
+        ) : (
+          <EmptyState
+            icon={Briefcase}
+            title={t(emptyKeys.title, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
+            description={t(emptyKeys.hint, {
+              title: targetTitle,
+              location: prefLocation,
+            })}
+            actionLabel={emptyKind === "filters" ? t("empty_filters_cta") : undefined}
+            onAction={
+              emptyKind === "filters"
+                ? () => {
+                    const next: JobsBarFilters = {
+                      countries: [],
+                      workModes: [],
+                      contractTypes: [],
+                      roles: [],
+                    };
+                    setBar(next);
+                    setApplied(next);
+                    setPrefsSeeded(true);
+                    void loadFeed(true, next);
+                  }
+                : undefined
+            }
+            secondaryHref="/pipeline/new"
+            secondaryLabel={t("empty_warming_cta")}
+          />
+        )
       ) : (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:min-h-0">
           <div className="space-y-2 lg:overflow-y-auto lg:pr-1">
-            {items.map((job) => {
-              const active = selected?.id === job.id;
-              const score = job.score ?? job.score_breakdown?.total;
-              return (
-                <button
-                  key={job.id}
-                  type="button"
-                  onClick={() => {
-                    setSelected(job);
-                    setActionMessage(null);
-                  }}
-                  className={`w-full rounded-2xl border px-4 py-3.5 text-left transition-all ${
-                    active
-                      ? "border-[#1a1a1a] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.04)] dark:border-white dark:bg-[#161616]"
-                      : "border-transparent bg-white hover:border-[#E4E4E4] dark:bg-[#111] dark:hover:border-[#333]"
-                  }`}
-                >
-                  <div className="flex items-start gap-3.5">
-                    <CompanyLogo
-                      name={job.company_name}
-                      slug={job.company_slug}
-                      url={job.apply_url}
-                      size={42}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <h2 className="truncate text-[14px] font-semibold text-[#1a1a1a] dark:text-white">
-                            {job.title}
-                          </h2>
-                          <p className="mt-0.5 truncate text-[13px] text-[#666] dark:text-[#aaa]">
-                            {job.company_name}
-                          </p>
-                        </div>
-                        <MatchScore score={score} compact />
-                      </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#888]">
-                        {job.location && (
-                          <span className="inline-flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {job.location}
-                          </span>
-                        )}
-                        {job.remote && <span>{t("remote")}</span>}
-                        {job.posted_at && (
-                          <span className="inline-flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            {formatRelativeTime(job.posted_at)}
-                          </span>
-                        )}
-                      </div>
-                      {job.skills?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {job.skills.slice(0, 3).map((skill) => (
-                            <span
-                              key={skill}
-                              className="rounded-md bg-[#F5F5F5] px-1.5 py-0.5 text-[11px] text-[#666] dark:bg-[#222] dark:text-[#aaa]"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+            {items.map((job) => (
+              <JobCard
+                key={job.id}
+                variant="list"
+                display={postingToDisplay(job)}
+                selected={selected?.id === job.id}
+                onClick={() => selectJob(job)}
+              />
+            ))}
 
             {cursor && (
               <Button
@@ -288,139 +509,36 @@ export default function JobsPage() {
           </div>
 
           <aside className="h-fit overflow-hidden rounded-2xl border border-[#EBEBEB] bg-white dark:border-[#333] dark:bg-[#111] lg:sticky lg:top-6">
-            {selected ? (
-              <div className="flex flex-col">
-                <div className="border-b border-[#F0F0F0] px-5 py-5 dark:border-[#222]">
-                  <div className="flex items-start gap-3.5">
-                    <CompanyLogo
-                      name={selected.company_name}
-                      slug={selected.company_slug}
-                      url={selected.apply_url}
-                      size={48}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-[16px] font-semibold leading-snug text-[#1a1a1a] dark:text-white">
-                        {selected.title}
-                      </h3>
-                      <p className="mt-0.5 text-[13px] text-[#666] dark:text-[#aaa]">
-                        {selected.company_name}
-                      </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <MatchScore score={selectedScore} />
-                        <span className="rounded-full bg-[#F5F5F5] px-2 py-0.5 text-[11px] uppercase tracking-wide text-[#666] dark:bg-[#222] dark:text-[#aaa]">
-                          {selected.source}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-[#777]">
-                    {selected.location && (
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5" />
-                        {selected.location}
-                      </span>
-                    )}
-                    {selected.remote && <span>{t("remote")}</span>}
-                    {selected.salary && (
-                      <span className="inline-flex items-center gap-1">
-                        <Banknote className="h-3.5 w-3.5" />
-                        {selected.salary}
-                      </span>
-                    )}
-                    {selected.contract_type && <span>{selected.contract_type}</span>}
-                  </div>
-                </div>
-
-                <div className="space-y-4 px-5 py-4">
-                  {selected.score_breakdown?.reasons?.length ? (
-                    <div>
-                      <div className="mb-2 flex items-center gap-1.5 text-[12px] font-semibold text-[#1a1a1a] dark:text-white">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        {t("why_match")}
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {selected.score_breakdown.reasons.slice(0, 6).map((reason) => (
-                          <span
-                            key={reason}
-                            className="rounded-lg bg-[#F7F7F7] px-2 py-1 text-[12px] leading-snug text-[#555] dark:bg-[#1c1c1c] dark:text-[#bbb]"
-                          >
-                            {reason}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-
-                  <p className="max-h-56 overflow-y-auto whitespace-pre-wrap text-[13px] leading-relaxed text-[#555] dark:text-[#aaa]">
-                    {selectedDescription.slice(0, 1600)}
-                    {selectedDescription.length > 1600 ? "…" : ""}
-                  </p>
-
-                  {actionMessage && (
-                    <p
-                      className={`text-[12px] ${
-                        actionMessage.kind === "error"
-                          ? "text-amber-700 dark:text-amber-300"
-                          : "text-[#666] dark:text-[#888]"
-                      }`}
-                    >
-                      {actionMessage.text}
-                    </p>
-                  )}
-                </div>
-
-                <div className="sticky bottom-0 space-y-2 border-t border-[#F0F0F0] bg-white px-5 py-4 dark:border-[#222] dark:bg-[#111]">
-                  <Button
-                    type="button"
-                    className="h-10 w-full rounded-xl text-[13px]"
-                    disabled={packetBusy}
-                    onClick={() => void onPreparePacket(selected)}
-                  >
-                    {packetBusy ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      t("prepare_packet")
-                    )}
-                  </Button>
-                  <div className="grid grid-cols-3 gap-2">
-                    <a
-                      href={selected.apply_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-[#EBEBEB] text-[12px] font-medium text-[#1a1a1a] hover:bg-[#FAFAFA] dark:border-[#333] dark:text-white dark:hover:bg-[#1a1a1a]"
-                    >
-                      {t("apply")}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-9 rounded-xl text-[12px]"
-                      disabled={signalBusy}
-                      onClick={() => void onSignal(selected, "save")}
-                    >
-                      <Bookmark className="mr-1 h-3.5 w-3.5" />
-                      {t("save")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-9 rounded-xl text-[12px]"
-                      disabled={signalBusy}
-                      onClick={() => void onSignal(selected, "dismiss")}
-                    >
-                      <X className="mr-1 h-3.5 w-3.5" />
-                      {t("dismiss")}
-                    </Button>
-                  </div>
+            {deepLinkMissing ? (
+              <div className="space-y-2 px-5 py-16 text-center">
+                <p className="text-[13px] font-medium text-[#1a1a1a] dark:text-white">
+                  {t("deep_link_missing")}
+                </p>
+                <p className="text-[13px] text-[#888]">
+                  {t("deep_link_missing_hint")}
+                </p>
+              </div>
+            ) : selected && selectedGate ? (
+              <JobCard
+                variant="detail"
+                display={postingToDisplay(selected)}
+                description={selected.description_text}
+                prepareGate={selectedGate}
+                prepareBusy={packetBusy}
+                onPrepare={() => void onPreparePacket(selected)}
+                onSave={() => void onSignal(selected, "save")}
+                onDismiss={() => void onSignal(selected, "dismiss")}
+                signalBusy={signalBusy}
+                actionMessage={actionMessage}
+                footerNote={
                   <Link
                     href="/pipeline/new"
                     className="block pt-1 text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
                   >
-                    {t("open_in_careeragent")}
+                    {t("url_not_in_feed")}
                   </Link>
-                </div>
-              </div>
+                }
+              />
             ) : (
               <p className="px-5 py-16 text-center text-[13px] text-[#999]">
                 {t("select_hint")}

@@ -7,6 +7,26 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.models.prefs import ContractType, CountryCode, WorkMode
+
+__all__ = [
+    "AtsProvider",
+    "CanonicalJob",
+    "ContractType",
+    "CountryCode",
+    "HealthResponse",
+    "IngestStatsResponse",
+    "JobListResponse",
+    "JobPostingOut",
+    "JobStatus",
+    "ReadyResponse",
+    "ScoreBreakdown",
+    "SignalRequest",
+    "SignalResponse",
+    "SignalType",
+    "WorkMode",
+]
+
 
 class AtsProvider(str, Enum):
     GREENHOUSE = "greenhouse"
@@ -40,6 +60,8 @@ class CanonicalJob(BaseModel):
     company_name: str
     title: str
     location: str | None = None
+    country_code: str | None = None
+    city: str | None = None
     remote: bool | None = None
     contract_type: str | None = None
     salary: str | None = None
@@ -57,6 +79,7 @@ class ScoreBreakdown(BaseModel):
     recency: float = 0.0
     source_trust: float = 0.0
     novelty: float = 0.0
+    geo: float = 0.0
     total: float = 0.0
     matching_skills: list[str] = Field(default_factory=list)
     reasons: list[str] = Field(default_factory=list)
@@ -70,6 +93,8 @@ class JobPostingOut(BaseModel):
     company_slug: str | None = None
     title: str
     location: str | None = None
+    country_code: str | None = None
+    city: str | None = None
     remote: bool | None = None
     contract_type: str | None = None
     salary: str | None = None

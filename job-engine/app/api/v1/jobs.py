@@ -13,13 +13,47 @@ from app.logging_setup import get_logger
 from app.metrics import RECOMMEND_CACHE_HITS
 from app.models.schemas import JobListResponse, JobPostingOut, SignalRequest, SignalResponse
 from app.rank.scorer import Ranker, prefs_hash
+from app.workers.demand import demand_packs_from_profile
+from app.workers.queue import enqueue_job
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
+def _csv_list(value: str | None) -> list[str] | None:
+    """Query param → override list.
+
+    None (omitted) = inherit profile. Empty string / empty CSV = explicit
+    all/any (Jobs UI cleared that dimension).
+    """
+    if value is None:
+        return None
+    return [p.strip() for p in value.split(",") if p.strip()]
+
+
 def _repo(supabase: AsyncClient) -> JobRepository:
     return JobRepository(supabase)
+
+
+async def _maybe_enqueue_discovery(
+    redis_client: redis.Redis,
+    user_id: str,
+    prefs: dict,
+    cv_structured: dict,
+) -> None:
+    """When geo/role recall is empty, kick profile-driven discovery (debounced)."""
+    queries = demand_packs_from_profile(prefs, cv_structured)
+    if not queries:
+        return
+    debounce_key = f"discover:{user_id}:{prefs_hash(prefs)}"
+    try:
+        already = await redis_client.get(debounce_key)
+        if already:
+            return
+        await redis_client.setex(debounce_key, 1800, "1")
+    except Exception as exc:
+        logger.warning("discover_debounce_failed", error=str(exc))
+    await enqueue_job("job_discover_tavily", queries)
 
 
 async def _cache_get(redis_client: redis.Redis, key: str) -> str | None:
@@ -52,19 +86,41 @@ async def recommend(
     redis_client: Annotated[redis.Redis, Depends(get_redis)],
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = None,
+    countries: str | None = Query(None, description="Comma-separated ISO alpha-2 codes"),
+    work_modes: str | None = Query(None),
+    contract_types: str | None = Query(None),
+    roles: str | None = Query(None),
 ) -> JobListResponse:
     settings = get_settings()
     repo = _repo(supabase)
     profile = await repo.get_profile(user["id"]) or {}
     prefs = profile.get("search_preferences") or {}
-    cache_key = f"recommend:{user['id']}:{prefs_hash(prefs)}:{limit}:{cursor or ''}"
+    cache_key = (
+        f"recommend:{user['id']}:{prefs_hash(prefs)}:{limit}:{cursor or ''}:"
+        f"{countries or ''}:{work_modes or ''}:{contract_types or ''}:{roles or ''}"
+    )
 
     cached = await _cache_get(redis_client, cache_key)
     if cached:
         RECOMMEND_CACHE_HITS.inc()
         return JobListResponse.model_validate_json(cached)
 
-    result = await Ranker(repo).recommend(user["id"], limit=limit, cursor=cursor)
+    result = await Ranker(repo).recommend(
+        user["id"],
+        limit=limit,
+        cursor=cursor,
+        override_countries=_csv_list(countries),
+        override_work_modes=_csv_list(work_modes),
+        override_contract_types=_csv_list(contract_types),
+        override_roles=_csv_list(roles),
+    )
+    if not result.items:
+        await _maybe_enqueue_discovery(
+            redis_client,
+            user["id"],
+            prefs if isinstance(prefs, dict) else {},
+            profile.get("cv_structured") or {},
+        )
     await _cache_set(
         redis_client,
         cache_key,
@@ -81,6 +137,10 @@ async def search(
     q: str = Query(""),
     location: str | None = None,
     remote: bool | None = None,
+    countries: str | None = Query(None),
+    work_modes: str | None = Query(None),
+    contract_types: str | None = Query(None),
+    roles: str | None = Query(None),
     limit: int = Query(20, ge=1, le=50),
     cursor: str | None = None,
 ) -> JobListResponse:
@@ -91,6 +151,10 @@ async def search(
         remote=remote,
         limit=limit,
         cursor=cursor,
+        countries=_csv_list(countries),
+        work_modes=_csv_list(work_modes),
+        contract_types=_csv_list(contract_types),
+        roles=_csv_list(roles),
     )
 
 

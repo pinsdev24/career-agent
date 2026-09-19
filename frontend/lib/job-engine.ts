@@ -3,6 +3,10 @@
 import { createClient } from "@/lib/supabase/client";
 import { JOB_ENGINE_URL, formatErrorDetail } from "@/lib/api-base";
 import type { JobListResponse, JobPosting, JobSignalType } from "@/lib/job-engine-types";
+import { applyJobFilters, type JobSearchFilters } from "@/lib/job-filters";
+
+export type { JobSearchFilters };
+export { applyJobFilters };
 
 class JobEngineError extends Error {
   status: number;
@@ -59,10 +63,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export async function getRecommendedJobs(
   cursor?: string | null,
-  limit = 20
+  limit = 20,
+  filters?: JobSearchFilters
 ): Promise<JobListResponse> {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.set("cursor", cursor);
+  applyJobFilters(params, filters);
   return request<JobListResponse>(`/v1/jobs/recommend?${params}`);
 }
 
@@ -72,6 +78,10 @@ export async function searchJobs(opts: {
   remote?: boolean;
   cursor?: string | null;
   limit?: number;
+  countries?: string[];
+  workModes?: string[];
+  contractTypes?: string[];
+  roles?: string[];
 }): Promise<JobListResponse> {
   const params = new URLSearchParams();
   if (opts.q) params.set("q", opts.q);
@@ -79,6 +89,12 @@ export async function searchJobs(opts: {
   if (opts.remote !== undefined) params.set("remote", String(opts.remote));
   if (opts.cursor) params.set("cursor", opts.cursor);
   params.set("limit", String(opts.limit ?? 20));
+  applyJobFilters(params, {
+    countries: opts.countries,
+    workModes: opts.workModes,
+    contractTypes: opts.contractTypes,
+    roles: opts.roles,
+  });
   return request<JobListResponse>(`/v1/jobs/search?${params}`);
 }
 

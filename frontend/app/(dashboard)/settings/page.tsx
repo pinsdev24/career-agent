@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Globe, Save, Check, MapPin, FileText, Wifi, Loader2, Handshake, MessageSquare, Megaphone, BookOpen, AlignLeft, Briefcase } from "lucide-react";
+import { Globe, Save, Check, MapPin, Loader2, Handshake, MessageSquare, Megaphone, BookOpen, AlignLeft, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,21 @@ import { LanguagePreference } from "@/lib/types";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { setUserLocale } from "@/lib/i18n/locale";
 import { useLocale } from "next-intl";
+import { useFirstRun } from "@/components/first-run-provider";
+import { MultiSelect } from "@/components/multi-select";
+import {
+  CONTRACT_TYPES,
+  COUNTRIES,
+  ROLE_SUGGESTIONS,
+  WORK_MODES,
+  countryLabel,
+  searchCities,
+} from "@/lib/geo-catalog";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
   const currentLocale = useLocale();
+  const { setProfile: setFirstRunProfile } = useFirstRun();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -25,9 +36,12 @@ export default function SettingsPage() {
   const [tone, setTone] = useState("professional");
   const [language, setLanguage] = useState<LanguagePreference>("en");
   const [jobTitle, setJobTitle] = useState("");
-  const [location, setLocation] = useState("");
-  const [contractType, setContractType] = useState("");
-  const [remote, setRemote] = useState("");
+  const [countries, setCountries] = useState<string[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [workModes, setWorkModes] = useState<string[]>([]);
+  const [contractTypes, setContractTypes] = useState<string[]>([]);
+  const [preferredRoles, setPreferredRoles] = useState<string[]>([]);
+  const [legacyLocation, setLegacyLocation] = useState("");
 
   // App UI Language
   const [uiLanguage, setUiLanguage] = useState<string>(currentLocale);
@@ -54,10 +68,16 @@ export default function SettingsPage() {
         if (prof?.language_preference) setLanguage(prof.language_preference);
         if (prof?.tone_of_voice) setTone(prof.tone_of_voice);
         if (prof?.search_preferences) {
-          setJobTitle(prof.search_preferences.job_title || "");
-          setLocation(prof.search_preferences.location || "");
-          setContractType(prof.search_preferences.contract_type || "");
-          setRemote(prof.search_preferences.remote_preference || "");
+          const prefs = prof.search_preferences;
+          setJobTitle(prefs.job_title || "");
+          setCountries((prefs.countries || []).map((c) => c.toUpperCase()));
+          setCities(prefs.cities || []);
+          setWorkModes(prefs.work_modes || (prefs.remote_preference ? [prefs.remote_preference] : []));
+          setContractTypes(
+            prefs.contract_types || (prefs.contract_type ? [prefs.contract_type] : [])
+          );
+          setPreferredRoles(prefs.preferred_roles || (prefs.job_title ? [prefs.job_title] : []));
+          setLegacyLocation(prefs.location || "");
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load preferences");
@@ -80,16 +100,22 @@ export default function SettingsPage() {
     setError(null);
     setSuccess(null);
     try {
-      await updatePreferences(
+      const updated = await updatePreferences(
         tone as any,
         {
           job_title: jobTitle,
-          location,
-          contract_type: contractType,
-          remote_preference: remote
+          countries,
+          cities,
+          work_modes: workModes,
+          contract_types: contractTypes,
+          preferred_roles: preferredRoles,
+          remote_preference: workModes[0] || "",
+          contract_type: contractTypes[0] || "",
+          location: legacyLocation || undefined,
         },
         language
       );
+      setFirstRunProfile(updated);
       setSuccess("Preferences saved successfully.");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: unknown) {
@@ -258,8 +284,8 @@ export default function SettingsPage() {
           <div className="space-y-3 border-t border-[#F5F5F5] dark:border-[#333] pt-5">
             <Label className="text-[12px] font-medium text-[#666] dark:text-[#888]">{t("search_filters")}</Label>
             <p className="text-[11px] text-[#999] dark:text-[#aaa] -mt-1">{t("search_filters_desc")}</p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+
+            <div className="space-y-4 mt-3">
               <div className="space-y-1.5">
                 <Label className="text-[11px] text-[#999] dark:text-[#aaa] flex items-center gap-1.5">
                   <Briefcase className="h-3 w-3" /> {t("job_title")}
@@ -272,38 +298,115 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[11px] text-[#999] dark:text-[#aaa] flex items-center gap-1.5">
-                  <MapPin className="h-3 w-3" /> {t("location")}
-                </Label>
-                <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="e.g. Paris, Remote"
-                  className="rounded-lg h-9 bg-[#FAFAFA] dark:bg-[#111] border-[#EBEBEB] dark:border-[#333] focus-visible:ring-[#1a1a1a] dark:focus-visible:ring-white text-[13px] px-3 dark:text-white"
+                <Label className="text-[11px] text-[#999] dark:text-[#aaa]">{t("countries_label")}</Label>
+                <MultiSelect
+                  values={countries}
+                  onChange={setCountries}
+                  options={COUNTRIES.map((c) => ({
+                    value: c.code,
+                    label: countryLabel(c.code, currentLocale),
+                  }))}
+                  placeholder={t("countries_placeholder")}
+                  hint={t("countries_hint")}
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[11px] text-[#999] dark:text-[#aaa] flex items-center gap-1.5">
-                  <FileText className="h-3 w-3" /> {t("contract_type")}
-                </Label>
-                <Input
-                  value={contractType}
-                  onChange={(e) => setContractType(e.target.value)}
-                  placeholder="e.g. full-time"
-                  className="rounded-lg h-9 bg-[#FAFAFA] dark:bg-[#111] border-[#EBEBEB] dark:border-[#333] focus-visible:ring-[#1a1a1a] dark:focus-visible:ring-white text-[13px] px-3 dark:text-white"
+                <Label className="text-[11px] text-[#999] dark:text-[#aaa]">{t("cities_label")}</Label>
+                <MultiSelect
+                  values={cities}
+                  onChange={setCities}
+                  options={searchCities("", countries).map((city) => ({
+                    value: city,
+                    label: city,
+                  }))}
+                  placeholder={t("cities_placeholder")}
+                  disabled={!countries.length}
+                  allowCustom
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[11px] text-[#999] dark:text-[#aaa] flex items-center gap-1.5">
-                  <Wifi className="h-3.5 w-3.5" /> {t("remote_preference")}
-                </Label>
-                <Input
-                  value={remote}
-                  onChange={(e) => setRemote(e.target.value)}
-                  placeholder="e.g. remote, hybrid"
-                  className="rounded-lg h-9 bg-[#FAFAFA] dark:bg-[#111] border-[#EBEBEB] dark:border-[#333] focus-visible:ring-[#1a1a1a] dark:focus-visible:ring-white text-[13px] px-3 dark:text-white"
+                <Label className="text-[11px] text-[#999] dark:text-[#aaa]">{t("work_mode_label")}</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {WORK_MODES.map((mode) => {
+                    const active = workModes.includes(mode);
+                    return (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() =>
+                          setWorkModes((current) =>
+                            current.includes(mode)
+                              ? current.filter((item) => item !== mode)
+                              : [...current, mode]
+                          )
+                        }
+                        className={`rounded-lg border px-2 py-2.5 text-[12px] font-medium transition-colors ${
+                          active
+                            ? "border-[#1a1a1a] bg-[#1a1a1a] text-white dark:border-white dark:bg-white dark:text-black"
+                            : "border-[#EBEBEB] bg-white text-[#1a1a1a] hover:border-[#ccc] dark:border-[#333] dark:bg-[#111] dark:text-white"
+                        }`}
+                      >
+                        {t(`work_mode_${mode}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[11px] text-[#999] dark:text-[#aaa]">{t("contract_label")}</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {CONTRACT_TYPES.map((type) => {
+                    const active = contractTypes.includes(type);
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() =>
+                          setContractTypes((current) =>
+                            current.includes(type)
+                              ? current.filter((item) => item !== type)
+                              : [...current, type]
+                          )
+                        }
+                        className={`rounded-lg border px-2 py-2.5 text-[12px] font-medium transition-colors ${
+                          active
+                            ? "border-[#1a1a1a] bg-[#1a1a1a] text-white dark:border-white dark:bg-white dark:text-black"
+                            : "border-[#EBEBEB] bg-white text-[#1a1a1a] hover:border-[#ccc] dark:border-[#333] dark:bg-[#111] dark:text-white"
+                        }`}
+                      >
+                        {t(`contract_${type}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[11px] text-[#999] dark:text-[#aaa]">{t("roles_label")}</Label>
+                <MultiSelect
+                  values={preferredRoles}
+                  onChange={setPreferredRoles}
+                  options={ROLE_SUGGESTIONS.map((role) => ({
+                    value: role,
+                    label: role,
+                  }))}
+                  placeholder={t("roles_placeholder")}
+                  hint={t("roles_hint")}
+                  allowCustom
                 />
               </div>
+              {legacyLocation ? (
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] text-[#999] dark:text-[#aaa] flex items-center gap-1.5">
+                    <MapPin className="h-3 w-3" /> {t("location_legacy_label")}
+                  </Label>
+                  <Input
+                    value={legacyLocation}
+                    onChange={(e) => setLegacyLocation(e.target.value)}
+                    className="rounded-lg h-9 bg-[#FAFAFA] dark:bg-[#111] border-[#EBEBEB] dark:border-[#333] text-[13px] px-3 dark:text-white"
+                  />
+                  <p className="text-[11px] text-[#999]">{t("location_legacy_hint")}</p>
+                </div>
+              ) : null}
             </div>
           </div>
 

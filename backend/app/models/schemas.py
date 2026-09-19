@@ -54,25 +54,168 @@ class LanguagePreference(str, Enum):
     NL = "nl"
 
 
+class WorkMode(str, Enum):
+    """Onsite / hybrid / remote — stored as structured codes."""
+
+    REMOTE = "remote"
+    HYBRID = "hybrid"
+    ONSITE = "onsite"
+
+
+class ContractType(str, Enum):
+    """Employment contract family."""
+
+    PERMANENT = "permanent"
+    FREELANCE = "freelance"
+    INTERNSHIP = "internship"
+    FIXED_TERM = "fixed_term"
+
+
 # ---------------------------------------------------------------------------
 # Profile
 # ---------------------------------------------------------------------------
 
 
+_LOCATION_TO_COUNTRY: dict[str, str] = {
+    "belgium": "BE",
+    "belgique": "BE",
+    "belgie": "BE",
+    "belgië": "BE",
+    "brussels": "BE",
+    "bruxelles": "BE",
+    "brussel": "BE",
+    "ghent": "BE",
+    "gent": "BE",
+    "antwerp": "BE",
+    "netherlands": "NL",
+    "nederland": "NL",
+    "holland": "NL",
+    "amsterdam": "NL",
+    "luxembourg": "LU",
+    "france": "FR",
+    "paris": "FR",
+    "germany": "DE",
+    "deutschland": "DE",
+    "berlin": "DE",
+    "united kingdom": "GB",
+    "uk": "GB",
+    "great britain": "GB",
+    "england": "GB",
+    "london": "GB",
+    "ireland": "IE",
+    "dublin": "IE",
+    "spain": "ES",
+    "italy": "IT",
+    "switzerland": "CH",
+    "united states": "US",
+    "usa": "US",
+    "canada": "CA",
+    "argentina": "AR",
+}
+
+
+def countries_from_location_text(location: str | None) -> list[str]:
+    """Best-effort ISO codes from legacy free-text location."""
+    import re
+    import unicodedata
+
+    raw = (location or "").strip()
+    if not raw:
+        return []
+    folded = unicodedata.normalize("NFKD", raw)
+    folded = "".join(ch for ch in folded if not unicodedata.combining(ch)).lower()
+    folded = re.sub(r"\s+", " ", folded).strip()
+    found: list[str] = []
+    seen: set[str] = set()
+    for alias, code in sorted(_LOCATION_TO_COUNTRY.items(), key=lambda kv: -len(kv[0])):
+        if alias == folded or re.search(rf"(?<![a-z0-9]){re.escape(alias)}(?![a-z0-9])", folded):
+            if code not in seen:
+                seen.add(code)
+                found.append(code)
+    token = folded.upper()
+    if len(token) == 2 and token.isalpha() and token not in seen:
+        mapped = "GB" if token == "UK" else token
+        found.append(mapped)
+    return found
+
+
 class SearchPreferences(BaseModel):
-    """User search preferences for job exploration."""
+    """User search preferences for job exploration (Cut 3 structured + legacy)."""
 
     location: str | None = None
+    countries: list[str] = Field(default_factory=list)
+    cities: list[str] = Field(default_factory=list)
+    work_modes: list[str] = Field(default_factory=list)
+    contract_types: list[str] = Field(default_factory=list)
+    preferred_roles: list[str] = Field(default_factory=list)
     contract_type: str | None = Field(
         None,
-        description="e.g. CDI, CDD, freelance, internship",
+        description="Legacy single contract string (e.g. CDI). Prefer contract_types.",
     )
     remote_preference: str | None = Field(
         None,
-        description="e.g. remote, onsite, hybrid",
+        description="Legacy single work-mode string. Prefer work_modes.",
     )
     job_title: str | None = None
     industry: str | None = None
+
+    @field_validator("countries", mode="before")
+    @classmethod
+    def _countries(cls, value: Any) -> list[str]:
+        if not value:
+            return []
+        if isinstance(value, str):
+            value = [value]
+        out: list[str] = []
+        seen: set[str] = set()
+        for item in value:
+            code = str(item).strip().upper()
+            if len(code) == 2 and code.isalpha() and code not in seen:
+                seen.add(code)
+                out.append("GB" if code == "UK" else code)
+        return out
+
+    @field_validator("cities", "preferred_roles", "work_modes", "contract_types", mode="before")
+    @classmethod
+    def _str_list(cls, value: Any) -> list[str]:
+        if not value:
+            return []
+        if isinstance(value, str):
+            value = [value]
+        out: list[str] = []
+        seen: set[str] = set()
+        for item in value:
+            text = str(item).strip()
+            key = text.lower()
+            if not text or key in seen:
+                continue
+            seen.add(key)
+            out.append(text)
+        return out
+
+    def normalized(self) -> dict[str, Any]:
+        data = self.model_dump(exclude_none=True)
+        countries = list(self.countries)
+        if not countries:
+            countries = countries_from_location_text(self.location)
+        data["countries"] = countries
+        if self.work_modes:
+            data["work_modes"] = [m.lower() for m in self.work_modes]
+        elif self.remote_preference:
+            pref = self.remote_preference.strip().lower()
+            mapped = {
+                "remote": "remote",
+                "fully remote": "remote",
+                "hybrid": "hybrid",
+                "onsite": "onsite",
+                "on-site": "onsite",
+                "on site": "onsite",
+            }.get(pref)
+            if mapped:
+                data["work_modes"] = [mapped]
+        if self.contract_types:
+            data["contract_types"] = [c.lower().replace(" ", "_") for c in self.contract_types]
+        return data
 
 
 class ProfileResponse(BaseModel):

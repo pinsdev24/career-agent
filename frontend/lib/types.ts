@@ -32,6 +32,11 @@ export type LanguagePreference = "en" | "fr" | "nl";
 
 export interface SearchPreferences {
   location?: string | null;
+  countries?: string[] | null;
+  cities?: string[] | null;
+  work_modes?: string[] | null;
+  contract_types?: string[] | null;
+  preferred_roles?: string[] | null;
   contract_type?: string | null;
   remote_preference?: string | null;
   job_title?: string | null;

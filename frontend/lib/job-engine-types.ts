@@ -6,6 +6,7 @@ export interface ScoreBreakdown {
   recency: number;
   source_trust: number;
   novelty: number;
+  geo?: number;
   total: number;
   matching_skills: string[];
   reasons: string[];
@@ -19,6 +20,8 @@ export interface JobPosting {
   company_slug?: string | null;
   title: string;
   location?: string | null;
+  country_code?: string | null;
+  city?: string | null;
   remote?: boolean | null;
   contract_type?: string | null;
   salary?: string | null;

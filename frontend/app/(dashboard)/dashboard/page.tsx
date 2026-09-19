@@ -11,23 +11,28 @@ import { getRecommendedJobs } from "@/lib/job-engine";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { CompanyLogo } from "@/components/company-logo";
+import { JobCard } from "@/components/job-card";
 import { MatchScore } from "@/components/match-score";
 import { StatusPill } from "@/components/status-pill";
 import { EmptyState } from "@/components/empty-state";
+import { useFirstRun } from "@/components/first-run-provider";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatRelativeTime } from "@/lib/company";
+import { postingToDisplay } from "@/lib/offer-display";
+import { jobsHref } from "@/lib/jobs-selection";
 import {
   ArrowUpRight,
   Inbox,
   Briefcase,
   FileText,
-  MapPin,
 } from "lucide-react";
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
   const tApp = useTranslations("Applications");
+  const tFirst = useTranslations("FirstRun");
+  const { ready, loading: setupLoading, openWizard } = useFirstRun();
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [apps, setApps] = useState<Application[]>([]);
   const [inbox, setInbox] = useState<WorkItem[]>([]);
@@ -192,31 +197,12 @@ export default function DashboardPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {jobs.map((job) => (
-              <Link
+              <JobCard
                 key={job.id}
-                href="/jobs"
-                className="rounded-2xl border border-[#EBEBEB] bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] dark:border-[#333] dark:bg-[#111]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <CompanyLogo
-                    name={job.company_name}
-                    slug={job.company_slug}
-                    url={job.apply_url}
-                    size={40}
-                  />
-                  <MatchScore score={job.score ?? job.score_breakdown?.total} compact />
-                </div>
-                <h3 className="mt-3 line-clamp-2 text-[14px] font-semibold leading-snug">
-                  {job.title}
-                </h3>
-                <p className="mt-1 truncate text-[12px] text-[#777]">{job.company_name}</p>
-                {job.location && (
-                  <p className="mt-2 inline-flex items-center gap-1 text-[11px] text-[#888]">
-                    <MapPin className="h-3 w-3" />
-                    {job.location}
-                  </p>
-                )}
-              </Link>
+                variant="tile"
+                href={jobsHref(job.id)}
+                display={postingToDisplay(job)}
+              />
             ))}
           </div>
         </section>
@@ -314,13 +300,16 @@ export default function DashboardPage() {
         </section>
       )}
 
-      {!loading && !hasAnything && (
+      {!loading && !setupLoading && !hasAnything && (
         <EmptyState
           icon={Briefcase}
-          title={t("empty.title")}
-          description={t("empty.description")}
-          actionHref="/jobs"
-          actionLabel={t("browse_jobs")}
+          title={ready ? t("empty.title") : tFirst("title")}
+          description={
+            ready ? t("empty.description") : tFirst("banner_desc")
+          }
+          actionHref={ready ? "/jobs" : undefined}
+          actionLabel={ready ? t("browse_jobs") : tFirst("banner_cta")}
+          onAction={ready ? undefined : openWizard}
         />
       )}
     </div>
