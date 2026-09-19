@@ -26,9 +26,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ariadne — AI Career Labyrinth Navigator",
+  title: "Ariadne — Match, draft, you apply",
   description:
-    "Navigate your career labyrinth. Multi-agent LLM system that analyzes your CV, matches job offers, and accelerates your hiring potential.",
+    "Ranked jobs from ATS boards we can reach. Letters in your tone. You review, then you apply — Ariadne never applies for you.",
 };
 
 export default async function RootLayout({

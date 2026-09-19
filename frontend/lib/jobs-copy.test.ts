@@ -261,6 +261,7 @@ describe("Jobs Cut 2 URL-seed copy", () => {
     expect(en.Jobs).not.toHaveProperty("seed_fail");
     expect(en.Jobs).not.toHaveProperty("seed_letter");
     expect(en.Jobs).not.toHaveProperty("seed_placeholder");
+    expect(en.Jobs).not.toHaveProperty("open_in_careeragent");
   });
 
   it("keeps exact NewMission pipeline side-effect strings", async () => {
@@ -313,6 +314,7 @@ describe("Jobs Cut 2 URL-seed copy", () => {
     ].join("\n");
     expect(blob).not.toMatch(/CareerAgent|MACA|ariadne\.app/i);
     expect(blob).not.toMatch(/full-market search/i);
+    expect(blob).not.toMatch(/\bLinkedIn\b|\bIndeed\b|Welcome to the Jungle|\bWTTJ\b/i);
   });
 });
 

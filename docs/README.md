@@ -1,9 +1,9 @@
-# CareerAgent Documentation
+# Ariadne Documentation
 
-Welcome to the official documentation for **CareerAgent**, a Multi-Agent System designed to assist candidates with their job applications.
+Welcome to the official documentation for **Ariadne**, a Multi-Agent System designed to assist candidates with their job applications.
 
 ## Overview
-CareerAgent leverages a Large Language Model (LLM) multi-agent architecture to semantically analyze a candidate's profile against job offers, identify skill gaps, and generate highly personalized cover letters. The system is designed with a "Human-in-the-Loop" (HITL) approach to ensure that users maintain control over critical decisions, such as offer selection and letter approval.
+Ariadne leverages a Large Language Model (LLM) multi-agent architecture to semantically analyze a candidate's profile against job offers, identify skill gaps, and generate highly personalized cover letters. The system is designed with a "Human-in-the-Loop" (HITL) approach to ensure that users maintain control over critical decisions, such as offer selection and letter approval. Ariadne never applies for you.
 
 ## Documentation Structure
 

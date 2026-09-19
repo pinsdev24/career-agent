@@ -1,6 +1,6 @@
 # API Endpoints
 
-The FastAPI backend exposes RESTful endpoints to interact with the CareerAgent system. All endpoints require authentication via a Supabase JWT passed in the `Authorization: Bearer <token>` header, unless otherwise noted.
+The FastAPI backend exposes RESTful endpoints to interact with the Ariadne system. All endpoints require authentication via a Supabase JWT passed in the `Authorization: Bearer <token>` header, unless otherwise noted.
 
 ## Base URL
 `http://localhost:8000` (Local Development)
