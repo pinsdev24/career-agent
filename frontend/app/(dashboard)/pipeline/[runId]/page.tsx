@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import Image from 'next/image'
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { getPipelineRun, selectOffer, reviewLetter, cancelPipeline, markApplied, deletePipeline } from "@/lib/api";
@@ -13,14 +12,8 @@ import { LetterEditor } from "@/components/letter-editor";
 import { LiveAgentLog } from "@/components/live-agent-log";
 import { CompanyLogo } from "@/components/company-logo";
 import { MissionInsights } from "@/components/mission-insights";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { HitlApplySteps } from "@/components/hitl-apply-steps";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,8 +30,6 @@ import {
   Copy,
   CheckCircle2,
   ArrowRight,
-  Rocket,
-  Mail,
   FileText,
   Trash2,
   ArrowLeft,
@@ -53,6 +44,7 @@ export default function PipelineRunPage({
   const { runId } = use(params);
   const router = useRouter();
   const t = useTranslations("MissionDetail");
+  const tApply = useTranslations("Applications");
   
   const [run, setRun] = useState<PipelineRun | null>(null);
   const [loading, setLoading] = useState(true);
@@ -174,28 +166,6 @@ export default function PipelineRunPage({
       await navigator.clipboard.writeText(run.final_letter);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  const handleOpenEmail = (platform: "gmail" | "outlook" | "default") => {
-    if (!run?.final_letter) return;
-
-    const subject = run.selected_offer
-      ? `Application for ${run.selected_offer.title} at ${run.selected_offer.company}`
-      : "Job Application";
-
-    const body = run.final_letter;
-    const recipient = run.selected_offer?.contact_email || "";
-
-    if (platform === "gmail") {
-      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipient}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.open(url, "_blank");
-    } else if (platform === "outlook") {
-      const url = `https://outlook.office.com/mail/deeplink/compose?to=${recipient}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.open(url, "_blank");
-    } else {
-      const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = mailtoUrl;
     }
   };
 
@@ -366,14 +336,14 @@ export default function PipelineRunPage({
         </div>
       )}
 
-      {/* Completed */}
+      {/* Completed — copy, open ATS, mark submitted. Ariadne never sends. */}
       {run.status === "completed" && (
         <div className="animate-in fade-in space-y-6 duration-500">
           {!hasSeenCompletion && (
             <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-900/30 dark:bg-emerald-900/10">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-500" />
               <p className="text-[13px] font-medium text-emerald-700 dark:text-emerald-400">
-                {t("ready_to_send")}
+                {t("ready_to_copy")}
               </p>
             </div>
           )}
@@ -388,72 +358,33 @@ export default function PipelineRunPage({
                       {t("final_letter")}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    <Button
-                      variant={isApplied ? "default" : "outline"}
-                      size="sm"
-                      className={cn(
-                        "h-8 gap-1.5 rounded-lg px-3 text-[12px] transition-all",
-                        isApplied
-                          ? "border-transparent bg-emerald-500 text-white hover:bg-emerald-600"
-                          : "border-[#EBEBEB] bg-transparent text-[#1a1a1a] hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700 dark:border-[#333] dark:text-white dark:hover:border-emerald-900/50 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400"
-                      )}
-                      onClick={handleMarkApplied}
-                      disabled={isApplied || isApplying}
-                    >
-                      {isApplying ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : isApplied ? (
-                        <CheckCircle2 className="h-3 w-3" />
-                      ) : (
-                        <Rocket className="h-3 w-3" />
-                      )}
-                      {isApplied ? t("applied") : t("i_applied")}
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        className={cn(
-                          buttonVariants({ variant: "outline", size: "sm" }),
-                          "h-8 gap-1.5 rounded-lg border-[#EBEBEB] bg-transparent px-3 text-[12px] text-[#1a1a1a] hover:bg-[#F5F5F5] dark:border-[#333] dark:text-white dark:hover:bg-[#222]"
-                        )}
-                      >
-                        <Mail className="h-3 w-3" />
-                        {t("send")}
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-44 rounded-lg p-1">
-                        <DropdownMenuItem onClick={() => handleOpenEmail("gmail")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
-                          <Image src="/google-gmail.svg" alt="Gmail" width={14} height={14} className="mr-2" />
-                          Gmail
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("outlook")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
-                          <Image src="/ms-outlook.svg" alt="Outlook" width={14} height={14} className="mr-2" />
-                          Outlook
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenEmail("default")} className="cursor-pointer rounded-md py-1.5 text-[13px]">
-                          <Mail className="mr-2 h-3.5 w-3.5 text-[#999]" />
-                          Default App
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 gap-1.5 rounded-lg border-[#EBEBEB] bg-transparent px-3 text-[12px] text-[#1a1a1a] hover:bg-[#F5F5F5] dark:border-[#333] dark:text-white dark:hover:bg-[#222]"
-                      onClick={handleCopy}
-                    >
-                      {copied ? (
-                        <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                      ) : (
-                        <Copy className="h-3 w-3" />
-                      )}
-                      {copied ? t("copied") : t("copy")}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1.5 rounded-lg border-[#EBEBEB] bg-transparent px-3 text-[12px] text-[#1a1a1a] hover:bg-[#F5F5F5] dark:border-[#333] dark:text-white dark:hover:bg-[#222]"
+                    onClick={handleCopy}
+                  >
+                    {copied ? (
+                      <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                    {copied ? tApply("copied") : tApply("copy_letter")}
+                  </Button>
                 </div>
                 <div className="whitespace-pre-wrap px-6 py-6 text-[15px] leading-[1.75] text-[#1a1a1a] selection:bg-blue-100 dark:text-white sm:px-8">
                   {run.final_letter}
                 </div>
               </div>
+
+              <HitlApplySteps
+                applyUrl={run.selected_offer?.url}
+                copied={copied}
+                onCopy={() => void handleCopy()}
+                onMarkSubmitted={() => void handleMarkApplied()}
+                submitted={isApplied}
+                submitting={isApplying}
+              />
 
               {run.selected_offer && (
                 <div className="space-y-2">

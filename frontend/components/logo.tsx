@@ -10,7 +10,7 @@ export function Logo({ className = "", iconOnly = false, variant = "default" }: 
   const isWhite = variant === "white";
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 ${className}`} aria-label="Ariadne">
       <div className={`w-7 h-7 rounded-tl-lg rounded-br-lg flex items-center justify-center shrink-0 transition-colors ${
         isWhite 
           ? "bg-white" 

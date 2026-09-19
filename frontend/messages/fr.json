@@ -547,11 +547,9 @@
     "review_draft": "Relisez votre lettre",
     "review_desc": "Lisez-la comme un recruteur. Modifiez, demandez une réécriture, ou approuvez.",
     "processing": "En cours…",
-    "ready_to_send": "Votre lettre de motivation est prête.",
     "final_letter": "Lettre finale",
     "applied": "Postulé !",
     "i_applied": "J'ai postulé",
-    "send": "Envoyer",
     "copied": "Copié",
     "copy": "Copier",
     "target_role": "Poste visé",
@@ -566,7 +564,7 @@
       "matching": "Ensuite, nous rédigeons la lettre",
       "writing": "Ensuite, un contrôle qualité",
       "critiquing": "Ensuite, c'est votre relecture",
-      "waiting_letter_review": "Ensuite, elle est prête à envoyer",
+      "waiting_letter_review": "Ensuite, elle est prête à copier",
       "completed": "Copiez-la vous-même dans le formulaire de l'employeur"
     },
     "insights": {
@@ -578,7 +576,7 @@
       "fit_mid": "Un écart sur le papier. Gardez la lettre honnête sur ce que vous apportez.",
       "fit_low": "Un vrai écart. N'exagérez pas les manques ci-dessous.",
       "fit_none": "L'adéquation apparaîtra après l'analyse.",
-      "quality_high": "Prête à envoyer si elle sonne toujours comme vous.",
+      "quality_high": "Prête à copier si elle sonne toujours comme vous.",
       "quality_mid": "Bon brouillon — resserrez ce qui paraît générique.",
       "quality_low": "Demandez une réécriture avant d'approuver.",
       "quality_none": "Les notes de qualité apparaîtront après la revue.",
@@ -609,7 +607,7 @@
       "writing": "Lettre",
       "critiquing": "Qualité",
       "waiting_letter_review": "Relecture",
-      "completed": "Envoi"
+      "completed": "Copier"
     },
     "stage": {
       "started": {
@@ -662,7 +660,8 @@
       "done_critique": "Contrôle qualité terminé",
       "done_route": "Étape suivante choisie",
       "done_memory": "Mémoire mise à jour"
-    }
+    },
+    "ready_to_copy": "Votre lettre de motivation est prête à copier."
   },
   "LetterEditor": {
     "title": "Lettre de motivation",
@@ -671,7 +670,7 @@
     "placeholder": "Le brouillon apparaîtra ici.",
     "notes_label": "Une réécriture ?",
     "feedback_placeholder": "ex. commencer par le travail RAG, ne pas revendiquer 5 ans de ML en production…",
-    "helper": "Approuvez quand ça sonne comme vous. Les notes vont à l'écrivain — jamais à l'employeur.",
+    "helper": "Approuvez quand ça sonne comme vous. Ensuite, copiez-la dans l’ATS — Ariadne ne l’envoie jamais.",
     "rewrite": "Réécrire",
     "approve": "Approuver la lettre"
   },
@@ -864,11 +863,11 @@
     "approve": "Approuver la lettre",
     "rewrite": "Réécrire avec un commentaire",
     "feedback_placeholder": "Que faut-il changer ?",
-    "mark_submitted": "Marquer comme envoyé",
+    "mark_submitted": "Marquer comme postulé",
     "open_ats": "Ouvrir l'ATS",
     "no_ats_url": "Aucune page de candidature enregistrée.",
     "next_steps_title": "Ensuite : postulez vous-même",
-    "next_steps_hint": "Copiez la lettre, ouvrez le formulaire de l'employeur, puis marquez comme envoyé. Ariadne ne postule jamais à votre place.",
+    "next_steps_hint": "Copiez la lettre, ouvrez le formulaire de l'employeur, puis marquez comme postulé. Ariadne ne postule jamais à votre place.",
     "copy_letter": "Copier la lettre",
     "copied": "Copié",
     "letter": "Lettre de motivation",
@@ -891,5 +890,11 @@
     "performance_desc": "Nous aide à voir quels parcours cassent pour les corriger. Pas de publicité.",
     "decline": "Refuser",
     "accept": "Tout accepter"
+  },
+  "Metadata": {
+    "meta_title": "Ariadne — offres ATS classées, vous postulez",
+    "meta_description": "Des rôles depuis Greenhouse, Lever, Ashby et Workable — les boards que nous atteignons. Brouillon avec relecture. Vous envoyez sur l’ATS.",
+    "meta_og_title": "Ariadne",
+    "meta_og_description": "Offres ATS classées, brouillons honnêtes — vous postulez."
   }
 }
