@@ -1,7 +1,7 @@
 """URL quality gates — aggregator denylist and ATS posting predicates."""
 
 import re
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 # Domains / patterns that are almost never direct apply pages.
 AGGREGATOR_DENYLIST = (
@@ -103,20 +103,64 @@ def is_valid_job_url(url: str) -> bool:
     return True
 
 
+_RESERVED_BOARD_SLUGS = frozenset({"embed", "embed2", "jobs", "api", "www", "app", "j"})
+SEEDABLE_ATS_PROVIDERS = frozenset({"greenhouse", "lever", "ashby", "workable"})
+
+
+def ats_careers_url(provider: str, slug: str) -> str:
+    """Canonical public board URL for a seeded ATS company."""
+    mapping = {
+        "greenhouse": f"https://boards.greenhouse.io/{slug}",
+        "lever": f"https://jobs.lever.co/{slug}",
+        "ashby": f"https://jobs.ashbyhq.com/{slug}",
+        "workable": f"https://apply.workable.com/{slug}",
+    }
+    return mapping.get(provider, "")
+
+
+def _is_board_slug(slug: str) -> bool:
+    token = (slug or "").strip().lower()
+    return len(token) >= 2 and token not in _RESERVED_BOARD_SLUGS
+
+
 def extract_ats_board_slug(url: str) -> tuple[str, str] | None:
-    """Return (provider, board_slug) when URL encodes an ATS company board."""
-    parsed = urlparse(url)
-    host = parsed.netloc.lower()
+    """Return (provider, board_slug) when URL encodes an ATS company board.
+
+    Accepts job posting URLs and board roots for Greenhouse, Lever, Ashby, and
+    Workable. Greenhouse embed boards use ``?for=``. Personio, Indeed, LinkedIn,
+    and other hosts return None (no fake company).
+    """
+    if not url or not isinstance(url, str):
+        return None
+    text = url.strip()
+    if not text:
+        return None
+    if "://" not in text:
+        text = "https://" + text
+
+    parsed = urlparse(text)
+    host = parsed.netloc.lower().removeprefix("www.")
     parts = [p for p in parsed.path.split("/") if p]
-    if not parts:
+    query = parse_qs(parsed.query)
+
+    provider: str | None = None
+    if "greenhouse.io" in host:
+        provider = "greenhouse"
+        for_token = (query.get("for") or [None])[0]
+        if for_token and _is_board_slug(for_token):
+            return (provider, for_token.strip().lower())
+    elif "lever.co" in host:
+        provider = "lever"
+    elif "ashbyhq.com" in host:
+        provider = "ashby"
+    elif "workable.com" in host:
+        provider = "workable"
+    else:
         return None
 
-    if "greenhouse.io" in host:
-        return ("greenhouse", parts[0].lower())
-    if "lever.co" in host:
-        return ("lever", parts[0].lower())
-    if "ashbyhq.com" in host:
-        return ("ashby", parts[0].lower())
-    if "workable.com" in host:
-        return ("workable", parts[0].lower())
-    return None
+    if not parts:
+        return None
+    slug = parts[0].lower()
+    if not _is_board_slug(slug):
+        return None
+    return (provider, slug)

@@ -21,6 +21,8 @@ __all__ = [
     "JobStatus",
     "ReadyResponse",
     "ScoreBreakdown",
+    "SeedUrlRequest",
+    "SeedUrlResponse",
     "SignalRequest",
     "SignalResponse",
     "SignalType",
@@ -111,6 +113,20 @@ class JobPostingOut(BaseModel):
 class JobListResponse(BaseModel):
     items: list[JobPostingOut]
     next_cursor: str | None = None
+
+
+class SeedUrlRequest(BaseModel):
+    url: str = Field(..., min_length=1, max_length=2048)
+
+
+class SeedUrlResponse(BaseModel):
+    ok: bool
+    reason: str | None = None
+    provider: str | None = None
+    slug: str | None = None
+    company_id: str | None = None
+    created: bool | None = None
+    sync_enqueued: bool = False
 
 
 class SignalRequest(BaseModel):

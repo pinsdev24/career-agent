@@ -112,4 +112,21 @@ export async function sendJobSignal(
   });
 }
 
+export type SeedBoardResponse = {
+  ok: boolean;
+  reason?: string | null;
+  provider?: string | null;
+  slug?: string | null;
+  company_id?: string | null;
+  created?: boolean | null;
+  sync_enqueued?: boolean;
+};
+
+export async function seedJobBoard(url: string): Promise<SeedBoardResponse> {
+  return request<SeedBoardResponse>("/v1/jobs/seed", {
+    method: "POST",
+    body: JSON.stringify({ url }),
+  });
+}
+
 export { JobEngineError };

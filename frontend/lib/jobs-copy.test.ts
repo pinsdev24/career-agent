@@ -152,6 +152,32 @@ describe("Jobs EN paste-ready copy", () => {
   });
 });
 
+describe("Jobs Cut 2 URL-seed copy", () => {
+  it("keeps exact EN/FR/NL placeholders", async () => {
+    const { default: en } = await import("../messages/en.json");
+    const { default: fr } = await import("../messages/fr.json");
+    const { default: nl } = await import("../messages/nl.json");
+    expect(en.Jobs.seed_success).toBe(
+      "Following this company — jobs will appear in the feed"
+    );
+    expect(en.Jobs.seed_fail).toBe(
+      "We couldn’t add that board — use a Greenhouse, Lever, Ashby, or Workable URL"
+    );
+    expect(fr.Jobs.seed_success).toBe(
+      "Entreprise suivie — les offres apparaîtront dans le fil"
+    );
+    expect(fr.Jobs.seed_fail).toBe(
+      "Impossible d’ajouter ce board — utilisez une URL Greenhouse, Lever, Ashby ou Workable"
+    );
+    expect(nl.Jobs.seed_success).toBe(
+      "Dit bedrijf wordt gevolgd — vacatures verschijnen in de feed"
+    );
+    expect(nl.Jobs.seed_fail).toBe(
+      "We konden dat board niet toevoegen — gebruik een Greenhouse-, Lever-, Ashby- of Workable-URL"
+    );
+  });
+});
+
 describe("Jobs FR/NL paste-ready copy", () => {
   it("keeps exact FR strings", async () => {
     const { default: fr } = await import("../messages/fr.json");

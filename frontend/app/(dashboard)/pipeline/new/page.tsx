@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { seedJobBoard } from "@/lib/job-engine";
 import { startPipeline } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
 import type { EntryMode } from "@/lib/types";
@@ -25,12 +26,14 @@ import {
 
 export default function NewPipelinePage() {
   const t = useTranslations("NewMission");
+  const tJobs = useTranslations("Jobs");
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<EntryMode>("url");
   const [url, setUrl] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [seedNote, setSeedNote] = useState<"ok" | "fail" | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,9 +53,15 @@ export default function NewPipelinePage() {
     }
     setLoading(true);
     try {
+      const trimmed = url.trim();
+      if (mode === "url" && trimmed) {
+        void seedJobBoard(trimmed)
+          .then((seed) => setSeedNote(seed.ok ? "ok" : "fail"))
+          .catch(() => setSeedNote("fail"));
+      }
       const result = await startPipeline(
         mode,
-        mode === "url" ? url.trim() : undefined
+        mode === "url" ? trimmed : undefined
       );
       router.push(`/pipeline/${result.id}`);
     } catch (err: unknown) {
@@ -179,6 +188,16 @@ export default function NewPipelinePage() {
         </div>
       )}
 
+      {seedNote === "ok" && (
+        <p className="text-[13px] text-emerald-700 dark:text-emerald-400" role="status">
+          {tJobs("seed_success")}
+        </p>
+      )}
+      {seedNote === "fail" && mode === "url" && (
+        <p className="text-[13px] text-red-600 dark:text-red-400" role="status">
+          {tJobs("seed_fail")}
+        </p>
+      )}
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-600">
           {error}

@@ -161,6 +161,56 @@ _ATS_DOMAIN_MAP: dict[str, int] = {
     "jobs.jobvite.com": 2,           # jobs.jobvite.com/COMPANY/job/uuid (varies)
 }
 
+_SEEDABLE_ATS_HOSTS: dict[str, str] = {
+    "boards.greenhouse.io": "greenhouse",
+    "job-boards.greenhouse.io": "greenhouse",
+    "jobs.lever.co": "lever",
+    "jobs.ashbyhq.com": "ashby",
+    "apply.workable.com": "workable",
+    "jobs.workable.com": "workable",
+}
+_RESERVED_BOARD_SLUGS = frozenset({"embed", "embed2", "jobs", "api", "www", "app", "j"})
+
+
+def extract_seedable_ats_slug(url: str) -> tuple[str, str] | None:
+    """Return (provider, board_slug) for Greenhouse/Lever/Ashby/Workable only.
+
+    Used as Cut 2 URL-seed input. Personio, Indeed, LinkedIn, SmartRecruiters,
+    and Jobvite are out of scope and return None.
+    """
+    if not url or not isinstance(url, str):
+        return None
+    try:
+        from urllib.parse import parse_qs, urlparse
+
+        parsed = urlparse(url.strip() if "://" in url else f"https://{url.strip()}")
+        host = parsed.netloc.lower().removeprefix("www.")
+        path_parts = [p for p in parsed.path.strip("/").split("/") if p]
+        provider = _SEEDABLE_ATS_HOSTS.get(host)
+        if provider is None:
+            if "greenhouse.io" in host:
+                provider = "greenhouse"
+            elif "lever.co" in host:
+                provider = "lever"
+            elif "ashbyhq.com" in host:
+                provider = "ashby"
+            elif "workable.com" in host:
+                provider = "workable"
+            else:
+                return None
+        if provider == "greenhouse":
+            for_token = (parse_qs(parsed.query).get("for") or [None])[0]
+            if for_token and for_token.strip().lower() not in _RESERVED_BOARD_SLUGS:
+                return (provider, for_token.strip().lower())
+        if not path_parts:
+            return None
+        slug = path_parts[0].lower()
+        if slug in _RESERVED_BOARD_SLUGS or len(slug) < 2:
+            return None
+        return (provider, slug)
+    except Exception:
+        return None
+
 
 def _extract_company_from_url(url: str) -> str:
     """ATS-aware company name extraction from URL.
@@ -447,6 +497,13 @@ async def scout_node(state: AgentState, config: RunnableConfig) -> AgentState:
     offers.sort(key=lambda x: x["pre_score"], reverse=True)
     logger.info("Scout: found %d offers for run=%s", len(offers), state.get("run_id"))
     await log_emitter.emit(state.get("run_id"), {"type": "info", "message": f"Scout: Found and scored {len(offers)} offers."})
+
+    try:
+        from app.tools.job_engine_seed import seed_boards_from_urls
+
+        await seed_boards_from_urls([o.get("url") or "" for o in offers])
+    except Exception as exc:
+        logger.warning("Scout: url seed side-effect failed: %s", exc)
 
     return {
         "discovered_offers": offers,
