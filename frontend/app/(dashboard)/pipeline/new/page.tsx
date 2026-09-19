@@ -26,14 +26,13 @@ import {
 
 export default function NewPipelinePage() {
   const t = useTranslations("NewMission");
-  const tJobs = useTranslations("Jobs");
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<EntryMode>("url");
   const [url, setUrl] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [seedNote, setSeedNote] = useState<"ok" | "fail" | null>(null);
+  const [seedNote, setSeedNote] = useState<"ok" | "unsupported" | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -56,8 +55,8 @@ export default function NewPipelinePage() {
       const trimmed = url.trim();
       if (mode === "url" && trimmed) {
         void seedJobBoard(trimmed)
-          .then((seed) => setSeedNote(seed.ok ? "ok" : "fail"))
-          .catch(() => setSeedNote("fail"));
+          .then((seed) => setSeedNote(seed.ok ? "ok" : "unsupported"))
+          .catch(() => setSeedNote(null));
       }
       const result = await startPipeline(
         mode,
@@ -190,12 +189,12 @@ export default function NewPipelinePage() {
 
       {seedNote === "ok" && (
         <p className="text-[13px] text-emerald-700 dark:text-emerald-400" role="status">
-          {tJobs("seed_success")}
+          {t("url_seed_side_success")}
         </p>
       )}
-      {seedNote === "fail" && mode === "url" && (
-        <p className="text-[13px] text-red-600 dark:text-red-400" role="status">
-          {tJobs("seed_fail")}
+      {seedNote === "unsupported" && mode === "url" && (
+        <p className="text-[13px] text-[#666] dark:text-[#aaa]" role="status">
+          {t("url_seed_side_unsupported")}
         </p>
       )}
       {error && (

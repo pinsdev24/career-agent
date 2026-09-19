@@ -119,6 +119,7 @@ export type SeedBoardResponse = {
   slug?: string | null;
   company_id?: string | null;
   created?: boolean | null;
+  name?: string | null;
   sync_enqueued?: boolean;
 };
 

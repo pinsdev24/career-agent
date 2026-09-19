@@ -42,6 +42,7 @@ async def test_seed_upserts_greenhouse_job_url():
     assert result["slug"] == "showpad"
     assert result["created"] is True
     assert result["company_id"] == "co-greenhouse-showpad"
+    assert result["name"] == "Showpad"
     assert len(repo.companies) == 1
     assert repo.companies[0]["board_token"] == "showpad"
     assert repo.companies[0]["careers_url"] == "https://boards.greenhouse.io/showpad"

@@ -50,4 +50,5 @@ async def seed_company_from_url(repo: JobRepository, url: str) -> dict:
         "slug": slug,
         "company_id": company_id,
         "created": created,
+        "name": name,
     }

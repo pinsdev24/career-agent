@@ -126,6 +126,7 @@ class SeedUrlResponse(BaseModel):
     slug: str | None = None
     company_id: str | None = None
     created: bool | None = None
+    name: str | None = None
     sync_enqueued: bool = False
 
 
