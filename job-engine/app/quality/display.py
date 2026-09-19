@@ -11,6 +11,7 @@ ATS_BRANDS = {
     "ashby",
     "ashbyhq",
     "workable",
+    "teamtailor",
     "linkedin",
     "indeed",
     "glassdoor",
@@ -49,7 +50,7 @@ _CHROME_SEGMENT = re.compile(
     r"^(jobs?|careers?|hiring|opportunities|vacancies|vacatures|emplois?|"
     r"offres?(?:\s+d['’]emploi)?|application|apply|job application|"
     r"linkedin(?:\s+jobs?)?|indeed|glassdoor|greenhouse|lever|ashby|workable|"
-    r"smartrecruiters|workday|monster|welcome to .+|jobs?\s+at\s+.+|"
+    r"teamtailor|smartrecruiters|workday|monster|welcome to .+|jobs?\s+at\s+.+|"
     r"careers?\s+at\s+.+|application\s+[-–—]\s*.+)$",
     re.IGNORECASE,
 )
@@ -64,7 +65,7 @@ _CHROME_PREFIXES = [
 ]
 
 _TRAILING_CHROME = re.compile(
-    r"\s+(?:application|apply|jobs?|careers?|linkedin|greenhouse|lever|ashby|workable)\s*$",
+    r"\s+(?:application|apply|jobs?|careers?|linkedin|greenhouse|lever|ashby|workable|teamtailor)\s*$",
     re.IGNORECASE,
 )
 

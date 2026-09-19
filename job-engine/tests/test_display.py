@@ -59,6 +59,9 @@ def test_display_company_never_url_host():
     )
     assert display_company("Stripe", apply_url="https://boards.greenhouse.io/stripe/jobs/1") == "Stripe"
     assert company_from_apply_url("https://jobs.ashbyhq.com/ramp/uuid-here") == "Ramp"
+    assert company_from_apply_url(
+        "https://acme.teamtailor.com/jobs/1234567-backend-engineer"
+    ) == "Acme"
 
 
 def test_canonical_job_strips_chrome_at_ingest():

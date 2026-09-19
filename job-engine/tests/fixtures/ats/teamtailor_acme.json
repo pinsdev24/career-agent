@@ -1,0 +1,75 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Acme",
+  "home_page_url": "https://acme.teamtailor.com/jobs",
+  "feed_url": "https://acme.teamtailor.com/jobs.json",
+  "items": [
+    {
+      "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "title": "Backend Engineer",
+      "url": "https://acme.teamtailor.com/jobs/1234567-backend-engineer",
+      "date_published": "2026-09-01T10:00:00+02:00",
+      "content_html": "<p>Build APIs with Python and FastAPI. Collaborate with product on distributed systems across Europe.</p>",
+      "_jobposting": {
+        "@context": "http://schema.org/",
+        "@type": "JobPosting",
+        "title": "Backend Engineer",
+        "description": "<p>Build APIs with Python and FastAPI. Collaborate with product on distributed systems across Europe.</p>",
+        "datePosted": "2026-09-01",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Acme",
+          "sameAs": "https://careers.acme.com"
+        },
+        "identifier": {
+          "@type": "PropertyValue",
+          "name": "Acme",
+          "value": 1234567
+        },
+        "jobLocation": [
+          {
+            "@type": "Place",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Stockholm",
+              "addressCountry": "SE",
+              "addressRegion": "Sweden"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "title": "Remote Data Engineer",
+      "url": "https://acme.teamtailor.com/jobs/7654321-remote-data-engineer",
+      "date_published": "2026-09-02T09:00:00+02:00",
+      "content_html": "<p>Own analytics pipelines. Fully remote role with Python, dbt, and warehouse modelling for a data-informed product team.</p>",
+      "_jobposting": {
+        "@context": "http://schema.org/",
+        "@type": "JobPosting",
+        "title": "Remote Data Engineer",
+        "description": "<p>Own analytics pipelines. Fully remote role with Python, dbt, and warehouse modelling for a data-informed product team.</p>",
+        "datePosted": "2026-09-02",
+        "jobLocationType": "TELECOMMUTE",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Acme"
+        },
+        "identifier": {
+          "@type": "PropertyValue",
+          "name": "Acme",
+          "value": 7654321
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Remote",
+            "addressCountry": "SE"
+          }
+        }
+      }
+    }
+  ]
+}

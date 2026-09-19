@@ -156,6 +156,54 @@ async def test_job_seed_url_dotted_ashby_enqueues_sync(monkeypatch):
     assert {e[1][0] for e in syncs} == {result["company_id"]}
 
 
+OATLY_TT = "https://oatly.teamtailor.com/jobs/8399088-national-account-manager-albertsons"
+
+
+async def test_seed_teamtailor_job_url_upserts_and_is_idempotent():
+    repo = _FakeRepo()
+    first = await seed_company_from_url(repo, OATLY_TT)
+    second = await seed_company_from_url(repo, "https://oatly.teamtailor.com/jobs")
+    assert first["ok"] is True
+    assert first["provider"] == "teamtailor"
+    assert first["slug"] == "oatly"
+    assert first["created"] is True
+    assert first["company_id"] == "co-teamtailor-oatly"
+    assert first["name"] == "Oatly"
+    assert repo.companies[0]["board_token"] == "oatly"
+    assert repo.companies[0]["careers_url"] == "https://oatly.teamtailor.com"
+    assert second["ok"] and second["created"] is False
+    assert second["company_id"] == first["company_id"]
+    assert len(repo.companies) == 1
+
+
+async def test_seed_rejects_teamtailor_custom_domain():
+    repo = _FakeRepo()
+    result = await seed_company_from_url(
+        repo, "https://careers.oatly.com/jobs/8399088-national-account-manager"
+    )
+    assert result["ok"] is False
+    assert result["reason"] == "not_ats"
+    assert repo.companies == []
+
+
+async def test_job_seed_url_teamtailor_enqueues_sync(monkeypatch):
+    repo = _FakeRepo()
+    enqueued: list[tuple] = []
+
+    async def _enqueue(name, *args):
+        enqueued.append((name, args))
+        return "job-sync-tt"
+
+    monkeypatch.setattr("app.workers.settings.enqueue_job", _enqueue)
+    result = await job_seed_url({"repo": repo}, OATLY_TT)
+    assert result["ok"] is True
+    assert result["sync_enqueued"] is True
+    assert result["slug"] == "oatly"
+    assert result["company_id"] == "co-teamtailor-oatly"
+    syncs = [e for e in enqueued if e[0] == "job_sync_company"]
+    assert {e[1][0] for e in syncs} == {result["company_id"]}
+
+
 async def test_job_seed_url_non_ats_does_not_enqueue(monkeypatch):
     repo = _FakeRepo()
     enqueued: list[tuple] = []

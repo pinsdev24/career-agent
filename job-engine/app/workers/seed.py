@@ -12,9 +12,10 @@ logger = get_logger(__name__)
 
 
 async def seed_company_from_url(repo: JobRepository, url: str) -> dict:
-    """Idempotent company upsert from a Greenhouse/Lever/Ashby/Workable URL.
+    """Idempotent company upsert from a Greenhouse/Lever/Ashby/Workable/Teamtailor URL.
 
     Non-ATS / unknown URLs return ``ok=False`` and do not insert a row.
+    Teamtailor custom career domains are not resolved — paste ``*.teamtailor.com``.
     """
     parsed = extract_ats_board_slug(url)
     if not parsed or parsed[0] not in SEEDABLE_ATS_PROVIDERS:

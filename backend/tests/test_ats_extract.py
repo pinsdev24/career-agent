@@ -36,7 +36,24 @@ class TestParseAtsJobUrl:
     def test_rejects_non_ats(self) -> None:
         assert parse_ats_job_url("https://www.linkedin.com/jobs/view/1") is None
         assert parse_ats_job_url("https://www.indeed.com/viewjob?jk=a") is None
+        assert parse_ats_job_url("https://careers.acme.com/jobs/1") is None
+        assert parse_ats_job_url("https://app.teamtailor.com/jobs/1") is None
         assert parse_ats_job_url("") is None
+
+    def test_teamtailor_subdomain_job_and_board(self) -> None:
+        assert parse_ats_job_url(
+            "https://oatly.teamtailor.com/jobs/8399088-national-account-manager"
+        ) == AtsJobRef(
+            "teamtailor",
+            "oatly",
+            "8399088-national-account-manager",
+        )
+        assert parse_ats_job_url("https://oatly.teamtailor.com/jobs") == AtsJobRef(
+            "teamtailor", "oatly", None
+        )
+        assert parse_ats_job_url(
+            "https://oatly.teamtailor.com/en-GB/jobs/8399088-role"
+        ) == AtsJobRef("teamtailor", "oatly", "8399088-role")
 
 
 @pytest.mark.asyncio
@@ -185,3 +202,43 @@ async def test_packet_backfill_uses_ats_not_tavily() -> None:
     assert updated["description_text"].startswith("AI Engineer")
     assert updated["title"] == "AI Engineer, Product"
     assert updated["company_name"] == "Mistral Ai"
+
+
+OATLY = "https://oatly.teamtailor.com/jobs/8399088-national-account-manager-albertsons"
+
+
+@pytest.mark.asyncio
+async def test_fetch_ats_job_teamtailor_jobs_json() -> None:
+    feed = {
+        "title": "Oatly AB",
+        "items": [
+            {
+                "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+                "title": "National Account Manager, Albertsons",
+                "url": OATLY,
+                "content_html": "<p>Drive distribution and sales with oat milk across the US grocery channel.</p>",
+                "_jobposting": {
+                    "title": "National Account Manager, Albertsons",
+                    "description": "<p>Drive distribution and sales with oat milk across the US grocery channel.</p>",
+                    "identifier": {"value": 8399088},
+                    "jobLocation": {
+                        "address": {
+                            "addressLocality": "United States",
+                            "addressCountry": "US",
+                        }
+                    },
+                    "hiringOrganization": {"name": "Oatly AB"},
+                },
+            }
+        ],
+    }
+    with patch("app.tools.ats_extract._get_json", new=AsyncMock(return_value=feed)) as get_json:
+        result = await fetch_ats_job(OATLY)
+
+    get_json.assert_awaited_once()
+    assert get_json.await_args.args[0] == "https://oatly.teamtailor.com/jobs.json"
+    assert result is not None
+    assert result["provider"] == "teamtailor"
+    assert result["title"] == "National Account Manager, Albertsons"
+    assert result["company"] == "Oatly AB"
+    assert "oat milk" in result["raw_content"]

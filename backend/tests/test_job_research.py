@@ -351,6 +351,9 @@ class TestExtractSeedableAtsSlug:
             "workable",
             "acme",
         )
+        assert extract_seedable_ats_slug(
+            "https://oatly.teamtailor.com/jobs/8399088-role"
+        ) == ("teamtailor", "oatly")
 
     def test_rejects_personio_indeed_linkedin_smartrecruiters(self) -> None:
         assert extract_seedable_ats_slug("https://www.linkedin.com/jobs/view/1") is None
@@ -359,6 +362,7 @@ class TestExtractSeedableAtsSlug:
         assert extract_seedable_ats_slug(
             "https://careers.smartrecruiters.com/Datadog/743999"
         ) is None
+        assert extract_seedable_ats_slug("https://careers.oatly.com/jobs/1") is None
 
 
 # ---------------------------------------------------------------------------

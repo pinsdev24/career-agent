@@ -35,6 +35,7 @@ class AtsProvider(str, Enum):
     LEVER = "lever"
     ASHBY = "ashby"
     WORKABLE = "workable"
+    TEAMTAILOR = "teamtailor"
     TAVILY = "tavily"
     UNKNOWN = "unknown"
 

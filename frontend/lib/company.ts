@@ -3,6 +3,7 @@ const ATS_HOST_HINTS = [
   "lever.co",
   "ashbyhq.com",
   "workable.com",
+  "teamtailor.com",
   "myworkdayjobs.com",
   "smartrecruiters.com",
   "icims.com",

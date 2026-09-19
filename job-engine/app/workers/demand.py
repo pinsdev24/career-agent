@@ -4,16 +4,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.connectors.registry import discovery_hosts
 from app.rank.countries import countries_from_text, country_query_names
 from app.rank.geo import expand_location_aliases
 
 # Public ATS hosts we already know how to sync (not Personio / new adapters).
-_DISCOVERY_HOSTS = (
-    "boards.greenhouse.io",
-    "jobs.lever.co",
-    "jobs.ashbyhq.com",
-    "apply.workable.com",
-)
+# Sourced from the connector registry so ATS #6 is one spec, not another list.
 
 RoleFamily = str  # eng | data | embedded | business | sales | general
 
@@ -204,26 +200,69 @@ def _location_variants(location: str) -> list[str]:
     return preferred
 
 
+def _places_from_profile(location: str | None, countries: list[str]) -> list[str]:
+    """Location query terms from free-text AND any ISO codes on the profile.
+
+    Discovery must follow the user's countries (SE, AR, …), not a Belgium-only
+    default. Explicit ISO codes use ``country_query_names`` (en/fr/nl).
+    """
+    preferred: list[str] = []
+    seen: set[str] = set()
+
+    def _add(value: str) -> None:
+        text = (value or "").strip()
+        key = text.lower()
+        if not text or key in seen:
+            return
+        seen.add(key)
+        preferred.append(text)
+
+    if location and location.strip():
+        for item in _location_variants(location):
+            _add(item)
+    for code in countries:
+        if not code or len(str(code).strip()) != 2:
+            continue
+        names = country_query_names(str(code).upper())
+        if names:
+            _add(names[0])
+    # Second-pass local-language names once each ISO has an English query term.
+    for code in countries:
+        if not code or len(str(code).strip()) != 2:
+            continue
+        for name in country_query_names(str(code).upper())[1:]:
+            _add(name)
+            if len(preferred) >= 6:
+                return preferred
+    return preferred
+
+
 def build_demand_packs(
     *,
     title: str,
     location: str | None = None,
     skills: list[str] | None = None,
     max_queries: int = 12,
+    places: list[str] | None = None,
 ) -> list[str]:
     """Tavily queries for this user's title + location (+ FR/NL) + ATS hosts.
 
     Packs differ by role family inferred from title+skills. No company names.
+    ``places`` overrides location expansion so profile ISO countries (any code)
+    drive ``site:`` queries instead of a Belgium-only default.
     """
     title = (title or "").strip()
     location = (location or "").strip()
-    if not title and not location:
+    resolved_places = [p.strip() for p in (places or []) if (p or "").strip()]
+    if not resolved_places:
+        resolved_places = _location_variants(location) or [""]
+    if not title and not location and not any(resolved_places):
         return []
 
     family = infer_role_family(title, skills)
     titles = _title_variants(title, family) or [title or "jobs"]
-    places = _location_variants(location) or [""]
-    hosts = list(_DISCOVERY_HOSTS)
+    place_terms = resolved_places or [""]
+    hosts = list(discovery_hosts())
 
     queries: list[str] = []
     seen: set[str] = set()
@@ -236,9 +275,11 @@ def build_demand_packs(
         seen.add(key)
         queries.append(text)
 
-    for host in hosts:
-        for t in titles[:3]:
-            for place in places[:3]:
+    # Hosts outer-most would starve ATS #5/#6. Round-robin hosts so every
+    # registered career site appears before we fill remaining slots.
+    for t in titles[:2]:
+        for place in place_terms[:2]:
+            for host in hosts:
                 if t and place:
                     _add(f"{t} {place} jobs site:{host}")
                 elif t:
@@ -250,12 +291,15 @@ def build_demand_packs(
 
     # Family-specific extra without repeating a company list.
     extra_bits = _FAMILY_EXTRA.get(family, ())
-    place0 = places[0] if places else ""
+    place0 = place_terms[0] if place_terms else ""
+    host0 = hosts[0] if hosts else ""
     for bit in extra_bits[:2]:
+        if not host0:
+            break
         if title and place0:
-            _add(f"{title} {bit} {place0} site:{hosts[0]}")
+            _add(f"{title} {bit} {place0} site:{host0}")
         elif title:
-            _add(f"{title} {bit} site:{hosts[0]}")
+            _add(f"{title} {bit} site:{host0}")
 
     return queries[:max_queries]
 
@@ -277,8 +321,7 @@ def demand_packs_from_profile(
     countries = [str(c).upper() for c in (prefs.get("countries") or []) if c]
     if not countries:
         countries = countries_from_text(location)
-    if countries and not location:
-        location = country_query_names(countries[0])[0]
+    places = _places_from_profile(location, countries)
     roles = [str(r).strip() for r in (prefs.get("preferred_roles") or []) if str(r).strip()]
     titles = [t for t in ([title] + roles) if t]
     seen_titles: set[str] = set()
@@ -290,7 +333,7 @@ def demand_packs_from_profile(
         seen_titles.add(key)
         unique_titles.append(item)
     if not unique_titles:
-        unique_titles = [title] if title else []
+        unique_titles = [title] if title else (["jobs"] if places else [])
 
     queries: list[str] = []
     per = max(4, max_queries // max(len(unique_titles), 1))
@@ -299,6 +342,7 @@ def demand_packs_from_profile(
             build_demand_packs(
                 title=role_title,
                 location=location,
+                places=places,
                 skills=skills_s,
                 max_queries=per,
             )

@@ -6,7 +6,7 @@ import { formatRelativeTime } from "@/lib/company";
 
 export const MAX_WHY_REASONS = 3;
 
-export type SourceChip = "greenhouse" | "lever" | "ashby" | "workable" | "web";
+export type SourceChip = "greenhouse" | "lever" | "ashby" | "workable" | "teamtailor" | "web";
 
 export type LinkGateReason = "ok" | "invalid_url" | "closed_job" | "not_found";
 
@@ -46,6 +46,7 @@ const ATS_BRANDS = new Set([
   "ashby",
   "ashbyhq",
   "workable",
+  "teamtailor",
   "linkedin",
   "indeed",
   "glassdoor",
@@ -81,7 +82,7 @@ const HOST_TLDS = new Set([
 ]);
 
 const CHROME_SEGMENT =
-  /^(jobs?|careers?|hiring|opportunities|vacancies|vacatures|emplois?|offres?(?:\s+d['’]emploi)?|application|apply|job application|linkedin(?:\s+jobs?)?|indeed|glassdoor|greenhouse|lever|ashby|workable|smartrecruiters|workday|monster|welcome to .+|jobs?\s+at\s+.+|careers?\s+at\s+.+|application\s+[-–—]\s*.+)$/i;
+  /^(jobs?|careers?|hiring|opportunities|vacancies|vacatures|emplois?|offres?(?:\s+d['’]emploi)?|application|apply|job application|linkedin(?:\s+jobs?)?|indeed|glassdoor|greenhouse|lever|ashby|workable|teamtailor|smartrecruiters|workday|monster|welcome to .+|jobs?\s+at\s+.+|careers?\s+at\s+.+|application\s+[-–—]\s*.+)$/i;
 
 const CHROME_PREFIXES: RegExp[] = [
   /^apply(?:\s+now)?(?:\s+for)?\s+/i,
@@ -92,7 +93,7 @@ const CHROME_PREFIXES: RegExp[] = [
   /^hiring[:\s]+/i,
 ];
 
-const TRAILING_CHROME = /\s+(?:application|apply|jobs?|careers?|linkedin|greenhouse|lever|ashby|workable)\s*$/i;
+const TRAILING_CHROME = /\s+(?:application|apply|jobs?|careers?|linkedin|greenhouse|lever|ashby|workable|teamtailor)\s*$/i;
 
 const CLOSED_JOB_PATTERNS =
   /(?:no\s+longer\s+(?:available|open|accepting)|position\s+(?:has\s+been\s+)?(?:filled|closed|removed)|(?:listing|posting)\s+(?:has\s+)?(?:expired|been\s+removed)|opportunity\s+(?:is\s+)?(?:closed|no\s+longer)|application\s+(?:period|window)\s+(?:has\s+)?(?:closed|ended|expired)|404\s*[-–—]?\s*(?:page|not\s+found)|job\s+not\s+found|couldn't\s+find\s+anything\s+here|(?:posting|job)\s+you'?r?e?\s+looking\s+for\s+(?:might\s+have\s+)?(?:closed|been\s+removed)|sorry,?\s+we\s+couldn't\s+find|(?:the\s+)?job\s+(?:you\s+(?:requested|are\s+looking\s+for)\s+)?(?:was\s+)?not\s+found|it\s+has\s+been\s+(?:removed|closed|taken\s+down))/i;
@@ -282,6 +283,7 @@ export function sourceChip(source?: string | null): SourceChip {
   if (value.includes("lever")) return "lever";
   if (value.includes("ashby")) return "ashby";
   if (value.includes("workable")) return "workable";
+  if (value.includes("teamtailor")) return "teamtailor";
   return "web";
 }
 

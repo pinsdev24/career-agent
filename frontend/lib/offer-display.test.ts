@@ -211,6 +211,7 @@ describe("sourceChip", () => {
     expect(sourceChip("lever")).toBe("lever");
     expect(sourceChip("ashby")).toBe("ashby");
     expect(sourceChip("workable")).toBe("workable");
+    expect(sourceChip("teamtailor")).toBe("teamtailor");
     expect(sourceChip("tavily")).toBe("web");
   });
 });
