@@ -1,10 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Briefcase, Link2, Loader2, Search } from "lucide-react";
+import { Briefcase, Loader2, Search } from "lucide-react";
 import type { JobPosting } from "@/lib/job-engine-types";
 import {
   getJob,
@@ -77,6 +76,7 @@ export default function JobsPage() {
     roles: [],
   });
   const [prefsSeeded, setPrefsSeeded] = useState(false);
+  const [seedOpen, setSeedOpen] = useState(false);
 
   const targetTitle = profile?.search_preferences?.job_title?.trim() || "";
   const prefCountries = (profile?.search_preferences?.countries || []).map((c) =>
@@ -104,6 +104,9 @@ export default function JobsPage() {
   const chipKind = selectJobsChipKind(copyCtx);
   const emptyKind = selectJobsEmptyKind(copyCtx);
   const emptyKeys = jobsEmptyMessageKeys(emptyKind);
+  const openSeedForm = useCallback(() => {
+    setSeedOpen(true);
+  }, []);
 
   const writeJobQuery = useCallback(
     (jobId: string | null, history: "push" | "replace") => {
@@ -215,6 +218,15 @@ export default function JobsPage() {
       failedFetchId.current = null;
     }
   }, [requestedJobId]);
+
+  useEffect(() => {
+    if (!seedOpen) return;
+    document.getElementById("jobs-url-seed-panel")?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    document.getElementById("jobs-url-seed-chrome")?.focus();
+  }, [seedOpen]);
 
   useEffect(() => {
     if (loading) return;
@@ -370,44 +382,50 @@ export default function JobsPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col gap-5">
-      <PageHeader
-        title={t("title")}
-        subtitle={t("subtitle")}
-        actions={
-          <Button
-            type="button"
-            variant="outline"
-            className="h-9 rounded-lg px-4 text-[13px]"
-            onClick={() => {
-              const el = document.getElementById("jobs-url-seed-chrome");
-              el?.scrollIntoView({ behavior: "smooth", block: "center" });
-              el?.focus();
-            }}
-          >
-            <Link2 className="h-4 w-4" />
-            {t("url_seed_title")}
+      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <form onSubmit={onSearch} className="flex min-w-0 flex-1 gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#999]" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("search_placeholder")}
+              className="h-11 w-full rounded-xl border border-[#EBEBEB] bg-white pl-10 pr-3 text-[13px] outline-none transition-colors focus:border-[#1a1a1a] dark:border-[#333] dark:bg-[#111] dark:focus:border-white"
+            />
+          </div>
+          <Button type="submit" className="h-11 rounded-xl px-5 text-[13px]">
+            {t("search")}
           </Button>
-        }
-      />
-
-      <form onSubmit={onSearch} className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#999]" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("search_placeholder")}
-            className="h-11 w-full rounded-xl border border-[#EBEBEB] bg-white pl-10 pr-3 text-[13px] outline-none transition-colors focus:border-[#1a1a1a] dark:border-[#333] dark:bg-[#111] dark:focus:border-white"
-          />
-        </div>
-        <Button type="submit" className="h-11 rounded-xl px-5 text-[13px]">
-          {t("search")}
-        </Button>
-      </form>
-
-      <div className="rounded-2xl border border-[#EBEBEB] bg-white px-4 py-3 dark:border-[#333] dark:bg-[#111]">
-        <JobsUrlSeed compact inputId="jobs-url-seed-chrome" />
+        </form>
+        {ready && (
+          <div className="flex shrink-0 flex-col items-start gap-0.5 sm:pt-1">
+            <Button
+              type="button"
+              variant="ghost"
+              aria-expanded={seedOpen}
+              aria-controls="jobs-url-seed-panel"
+              className="h-9 px-2 text-[13px] font-medium text-[#555] hover:text-[#1a1a1a] dark:text-[#bbb] dark:hover:text-white"
+              onClick={() => setSeedOpen((open) => !open)}
+            >
+              {t("paste_url_header")}
+            </Button>
+            <p className="max-w-[15.5rem] px-2 text-[11px] leading-snug text-[#999]">
+              {t("paste_url_header_hint")}
+            </p>
+          </div>
+        )}
       </div>
+
+      {seedOpen && (
+        <div
+          id="jobs-url-seed-panel"
+          className="rounded-2xl border border-[#EBEBEB] bg-white px-4 py-3 dark:border-[#333] dark:bg-[#111]"
+        >
+          <JobsUrlSeed compact inputId="jobs-url-seed-chrome" autoFocus />
+        </div>
+      )}
 
       <JobsFilterBar
         value={bar}
@@ -481,7 +499,9 @@ export default function JobsPage() {
               title: targetTitle,
               location: prefLocation,
             })}
-            actionLabel={emptyKind === "filters" ? t("empty_filters_cta") : undefined}
+            actionLabel={
+              emptyKind === "filters" ? t("empty_filters_cta") : t("empty_warming_cta")
+            }
             onAction={
               emptyKind === "filters"
                 ? () => {
@@ -496,11 +516,9 @@ export default function JobsPage() {
                     setPrefsSeeded(true);
                     void loadFeed(true, next);
                   }
-                : undefined
+                : openSeedForm
             }
-          >
-            <JobsUrlSeed inputId="jobs-url-seed-empty" />
-          </EmptyState>
+          />
         )
       ) : (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] lg:min-h-0">
@@ -554,15 +572,13 @@ export default function JobsPage() {
                 signalBusy={signalBusy}
                 actionMessage={actionMessage}
                 footerNote={
-                  <div className="space-y-2 pt-1">
-                    <JobsUrlSeed compact inputId="jobs-url-seed-detail" />
-                    <Link
-                      href="/pipeline/new"
-                      className="block text-center text-[12px] text-[#888] underline-offset-2 hover:text-[#1a1a1a] hover:underline dark:hover:text-white"
-                    >
-                      {t("url_not_in_feed")}
-                    </Link>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={openSeedForm}
+                    className="block w-full pt-1 text-center text-[12px] text-[#999] underline-offset-2 hover:text-[#666] hover:underline dark:text-[#777] dark:hover:text-[#bbb]"
+                  >
+                    {t("paste_url_detail_link")}
+                  </button>
                 }
               />
             ) : (

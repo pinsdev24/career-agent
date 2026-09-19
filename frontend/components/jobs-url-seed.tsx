@@ -28,9 +28,11 @@ function isHttpUrl(value: string): boolean {
 export function JobsUrlSeed({
   compact = false,
   inputId = "jobs-url-seed",
+  autoFocus = false,
 }: {
   compact?: boolean;
   inputId?: string;
+  autoFocus?: boolean;
 }) {
   const t = useTranslations("Jobs");
   const [url, setUrl] = useState("");
@@ -75,6 +77,7 @@ export function JobsUrlSeed({
         <Input
           id={inputId}
           type="url"
+          autoFocus={autoFocus}
           value={url}
           onChange={(e) => {
             setUrl(e.target.value);
