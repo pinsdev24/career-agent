@@ -25,7 +25,7 @@
     },
     "sidebar": {
       "title": "Sortez du labyrinthe des candidatures.",
-      "subtitle": "Ariadne pour des matches plus clairs, des lettres dans votre voix, et une relecture avant de postuler sur l’ATS.",
+      "subtitle": "Rejoignez Ariadne pour des matches plus clairs, des lettres sur mesure, et une relecture avant de postuler sur l’ATS.",
       "hired": "Recruté"
     }
   },
@@ -53,7 +53,7 @@
       "faq": "FAQ",
       "sign_in": "Connexion",
       "start": "Créer un compte",
-      "dashboard": "Aller à l’Accueil"
+      "dashboard": "Aller à l’accueil"
     },
     "hero": {
       "eyebrow": "Matching carrière, avec vous dans la boucle",
@@ -65,7 +65,7 @@
         "review",
         "apply"
       ],
-      "subtitle": "Ariadne classe les offres ATS selon votre CV, rédige une lettre qui sonne comme vous, et vous postulez sur le site de l’employeur — nous ne postulons jamais à votre place.",
+      "subtitle": "Ariadne classe des offres ATS selon votre CV, rédige une lettre qui vous ressemble, et c’est vous qui postulez sur le site de l’employeur — nous ne postulons jamais à votre place.",
       "cta_primary": "Créer un compte",
       "cta_secondary": "Voir comment ça marche"
     },
@@ -91,8 +91,8 @@
         },
         {
           "n": "04",
-          "title": "D’abord le fil Jobs",
-          "desc": "Rôles classés depuis Greenhouse, Lever, Ashby et Workable — des boards que nous pouvons atteindre. Collez une URL si un board manque encore."
+          "title": "Flux Jobs d’abord",
+          "desc": "Offres classées depuis Greenhouse, Lever, Ashby et Workable — les boards que nous pouvons atteindre. Collez une URL si un board manque encore."
         }
       ]
     },
@@ -186,17 +186,17 @@
         {
           "roman": "I",
           "title": "Téléchargez votre CV",
-          "desc": "Déposez-le une fois. Ariadne extrait compétences, expérience et intention dans un profil qui sert à classer les rôles ATS."
+          "desc": "Déposez un PDF une fois. Ariadne construit un profil pour classer les rôles et rédiger les lettres."
         },
         {
           "roman": "II",
           "title": "Choisissez un rôle classé",
-          "desc": "Le fil Jobs est le défaut — Greenhouse, Lever, Ashby et Workable. Collez une URL si un board manque encore. Explore est avancé."
+          "desc": "Parcourez les Jobs alignés sur votre cible et vos pays — depuis les boards ATS que nous synchronisons, pas un scrape du web entier."
         },
         {
           "roman": "III",
           "title": "Relisez, puis postulez sur l’ATS",
-          "desc": "Le rédacteur écrit. Le critique note. Vous approuvez le dossier, copiez la lettre, et postulez sur le site de l’employeur. Ariadne ne postule jamais à votre place."
+          "desc": "Approuvez la lettre, copiez-la, ouvrez l’offre, et envoyez vous-même."
         }
       ]
     },
@@ -204,25 +204,25 @@
       "badge": "En coulisses",
       "title": "Le travail,",
       "title_muted": "pas le pitch.",
-      "subtitle": "Des jobs avec le why-match. Les brouillons à côté des écarts. Vous voyez toujours pourquoi — et vous approuvez toujours avant de postuler.",
+      "subtitle": "Jobs avec le pourquoi du match. Brouillons à côté des écarts. Vous voyez toujours pourquoi — et vous approuvez avant de postuler.",
       "dashboard_label": "Jobs",
       "dashboard_caption": "Rôles classés dans une liste — fit, statut, prochaine action.",
       "dashboard_alt": "Fil Jobs Ariadne avec raisons de match et préparation de dossier",
-      "review_label": "Applications",
+      "review_label": "Candidatures",
       "review_caption": "La lettre à gauche. Les écarts à droite. Approuver, réécrire ou modifier — ensuite, vous postulez sur l’ATS.",
       "review_alt": "Relecture du dossier de candidature avec analyse d’écarts et contrôles d’approbation",
       "insights": [
         {
           "k": "Match",
-          "v": "Affinité sémantique sur chaque poste — pas du spam de mots-clés."
+          "v": "Affinité sémantique sur les rôles que nous pouvons atteindre — pas du bruit de mots-clés."
         },
         {
           "k": "Statut",
-          "v": "À relire ou prêt — la prochaine action est évidente."
+          "v": "Dossier à relire ou envoyé — la prochaine action est évidente."
         },
         {
           "k": "Control",
-          "v": "Vous approuvez. Vous postulez sur l’ATS."
+          "v": "Rien n’est envoyé à votre place. Vous postulez sur le site de l’employeur."
         }
       ]
     },
@@ -230,23 +230,17 @@
       "badge": "Boards",
       "title": "Boards ATS",
       "title_muted": "que nous atteignons.",
-      "subtitle": "Rôles classés depuis Greenhouse, Lever, Ashby et Workable — des boards que nous pouvons atteindre, pas tout le web. Explore est avancé ; le fil Jobs est le défaut.",
+      "subtitle": "Le flux Jobs classe des offres Greenhouse, Lever, Ashby et Workable — pas LinkedIn, Indeed, ni un balayage du web entier. Collez une URL supportée pour suivre un nouveau board.",
       "paste_url": "Coller une URL d’offre",
       "source_kind": "Board ATS",
-      "facts": [
-        {
-          "value": "4",
-          "label": "connecteurs ATS"
-        },
-        {
-          "value": "Vous",
-          "label": "relisez avant de postuler"
-        },
-        {
-          "value": "Sync",
-          "label": "les boards grandissent avec le temps"
-        }
-      ],
+      "stat_sources_value": "4",
+      "stat_sources": "Connecteurs ATS",
+      "stat_rank_value": "Vous",
+      "stat_rank": "Relisez toujours d’abord",
+      "stat_refresh_value": "Sync",
+      "stat_refresh": "Les boards se mettent à jour",
+      "status": "Sync des boards",
+      "status_ok": "Connecteurs prêts",
       "sources": [
         {
           "id": "greenhouse",
@@ -270,7 +264,7 @@
       "badge": "Sécurité",
       "title": "La confiance",
       "title_muted": "n’est pas négociable.",
-      "subtitle": "Votre CV et vos lettres restent les vôtres. Chiffrement, accès par ligne, et relecture avant que vous postuliez — intégrés à chaque couche.",
+      "subtitle": "Votre CV et vos lettres restent les vôtres. Chiffrement, accès par ligne, et relecture avant que vous postuliez sont intégrés.",
       "badges": [
         "Auth Supabase",
         "RLS",
@@ -284,11 +278,11 @@
         },
         {
           "title": "Accès par ligne",
-          "desc": "Chaque requête est authentifiée. Vous ne voyez que vos jobs, brouillons et profil."
+          "desc": "Chaque requête est authentifiée. Vous ne voyez que vos jobs, dossiers et profil."
         },
         {
-          "title": "Vous approuvez d’abord",
-          "desc": "Rien n’est envoyé en votre nom. L’humain dans la boucle est le défaut, pas une option."
+          "title": "Vous postulez vous-même",
+          "desc": "Ariadne n’envoie jamais à votre place. L’humain dans la boucle est le défaut."
         },
         {
           "title": "Privé par conception",
@@ -300,7 +294,7 @@
       "badge": "Votre contrôle",
       "title": "Conçu avec vous.",
       "title_muted": "Pas autour de vous.",
-      "subtitle": "Les agents font la recherche et le premier jet. Vous gardez le jugement — modifier, réécrire ou approuver avant de postuler sur l’ATS.",
+      "subtitle": "Les agents recherchent et rédigent. Vous gardez le jugement — modifier, réécrire ou approuver, puis postuler sur l’ATS.",
       "items": [
         {
           "title": "Mémoire de ton",
@@ -327,7 +321,7 @@
       "items": [
         {
           "q": "Ariadne est-il vraiment gratuit ?",
-          "a": "Oui. Créez un compte et utilisez les offres classées et les dossiers. Pas de carte. Nous n’avons pas encore de formule premium."
+          "a": "Oui. Créez un compte et utilisez les offres classées et les dossiers. Pas de carte — ce n’est pas un essai gratuit."
         },
         {
           "q": "Ça marche pour tous les secteurs ?",
@@ -346,23 +340,23 @@
           "a": "Non. Ariadne ne postule jamais à votre place. Vous relisez le dossier, puis vous postulez vous-même sur l’ATS."
         },
         {
-          "q": "Indeed / LinkedIn ?",
+          "q": "LinkedIn / Indeed ?",
           "a": "Nous ne les scrapons pas. Nous suivons les boards Greenhouse, Lever, Ashby et Workable que nous pouvons atteindre."
         }
       ]
     },
     "cta": {
-      "title": "Prêt à matcher, rédiger, et postuler vous-même ?",
-      "subtitle": "Créez un compte, parcourez les offres classées, et relisez un dossier avant de postuler sur l’ATS.",
+      "title": "Prêt à parcourir des rôles qui collent ?",
+      "subtitle": "Créez un compte, terminez une courte config, et relisez les dossiers avant de postuler sur l’ATS.",
       "button": "Créer un compte",
-      "secondary": "Aller à l’Accueil",
-      "footer": "Aucune carte requise"
+      "secondary": "Aller à l’accueil",
+      "footer": "C’est toujours vous qui envoyez"
     },
     "footer": {
-      "tagline": "Le lab carrière pour ceux qui relisent un dossier, puis postulent eux-mêmes.",
+      "tagline": "Offres ATS classées, brouillons honnêtes, vous postulez.",
       "product": "Produit",
       "product_features": "Fonctionnalités",
-      "product_explore": "Fil Jobs",
+      "product_explore": "Coller une URL d’offre",
       "product_how": "Comment ça marche",
       "product_inside": "En coulisses",
       "resources": "Ressources",

@@ -15,7 +15,6 @@ const MARK: Record<AtsId, string> = {
 };
 
 type Source = { id: string; name: string };
-type Fact = { value: string; label: string };
 
 function isAtsId(id: string): id is AtsId {
   return (ALLOWED_ATS as readonly string[]).includes(id);
@@ -35,7 +34,11 @@ function AtsMonogram({ id }: { id: AtsId }) {
 export function BoardsSync() {
   const t = useTranslations("Landing.scout");
   const sources = (t.raw("sources") as Source[]).filter((source) => isAtsId(source.id));
-  const facts = t.raw("facts") as Fact[];
+  const facts = [
+    { value: t("stat_sources_value"), label: t("stat_sources") },
+    { value: t("stat_rank_value"), label: t("stat_rank") },
+    { value: t("stat_refresh_value"), label: t("stat_refresh") },
+  ];
 
   return (
     <section id="boards" className="relative scroll-mt-28 overflow-hidden py-24 lg:py-32">
@@ -74,6 +77,14 @@ export function BoardsSync() {
           </div>
 
           <div className="grid grid-cols-2 gap-px overflow-hidden border border-foreground/10 bg-foreground/10">
+            <div className="col-span-2 flex items-center justify-between bg-background px-6 py-3 sm:px-8">
+              <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
+                {t("status")}
+              </span>
+              <span className="font-mono text-[11px] tracking-widest text-muted-foreground uppercase">
+                {t("status_ok")}
+              </span>
+            </div>
             {sources.map((source) => (
               <div key={source.id} className="flex flex-col justify-between gap-8 bg-background p-6 sm:p-8">
                 <AtsMonogram id={source.id as AtsId} />

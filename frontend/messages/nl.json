@@ -25,7 +25,7 @@
     },
     "sidebar": {
       "title": "Ontsnap uit de sollicitatiemaze.",
-      "subtitle": "Ariadne voor duidelijkere matches, brieven op jouw stem, en review voordat je op de ATS solliciteert.",
+      "subtitle": "Word lid van Ariadne voor duidelijkere matches, brieven op maat, en review voordat je op de ATS solliciteert.",
       "hired": "Aangenomen"
     }
   },
@@ -65,7 +65,7 @@
         "review",
         "apply"
       ],
-      "subtitle": "Ariadne rangschikt ATS-jobs op je cv, schrijft een brief die als jij klinkt, en jij solliciteert op de site van de werkgever — wij solliciteren nooit voor jou.",
+      "subtitle": "Ariadne rangschikt ATS-jobs op je cv, schrijft een brief die als jij klinkt, en jij dient in op de site van de werkgever — wij solliciteren nooit voor jou.",
       "cta_primary": "Account aanmaken",
       "cta_secondary": "Bekijk hoe het werkt"
     },
@@ -82,7 +82,7 @@
         {
           "n": "02",
           "title": "Klinkt als jij",
-          "desc": "De writer leert van je reviews. Na een paar brieven zitten drafts dichter bij jouw stem."
+          "desc": "De writer leert van je reviews. Na een paar brieven komen drafts dichter bij jouw stem."
         },
         {
           "n": "03",
@@ -92,7 +92,7 @@
         {
           "n": "04",
           "title": "Eerst de Jobs-feed",
-          "desc": "Gerangschikte rollen van Greenhouse, Lever, Ashby en Workable — boards die we kunnen bereiken. Plak een URL als een board nog ontbreekt."
+          "desc": "Gerangschikte rollen van Greenhouse-, Lever-, Ashby- en Workable-boards die we kunnen bereiken. Plak een URL als een board nog niet in de feed staat."
         }
       ]
     },
@@ -186,17 +186,17 @@
         {
           "roman": "I",
           "title": "Upload je cv",
-          "desc": "Drop je cv één keer. Ariadne haalt skills, ervaring en intentie tot een profiel waarmee we ATS-rollen rangschikken."
+          "desc": "Drop één keer een PDF. Ariadne bouwt een profiel om rollen te rangschikken en brieven te schrijven."
         },
         {
           "roman": "II",
           "title": "Kies een gerangschikte rol",
-          "desc": "De Jobs-feed is de default — Greenhouse, Lever, Ashby en Workable. Plak een URL als een board nog ontbreekt. Explore is geavanceerd."
+          "desc": "Blader door Jobs die matchen met je doel en landen — van ATS-boards die we syncen, geen scrape van het hele web."
         },
         {
           "roman": "III",
           "title": "Review, solliciteer daarna op de ATS",
-          "desc": "Writer schrijft. Critic scoort. Jij keurt het packet goed, kopieert de brief, en solliciteert zelf op de site van de werkgever. Ariadne solliciteert nooit voor jou."
+          "desc": "Keur de brief goed, kopieer hem, open de vacature, en dien zelf in."
         }
       ]
     },
@@ -214,15 +214,15 @@
       "insights": [
         {
           "k": "Match",
-          "v": "Semantische fit op elke rol — geen keywordspam."
+          "v": "Semantische fit op rollen die we kunnen bereiken — geen keyword-ruis."
         },
         {
           "k": "Status",
-          "v": "Review of klaar — de volgende actie is duidelijk."
+          "v": "Packet reviewen of ingediend — de volgende actie is duidelijk."
         },
         {
           "k": "Control",
-          "v": "Jij keurt goed. Jij solliciteert op de ATS."
+          "v": "Niets wordt voor jou verstuurd. Jij solliciteert op de site van de werkgever."
         }
       ]
     },
@@ -230,23 +230,17 @@
       "badge": "Boards",
       "title": "ATS-boards",
       "title_muted": "die we bereiken.",
-      "subtitle": "Gerangschikte rollen van Greenhouse, Lever, Ashby en Workable — boards die we kunnen bereiken, niet het hele web. Explore is geavanceerd; de Jobs-feed is de default.",
+      "subtitle": "De Jobs-feed rangschikt rollen van Greenhouse, Lever, Ashby en Workable — niet LinkedIn, Indeed, of een scrape van de hele markt. Plak een ondersteunde URL om een nieuw board te volgen.",
       "paste_url": "Plak een job-URL",
       "source_kind": "ATS board",
-      "facts": [
-        {
-          "value": "4",
-          "label": "ATS-connectors"
-        },
-        {
-          "value": "Jij",
-          "label": "review altijd eerst"
-        },
-        {
-          "value": "Sync",
-          "label": "boards groeien in de tijd"
-        }
-      ],
+      "stat_sources_value": "4",
+      "stat_sources": "ATS-connectors",
+      "stat_rank_value": "Jij",
+      "stat_rank": "Review altijd eerst",
+      "stat_refresh_value": "Sync",
+      "stat_refresh": "Boards worden bijgewerkt",
+      "status": "Board-sync",
+      "status_ok": "Connectors klaar",
       "sources": [
         {
           "id": "greenhouse",
@@ -270,7 +264,7 @@
       "badge": "Beveiliging",
       "title": "Vertrouwen is",
       "title_muted": "niet onderhandelbaar.",
-      "subtitle": "Je cv en brieven blijven van jou. Encryptie, row-level access en review voordat jij solliciteert zitten in elke laag — niet erachteraan geplakt.",
+      "subtitle": "Je cv en brieven blijven van jou. Encryptie, row-level access en review voordat jij solliciteert zitten ingebouwd.",
       "badges": [
         "Supabase Auth",
         "RLS",
@@ -284,11 +278,11 @@
         },
         {
           "title": "Toegang per rij",
-          "desc": "Elke request is geauthenticeerd. Je ziet alleen je eigen jobs, drafts en profiel."
+          "desc": "Elke request is geauthenticeerd. Je ziet alleen je eigen jobs, packets en profiel."
         },
         {
-          "title": "Jij keurt eerst goed",
-          "desc": "Niets wordt namens jou verstuurd. Human-in-the-loop is de default, geen optie."
+          "title": "Jij solliciteert zelf",
+          "desc": "Ariadne dient nooit namens jou in. Human-in-the-loop is de default."
         },
         {
           "title": "Privé van ontwerp",
@@ -300,7 +294,7 @@
       "badge": "Jouw controle",
       "title": "Gebouwd mét jou.",
       "title_muted": "Niet om je heen.",
-      "subtitle": "Agents doen research en de eerste draft. Jij houdt het oordeel — bewerk, herschrijf of keur goed voordat je op de ATS solliciteert.",
+      "subtitle": "Agents doen research en de eerste draft. Jij houdt het oordeel — bewerk, herschrijf of keur goed, en solliciteer daarna op de ATS.",
       "items": [
         {
           "title": "Toongeheugen",
@@ -327,7 +321,7 @@
       "items": [
         {
           "q": "Is Ariadne echt gratis?",
-          "a": "Ja. Maak een account aan en gebruik gerangschikte jobs en packets. Geen creditcard. Er is nog geen premium-plan."
+          "a": "Ja. Maak een account aan en gebruik gerangschikte jobs en packets. Geen creditcard — dit is geen gratis trial."
         },
         {
           "q": "Werkt het voor elke sector?",
@@ -335,7 +329,7 @@
         },
         {
           "q": "Klinken de brieven generiek?",
-          "a": "Nee. De writer leert je toon uit je reviews. Na een paar brieven zitten drafts dichter bij jouw stem."
+          "a": "Nee. De writer leert je toon uit je reviews. Na een paar brieven komen drafts dichter bij jouw stem."
         },
         {
           "q": "Hoe worden mijn data behandeld?",
@@ -346,23 +340,23 @@
           "a": "Nee. Ariadne solliciteert nooit voor jou. Jij reviewt het packet en solliciteert zelf op de ATS."
         },
         {
-          "q": "Indeed / LinkedIn?",
+          "q": "LinkedIn / Indeed?",
           "a": "We scrapen ze niet. We volgen Greenhouse-, Lever-, Ashby- en Workable-boards die we kunnen bereiken."
         }
       ]
     },
     "cta": {
-      "title": "Klaar om te matchen, te draften, en zelf te solliciteren?",
-      "subtitle": "Maak een account aan, bekijk gerangschikte jobs, en review een packet voordat je op de ATS solliciteert.",
+      "title": "Klaar om rollen te bekijken die passen?",
+      "subtitle": "Maak een account aan, rond een korte setup af, en review packets voordat je op de ATS solliciteert.",
       "button": "Account aanmaken",
       "secondary": "Naar Home",
-      "footer": "Geen creditcard vereist"
+      "footer": "Jij dient altijd zelf in"
     },
     "footer": {
-      "tagline": "Het carrière-lab voor mensen die een packet reviewen, en daarna zelf solliciteren.",
+      "tagline": "Gerangschikte ATS-jobs, eerlijke drafts, jij solliciteert.",
       "product": "Product",
       "product_features": "Functies",
-      "product_explore": "Jobs-feed",
+      "product_explore": "Plak een job-URL",
       "product_how": "Zo werkt het",
       "product_inside": "Binnenin",
       "resources": "Bronnen",
