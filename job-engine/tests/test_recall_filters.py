@@ -142,3 +142,51 @@ async def test_belgium_pref_does_not_recall_argentina_via_gent_substring():
     ids = {r["job_id"] for r in recalled}
     assert "bru-1" in ids
     assert "ar-1" not in ids
+
+
+NULL_REMOTE = {
+    "id": "null-1",
+    "title": "AI Engineer",
+    "company_name": "UnknownCo",
+    "location": "Remote",
+    "country_code": None,
+    "remote": True,
+    "status": "active",
+    "description_text": "Remote role with no ISO country yet",
+}
+
+
+async def test_be_filter_keeps_null_country_unknown():
+    repo = _FakeRepo([NULL_REMOTE, AR, BRU, NYC])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Ingénieur IA",
+        embedding=None,
+        filter_remote=None,
+        filter_location=None,
+        filter_contract=None,
+        filter_countries=["BE"],
+        limit=80,
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "null-1" in ids
+    assert "bru-1" in ids
+    assert "ar-1" not in ids
+    assert "nyc-1" not in ids
+
+
+async def test_all_countries_recall_keeps_null_and_argentina():
+    repo = _FakeRepo([NULL_REMOTE, AR, BRU, NYC])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Ingénieur IA",
+        embedding=None,
+        filter_remote=None,
+        filter_location=None,
+        filter_contract=None,
+        filter_countries=None,
+        limit=80,
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "null-1" in ids
+    assert "ar-1" in ids
+    assert "bru-1" in ids
+    assert "nyc-1" in ids

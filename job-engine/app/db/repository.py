@@ -48,6 +48,16 @@ def _row_matches_tokens(row: dict, tokens: list[str]) -> bool:
     return any(token.lower() in blob for token in tokens)
 
 
+def country_code_or_clause(codes: list[str]) -> str:
+    """PostgREST OR: selected ISO codes *or* unknown (NULL) country_code.
+
+    ``IN (...)`` alone drops NULL rows, which emptied recommend after Cut 3a
+    when migration 007 left many postings uncoded.
+    """
+    joined = ",".join(codes)
+    return f"country_code.in.({joined}),country_code.is.null"
+
+
 def apply_catalog_filters(
     q,
     *,
@@ -58,15 +68,18 @@ def apply_catalog_filters(
 ):
     """Apply location/remote/country filters in SQL.
 
-    Country codes are the Cut 3 hard geo gate. Location aliases remain as a
-    recall hint only when no country codes are available. Remote=false is *not*
-    encoded here (``or`` would collide); callers also run ``row_matches_filters``.
+    Country codes are the Cut 3 hard geo gate. Unknown (NULL) codes stay in
+    recall; Python ``row_matches_structured`` still excludes a *known* country
+    outside the selected ISO set (Argentina stays out of a BE filter). Location
+    aliases remain as a recall hint only when no country codes are available.
+    Remote=false is *not* encoded here (``or`` would collide); callers also run
+    ``row_matches_filters``.
     """
     if filter_remote is True:
         q = q.eq("remote", True)
     codes = [c.upper() for c in (filter_countries or []) if c and len(c) == 2]
     if codes:
-        q = q.in_("country_code", codes)
+        q = q.or_(country_code_or_clause(codes))
     else:
         aliases = expand_location_aliases(filter_location)
         if aliases:

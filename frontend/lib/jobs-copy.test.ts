@@ -23,6 +23,17 @@ describe("selectJobsEmptyKind", () => {
     ).toBe("filters");
   });
 
+  it("uses warming/catalog when the Jobs bar has no UI filters", () => {
+    expect(
+      selectJobsEmptyKind({
+        title: "Ingénieur IA",
+        location: "Belgique · France",
+        structuredFilters: false,
+        uiFiltersActive: false,
+      })
+    ).toBe("warming");
+  });
+
   it("uses geo when only location is set", () => {
     expect(selectJobsEmptyKind({ location: "Belgium" })).toBe("geo");
   });

@@ -21,10 +21,14 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
 def _csv_list(value: str | None) -> list[str] | None:
+    """Query param → override list.
+
+    None (omitted) = inherit profile. Empty string / empty CSV = explicit
+    all/any (Jobs UI cleared that dimension).
+    """
     if value is None:
         return None
-    items = [p.strip() for p in value.split(",") if p.strip()]
-    return items
+    return [p.strip() for p in value.split(",") if p.strip()]
 
 
 def _repo(supabase: AsyncClient) -> JobRepository:
