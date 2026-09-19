@@ -1,17 +1,24 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Briefcase, Loader2, Search } from "lucide-react";
 import type { JobPosting } from "@/lib/job-engine-types";
 import {
+  getJob,
   getRecommendedJobs,
   searchJobs,
   sendJobSignal,
   JobEngineError,
 } from "@/lib/job-engine";
+import {
+  includeFetchedJob,
+  mergeJobQuery,
+  readJobQueryId,
+  resolveJobSelection,
+} from "@/lib/jobs-selection";
 import { Button } from "@/components/ui/button";
 import { createApplication } from "@/lib/api";
 import { formatUnknownError } from "@/lib/api-base";
@@ -36,6 +43,10 @@ export default function JobsPage() {
   const t = useTranslations("Jobs");
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedJobId = readJobQueryId(searchParams.get("job"));
+  const search = searchParams.toString();
+  const failedFetchId = useRef<string | null>(null);
   const { ready, loading: setupLoading, openWizard, profile } = useFirstRun();
   const [items, setItems] = useState<JobPosting[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -92,6 +103,29 @@ export default function JobsPage() {
   const emptyKind = selectJobsEmptyKind(copyCtx);
   const emptyKeys = jobsEmptyMessageKeys(emptyKind);
 
+  const writeJobQuery = useCallback(
+    (jobId: string | null, history: "push" | "replace") => {
+      const next = mergeJobQuery(search, jobId);
+      const current = search ? `/jobs?${search}` : "/jobs";
+      if (next === current) return;
+      if (history === "push") {
+        router.push(next, { scroll: false });
+      } else {
+        router.replace(next, { scroll: false });
+      }
+    },
+    [router, search]
+  );
+
+  const selectJob = useCallback(
+    (job: JobPosting, history: "push" | "replace" = "push") => {
+      setSelected(job);
+      setActionMessage(null);
+      writeJobQuery(job.id, history);
+    },
+    [writeJobQuery]
+  );
+
   const loadFeed = useCallback(
     async (reset = true, filters = applied) => {
       if (reset) {
@@ -121,7 +155,14 @@ export default function JobsPage() {
             : await getRecommendedJobs(reset ? null : cursor, 20, filterPayload);
         setItems((prev) => (reset ? res.items : [...prev, ...res.items]));
         setCursor(res.next_cursor ?? null);
-        if (reset && res.items[0]) setSelected(res.items[0]);
+        if (reset) {
+          const result = resolveJobSelection(res.items, requestedJobId);
+          if (result.status === "matched" || result.status === "default") {
+            setSelected(result.selected);
+          } else {
+            setSelected(result.fallback);
+          }
+        }
       } catch (err) {
         const message =
           err instanceof JobEngineError ? err.message : t("error_generic");
@@ -131,7 +172,7 @@ export default function JobsPage() {
         setLoadingMore(false);
       }
     },
-    [applied, cursor, mode, prefLocation, prefRemote, query, t]
+    [applied, cursor, mode, prefLocation, prefRemote, query, requestedJobId, t]
   );
 
   useEffect(() => {
@@ -164,6 +205,59 @@ export default function JobsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
+  useEffect(() => {
+    if (failedFetchId.current && failedFetchId.current !== requestedJobId) {
+      failedFetchId.current = null;
+    }
+  }, [requestedJobId]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const result = resolveJobSelection(items, requestedJobId, selected?.id);
+
+    if (result.status === "default") {
+      setSelected((current) =>
+        current?.id === result.selected?.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (result.status === "matched") {
+      setSelected((current) =>
+        current?.id === result.selected.id ? current : result.selected
+      );
+      return;
+    }
+
+    if (failedFetchId.current === result.id) {
+      setSelected((current) =>
+        current?.id === result.fallback?.id ? current : result.fallback
+      );
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const fetched = await getJob(result.id);
+        if (cancelled) return;
+        setItems((prev) => includeFetchedJob(prev, fetched));
+        setSelected(fetched);
+      } catch {
+        if (cancelled) return;
+        failedFetchId.current = result.id;
+        setActionMessage({ kind: "error", text: t("offer_not_in_feed") });
+        setSelected(result.fallback);
+        writeJobQuery(null, "replace");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [items, loading, requestedJobId, selected?.id, t, writeJobQuery]);
+
   const onSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setMode(query.trim() ? "search" : "recommend");
@@ -190,7 +284,12 @@ export default function JobsPage() {
           });
       setItems(res.items);
       setCursor(res.next_cursor ?? null);
-      setSelected(res.items[0] ?? null);
+      const result = resolveJobSelection(res.items, requestedJobId);
+      if (result.status === "matched" || result.status === "default") {
+        setSelected(result.selected);
+      } else {
+        setSelected(result.fallback);
+      }
       setMode(query.trim() ? "search" : "recommend");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("error_generic"));
@@ -235,9 +334,10 @@ export default function JobsPage() {
       if (type === "dismiss") {
         const remaining = items.filter((j) => j.id !== job.id);
         setItems(remaining);
-        setSelected((current) =>
-          current?.id === job.id ? remaining[0] ?? null : current
-        );
+        const next =
+          selected?.id === job.id ? remaining[0] ?? null : selected;
+        setSelected(next);
+        writeJobQuery(next?.id ?? null, "replace");
         setActionMessage({ kind: "ok", text: t("dismissed") });
       } else {
         setActionMessage({ kind: "ok", text: t("saved") });
@@ -316,6 +416,15 @@ export default function JobsPage() {
         </div>
       )}
 
+      {!error &&
+        actionMessage?.kind === "error" &&
+        items.length === 0 &&
+        !loading && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+            {actionMessage.text}
+          </div>
+        )}
+
       {loading ? (
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="space-y-2">
@@ -381,10 +490,7 @@ export default function JobsPage() {
                 variant="list"
                 display={postingToDisplay(job)}
                 selected={selected?.id === job.id}
-                onClick={() => {
-                  setSelected(job);
-                  setActionMessage(null);
-                }}
+                onClick={() => selectJob(job)}
               />
             ))}
 

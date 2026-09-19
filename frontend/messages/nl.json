@@ -891,6 +891,7 @@
     "open_in_careeragent": "Staat de URL niet in de feed?",
     "url_not_in_feed": "Staat de URL niet in de feed?",
     "select_hint": "Selecteer een rol voor matchredenen en de vacature.",
+    "offer_not_in_feed": "Aanbod niet in de huidige feed",
     "error_generic": "Kon banen niet laden. Draait de job engine?",
     "saved": "Opgeslagen in je feed.",
     "dismissed": "Verwijderd uit je feed.",
