@@ -1,5 +1,6 @@
 """Token country parsing — Gent must not resolve Argentina; Belgique → BE."""
 
+from app.db.repository import country_code_or_filter
 from app.rank.countries import countries_from_text, parse_posting_location, posting_country_code
 from app.rank.filters import (
     CatalogFilters,
@@ -138,3 +139,67 @@ def test_contract_filter_skips_unknown_posting_type():
 def test_posting_country_code_falls_back_to_location():
     row = {"location": "Antwerpen", "country_code": None}
     assert posting_country_code(row) == "BE"
+
+
+def test_null_country_included_when_no_country_filter():
+    unknown = {"title": "Engineer", "location": "Remote worldwide", "country_code": None}
+    assert row_matches_structured(unknown, CatalogFilters())
+    assert row_matches_structured(
+        unknown,
+        filters_from_prefs(
+            {"countries": ["BE"], "location": "Belgique"},
+            override_countries=[],
+        ),
+    )
+
+
+def test_null_country_unknown_excluded_when_countries_be():
+    """Unknown NULL is a miss only when a country gate is on.
+
+    Location fallback still lets parseable cities through (Antwerpen → BE).
+    """
+    unknown = {"title": "Engineer", "location": "Remote worldwide", "country_code": None}
+    antwerp = {"title": "Engineer", "location": "Antwerpen", "country_code": None}
+    filters = CatalogFilters(countries=["BE"])
+    assert not row_matches_structured(unknown, filters)
+    assert row_matches_structured(antwerp, filters)
+
+
+def test_explicit_empty_overrides_do_not_apply_profile_hard_gates():
+    prefs = {
+        "countries": ["BE", "FR"],
+        "location": "Belgique",
+        "work_modes": ["hybrid", "onsite"],
+        "contract_types": ["permanent", "fixed_term"],
+        "preferred_roles": ["AI/ML Engineer"],
+        "job_title": "AI/ML Engineer",
+    }
+    cleared = filters_from_prefs(
+        prefs,
+        override_countries=[],
+        override_work_modes=[],
+        override_contract_types=[],
+        override_roles=[],
+    )
+    assert cleared.countries == []
+    assert cleared.location is None
+    assert cleared.work_modes == []
+    assert cleared.contract_types == []
+    assert cleared.roles == []
+    assert cleared.remote is None
+    assert not cleared.hard_filters_on()
+
+
+def test_omitted_overrides_still_use_profile_countries():
+    resolved = filters_from_prefs({"countries": ["BE"], "location": "Belgique"})
+    assert resolved.countries == ["BE"]
+
+
+def test_country_sql_includes_null_when_restricting():
+    assert country_code_or_filter(["BE"]) == "country_code.in.(BE),country_code.is.null"
+    assert country_code_or_filter(["be", "fr"]) == "country_code.in.(BE,FR),country_code.is.null"
+
+
+def test_country_sql_unrestricted_does_not_filter_null_codes():
+    assert country_code_or_filter([]) is None
+    assert country_code_or_filter(None) is None

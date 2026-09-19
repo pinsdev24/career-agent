@@ -21,6 +21,7 @@ router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
 
 def _csv_list(value: str | None) -> list[str] | None:
+    """None = param omitted (use profile). [] = explicit empty (all / any)."""
     if value is None:
         return None
     items = [p.strip() for p in value.split(",") if p.strip()]

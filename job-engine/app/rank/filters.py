@@ -135,35 +135,42 @@ def filters_from_prefs(
 ) -> CatalogFilters:
     structured = resolve_structured_prefs(prefs)
     countries = list(structured.countries)
-    if override_countries:
+    # None = caller omitted the dimension (use profile). [] = explicit clear
+    # (all countries / any mode) — do not fall back to profile hard gates.
+    if override_countries is not None:
         countries = [c.upper() for c in override_countries if len(c.strip()) == 2]
     location = structured.location
     if override_location is not None:
         location = override_location.strip() or None
-        if not countries:
+        if override_countries is None and not countries:
             countries = countries_from_text(location)
+    if override_countries is not None and not countries:
+        # UI "Tous les pays" / empty countries pref: unknown geo is not a miss.
+        location = None
 
     work_modes = list(structured.work_modes)
-    if override_work_modes:
+    if override_work_modes is not None:
         work_modes = parse_work_modes(override_work_modes)
 
     contract_types = list(structured.contract_types)
-    if override_contract_types:
+    if override_contract_types is not None:
         from app.models.prefs import parse_contract_types
 
         contract_types = parse_contract_types(override_contract_types)
 
     roles = list(structured.preferred_roles)
-    if override_roles:
+    if override_roles is not None:
         roles = _str_list(override_roles)
 
     remote = work_modes_to_remote_filter(work_modes)
     if override_remote is not None:
         remote = override_remote
-    elif remote is None:
+    elif override_work_modes is None and remote is None:
         remote = remote_pref_to_filter(structured.remote_preference)
 
     contract = structured.contract_type
+    if override_contract_types is not None and not contract_types:
+        contract = None
     return CatalogFilters(
         countries=countries,
         cities=list(structured.cities),
@@ -294,7 +301,11 @@ def row_matches_structured(row: dict, filters: CatalogFilters) -> bool:
         return False
 
     if filters.countries:
+        # Stored NULL is unknown, not a miss, until location text resolves a
+        # code. Unresolvable unknown is excluded only when a country gate is on.
         code = posting_country_code(row)
+        if code is None:
+            return False
         if code not in {c.upper() for c in filters.countries}:
             return False
     elif filters.location and not location_matches(row.get("location"), filters.location):

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
+  emptyJobsHardFilters,
   jobsChipMessageKey,
   jobsEmptyMessageKeys,
+  jobsHardFiltersActive,
   selectJobsChipKind,
   selectJobsEmptyKind,
 } from "./jobs-copy";
@@ -21,6 +23,31 @@ describe("selectJobsEmptyKind", () => {
         structuredFilters: true,
       })
     ).toBe("filters");
+  });
+
+  it("does not use filter-empty copy when the bar has no hard gates", () => {
+    const cleared = emptyJobsHardFilters();
+    expect(jobsHardFiltersActive(cleared)).toBe(false);
+    expect(
+      selectJobsEmptyKind({
+        title: "AI/ML Engineer",
+        location: "",
+        structuredFilters: jobsHardFiltersActive(cleared),
+      })
+    ).toBe("role");
+    expect(selectJobsEmptyKind({ structuredFilters: false })).toBe("warming");
+    expect(
+      selectJobsEmptyKind({
+        title: "AI/ML Engineer",
+        location: "Belgique · France",
+        structuredFilters: true,
+      })
+    ).toBe("filters");
+  });
+
+  it("treats profile-only countries as inactive until the bar applies them", () => {
+    expect(jobsHardFiltersActive({ countries: [] })).toBe(false);
+    expect(jobsHardFiltersActive({ countries: ["BE", "FR"] })).toBe(true);
   });
 
   it("uses geo when only location is set", () => {

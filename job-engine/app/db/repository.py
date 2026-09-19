@@ -48,6 +48,20 @@ def _row_matches_tokens(row: dict, tokens: list[str]) -> bool:
     return any(token.lower() in blob for token in tokens)
 
 
+def country_code_or_filter(codes: list[str] | None) -> str | None:
+    """PostgREST ``or`` clause for a country hard gate.
+
+    ``country_code IN (...)`` alone drops pre-migration 007 rows where
+    ``country_code IS NULL``. Include NULLs in SQL recall; Python
+    ``row_matches_structured`` then applies location fallback and excludes
+    unknown-only when a country restriction is actually on.
+    """
+    cleaned = [c.upper() for c in (codes or []) if c and len(c) == 2]
+    if not cleaned:
+        return None
+    return f"country_code.in.({','.join(cleaned)}),country_code.is.null"
+
+
 def apply_catalog_filters(
     q,
     *,
@@ -64,9 +78,9 @@ def apply_catalog_filters(
     """
     if filter_remote is True:
         q = q.eq("remote", True)
-    codes = [c.upper() for c in (filter_countries or []) if c and len(c) == 2]
-    if codes:
-        q = q.in_("country_code", codes)
+    country_or = country_code_or_filter(filter_countries)
+    if country_or:
+        q = q.or_(country_or)
     else:
         aliases = expand_location_aliases(filter_location)
         if aliases:

@@ -130,6 +130,48 @@ async def test_belgium_aliases_can_recall_brussels():
     assert "nyc-1" not in ids
 
 
+NULL_UNKNOWN = {
+    "id": "null-1",
+    "title": "Software Engineer",
+    "company_name": "UnknownCo",
+    "location": "Remote worldwide",
+    "country_code": None,
+    "remote": False,
+    "status": "active",
+    "description_text": "Pre-migration posting without a country_code",
+}
+
+
+async def test_null_country_code_recalled_when_no_country_filter():
+    repo = _FakeRepo([NULL_UNKNOWN, BRU, NYC])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Software Engineer",
+        embedding=None,
+        filter_remote=None,
+        filter_location=None,
+        filter_contract=None,
+        filter_countries=None,
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "null-1" in ids
+    assert "bru-1" in ids
+
+
+async def test_null_country_code_unknown_excluded_when_countries_be():
+    repo = _FakeRepo([NULL_UNKNOWN, BRU])
+    recalled = await SearchIndex(repo).recall(
+        query_text="Software Engineer",
+        embedding=None,
+        filter_remote=None,
+        filter_location=None,
+        filter_contract=None,
+        filter_countries=["BE"],
+    )
+    ids = {r["job_id"] for r in recalled}
+    assert "bru-1" in ids
+    assert "null-1" not in ids
+
+
 async def test_belgium_pref_does_not_recall_argentina_via_gent_substring():
     repo = _FakeRepo([AR_REMOTE, BRU])
     recalled = await SearchIndex(repo).recall(

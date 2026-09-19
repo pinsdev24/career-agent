@@ -11,6 +11,30 @@ export type JobsCopyContext = {
   structuredFilters?: boolean | null;
 };
 
+export type JobsHardFilters = {
+  countries?: string[] | null;
+  workModes?: string[] | null;
+  contractTypes?: string[] | null;
+  roles?: string[] | null;
+};
+
+/** Hard gates from the applied filter bar only — not silent profile prefs. */
+export function jobsHardFiltersActive(
+  filters: JobsHardFilters | null | undefined
+): boolean {
+  if (!filters) return false;
+  return Boolean(
+    filters.countries?.length ||
+      filters.workModes?.length ||
+      filters.contractTypes?.length ||
+      filters.roles?.length
+  );
+}
+
+export function emptyJobsHardFilters(): JobsHardFilters {
+  return { countries: [], workModes: [], contractTypes: [], roles: [] };
+}
+
 function nonEmpty(value: string | null | undefined): string {
   return (value || "").trim();
 }

@@ -23,8 +23,10 @@ import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { remotePreferenceToFilter } from "@/lib/profile-ready";
 import {
+  emptyJobsHardFilters,
   jobsChipMessageKey,
   jobsEmptyMessageKeys,
+  jobsHardFiltersActive,
   selectJobsChipKind,
   selectJobsEmptyKind,
 } from "@/lib/jobs-copy";
@@ -76,18 +78,11 @@ export default function JobsPage() {
     profile?.search_preferences?.remote_preference,
     profile?.search_preferences?.work_modes
   );
-  const structuredOn =
-    applied.countries.length > 0 ||
-    applied.workModes.length > 0 ||
-    applied.contractTypes.length > 0 ||
-    applied.roles.length > 0 ||
-    prefCountries.length > 0 ||
-    Boolean(profile?.search_preferences?.work_modes?.length) ||
-    Boolean(profile?.search_preferences?.preferred_roles?.length);
+  const structuredOn = jobsHardFiltersActive(applied);
   const copyCtx = {
     title: targetTitle,
-    location: prefLocation,
-    remote: prefRemote === true,
+    location: applied.countries.length ? prefLocation : "",
+    remote: applied.workModes.length ? prefRemote === true : false,
     structuredFilters: structuredOn,
   };
   const chipKind = selectJobsChipKind(copyCtx);
@@ -113,8 +108,10 @@ export default function JobsPage() {
           mode === "search" && query.trim()
             ? await searchJobs({
                 q: query.trim(),
-                location: prefLocation || undefined,
-                remote: prefRemote,
+                location: filterPayload.countries.length
+                  ? prefLocation || undefined
+                  : undefined,
+                remote: filterPayload.workModes.length ? prefRemote : undefined,
                 cursor: reset ? null : cursor,
                 ...filterPayload,
               })
@@ -173,8 +170,8 @@ export default function JobsPage() {
       const res = query.trim()
         ? await searchJobs({
             q: query.trim(),
-            location: prefLocation || undefined,
-            remote: prefRemote,
+            location: applied.countries.length ? prefLocation || undefined : undefined,
+            remote: applied.workModes.length ? prefRemote : undefined,
             countries: applied.countries,
             workModes: applied.workModes,
             contractTypes: applied.contractTypes,
@@ -285,13 +282,7 @@ export default function JobsPage() {
           void loadFeed(true, bar);
         }}
         onClear={() => {
-          const prefs = profile?.search_preferences;
-          const next: JobsBarFilters = {
-            countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
-            workModes: prefs?.work_modes || [],
-            contractTypes: prefs?.contract_types || [],
-            roles: prefs?.preferred_roles || [],
-          };
+          const next = emptyJobsHardFilters() as JobsBarFilters;
           setBar(next);
           setApplied(next);
           void loadFeed(true, next);
@@ -352,13 +343,7 @@ export default function JobsPage() {
             onAction={
               emptyKind === "filters"
                 ? () => {
-                    const prefs = profile?.search_preferences;
-                    const next: JobsBarFilters = {
-                      countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
-                      workModes: prefs?.work_modes || [],
-                      contractTypes: prefs?.contract_types || [],
-                      roles: prefs?.preferred_roles || [],
-                    };
+                    const next = emptyJobsHardFilters() as JobsBarFilters;
                     setBar(next);
                     setApplied(next);
                     void loadFeed(true, next);

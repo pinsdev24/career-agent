@@ -75,12 +75,13 @@ export type JobSearchFilters = {
   roles?: string[];
 };
 
-function applyJobFilters(params: URLSearchParams, filters?: JobSearchFilters) {
+/** Always send bar-driven keys, including empty = explicit "all / any". */
+export function applyJobFilters(params: URLSearchParams, filters?: JobSearchFilters) {
   if (!filters) return;
-  if (filters.countries?.length) params.set("countries", filters.countries.join(","));
-  if (filters.workModes?.length) params.set("work_modes", filters.workModes.join(","));
-  if (filters.contractTypes?.length) params.set("contract_types", filters.contractTypes.join(","));
-  if (filters.roles?.length) params.set("roles", filters.roles.join(","));
+  params.set("countries", (filters.countries ?? []).join(","));
+  params.set("work_modes", (filters.workModes ?? []).join(","));
+  params.set("contract_types", (filters.contractTypes ?? []).join(","));
+  params.set("roles", (filters.roles ?? []).join(","));
 }
 
 export async function searchJobs(opts: {
