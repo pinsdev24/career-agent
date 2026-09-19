@@ -547,11 +547,9 @@
     "review_draft": "Review your letter",
     "review_desc": "Read it like a hiring manager would. Edit freely, ask for a rewrite, or approve.",
     "processing": "Working…",
-    "ready_to_send": "Your cover letter is ready to send.",
     "final_letter": "Final letter",
     "applied": "Applied!",
     "i_applied": "I applied",
-    "send": "Send",
     "copied": "Copied",
     "copy": "Copy",
     "target_role": "Target role",
@@ -566,7 +564,7 @@
       "matching": "Then we write the letter",
       "writing": "Then a quality check",
       "critiquing": "Then it’s your review",
-      "waiting_letter_review": "Then it’s ready to send",
+      "waiting_letter_review": "Then it’s ready to copy",
       "completed": "Copy it into the employer’s form yourself"
     },
     "insights": {
@@ -578,7 +576,7 @@
       "fit_mid": "A stretch on paper. Keep the letter honest about what you bring.",
       "fit_low": "A real stretch. Don’t overclaim the gaps below.",
       "fit_none": "Fit will appear once matching finishes.",
-      "quality_high": "Ready to send if it still sounds like you.",
+      "quality_high": "Ready to copy if it still sounds like you.",
       "quality_mid": "Solid draft — tighten anything that feels generic.",
       "quality_low": "Ask for a rewrite before you approve.",
       "quality_none": "Quality notes will appear after the review.",
@@ -609,7 +607,7 @@
       "writing": "Letter",
       "critiquing": "Quality",
       "waiting_letter_review": "Review",
-      "completed": "Send"
+      "completed": "Apply"
     },
     "stage": {
       "started": {
@@ -662,7 +660,8 @@
       "done_critique": "Finished the quality check",
       "done_route": "Chose the next step",
       "done_memory": "Updated what we know about you"
-    }
+    },
+    "ready_to_copy": "Your cover letter is ready to copy."
   },
   "LetterEditor": {
     "title": "Cover letter",
@@ -864,8 +863,8 @@
     "approve": "Approve letter",
     "rewrite": "Rewrite with feedback",
     "feedback_placeholder": "What should change?",
-    "mark_submitted": "Mark submitted",
-    "open_ats": "Open ATS",
+    "mark_submitted": "I submitted this",
+    "open_ats": "Open application page",
     "no_ats_url": "No application page on file.",
     "next_steps_title": "Next: apply yourself",
     "next_steps_hint": "Copy the letter, open the employer’s form, then mark it submitted. Ariadne never applies for you.",
@@ -891,5 +890,11 @@
     "performance_desc": "Helps us see which flows break so we can fix them. Not used for ads.",
     "decline": "Decline",
     "accept": "Accept all"
+  },
+  "Metadata": {
+    "meta_title": "Ariadne — ranked ATS jobs, you apply",
+    "meta_description": "Match roles from Greenhouse, Lever, Ashby, and Workable boards we can reach. Draft with review. You submit on the ATS.",
+    "meta_og_title": "Ariadne",
+    "meta_og_description": "Ranked ATS jobs, honest drafts — you apply."
   }
 }

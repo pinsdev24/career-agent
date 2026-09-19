@@ -4,7 +4,7 @@ const ATS_NAMES = ["Greenhouse", "Lever", "Ashby", "Workable"] as const;
 const BANNED_SOURCES = /LinkedIn|Indeed|Welcome to the Jungle|\bWTTJ\b/i;
 const VANITY_METRICS =
   /24x|\b94%|\b91%|\b96%|\b88%|\b87%|2[.,\s]?400\+|4\.9(?:\/5)?|All operational|Tout opérationnel|Alles operationeel|Infinite interviews|Oneindig veel gesprekken/i;
-const BANNED_BRAND = /CareerAgent|MACA|ariadne\.app/i;
+const BANNED_BRAND = /CareerAgent|MACA|ariadne\.app|Labyrinth Navigator|Career Labyrinth/i;
 const REMOVED_SECTIONS = ["marquee", "stats", "metrics", "testimonials"] as const;
 const CTA_BAN = /start free trial|start applying|essai gratuit|start gratis trial/i;
 
@@ -287,6 +287,9 @@ describe("Landing honesty Cut 1", () => {
     expect(landing.scout.subtitle).toMatch(/niet LinkedIn, Indeed/);
     expect(landing.cta.button).toBe("Account aanmaken");
     expect(landing.footer.product_explore).toBe("Plak een job-URL");
+    expect(nl.Auth.sidebar.subtitle).toBe(
+      "Ariadne voor duidelijkere matches, brieven op jouw toon, en review voordat je op de ATS solliciteert."
+    );
   });
 
   it("does not leave English stubs in NL user-visible Landing strings", async () => {
