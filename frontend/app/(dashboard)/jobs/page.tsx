@@ -76,19 +76,17 @@ export default function JobsPage() {
     profile?.search_preferences?.remote_preference,
     profile?.search_preferences?.work_modes
   );
-  const structuredOn =
+  const uiFiltersOn =
     applied.countries.length > 0 ||
     applied.workModes.length > 0 ||
     applied.contractTypes.length > 0 ||
-    applied.roles.length > 0 ||
-    prefCountries.length > 0 ||
-    Boolean(profile?.search_preferences?.work_modes?.length) ||
-    Boolean(profile?.search_preferences?.preferred_roles?.length);
+    applied.roles.length > 0;
   const copyCtx = {
     title: targetTitle,
     location: prefLocation,
     remote: prefRemote === true,
-    structuredFilters: structuredOn,
+    structuredFilters: uiFiltersOn,
+    uiFiltersActive: uiFiltersOn,
   };
   const chipKind = selectJobsChipKind(copyCtx);
   const emptyKind = selectJobsEmptyKind(copyCtx);
@@ -113,8 +111,10 @@ export default function JobsPage() {
           mode === "search" && query.trim()
             ? await searchJobs({
                 q: query.trim(),
-                location: prefLocation || undefined,
-                remote: prefRemote,
+                location: filters.countries.length
+                  ? prefLocation || undefined
+                  : undefined,
+                remote: filters.workModes.length ? prefRemote : undefined,
                 cursor: reset ? null : cursor,
                 ...filterPayload,
               })
@@ -135,25 +135,25 @@ export default function JobsPage() {
   );
 
   useEffect(() => {
+    if (setupLoading || prefsSeeded) return;
+    if (profile?.search_preferences) {
+      const prefs = profile.search_preferences;
+      const next: JobsBarFilters = {
+        countries: (prefs.countries || []).map((c) => c.toUpperCase()),
+        workModes: prefs.work_modes || [],
+        contractTypes: prefs.contract_types || [],
+        roles: prefs.preferred_roles || [],
+      };
+      setBar(next);
+      setApplied(next);
+      setPrefsSeeded(true);
+      void loadFeed(true, next);
+      return;
+    }
+    setPrefsSeeded(true);
     void loadFeed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (prefsSeeded || !profile?.search_preferences) return;
-    const prefs = profile.search_preferences;
-    const next: JobsBarFilters = {
-      countries: (prefs.countries || []).map((c) => c.toUpperCase()),
-      workModes: prefs.work_modes || [],
-      contractTypes: prefs.contract_types || [],
-      roles: prefs.preferred_roles || [],
-    };
-    setBar(next);
-    setApplied(next);
-    setPrefsSeeded(true);
-    void loadFeed(true, next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefsSeeded, profile]);
+  }, [setupLoading, prefsSeeded, profile]);
 
   useEffect(() => {
     if (!ready || loading) return;
@@ -173,8 +173,10 @@ export default function JobsPage() {
       const res = query.trim()
         ? await searchJobs({
             q: query.trim(),
-            location: prefLocation || undefined,
-            remote: prefRemote,
+            location: applied.countries.length
+              ? prefLocation || undefined
+              : undefined,
+            remote: applied.workModes.length ? prefRemote : undefined,
             countries: applied.countries,
             workModes: applied.workModes,
             contractTypes: applied.contractTypes,
@@ -282,18 +284,19 @@ export default function JobsPage() {
         onChange={setBar}
         onApply={() => {
           setApplied(bar);
+          setPrefsSeeded(true);
           void loadFeed(true, bar);
         }}
         onClear={() => {
-          const prefs = profile?.search_preferences;
           const next: JobsBarFilters = {
-            countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
-            workModes: prefs?.work_modes || [],
-            contractTypes: prefs?.contract_types || [],
-            roles: prefs?.preferred_roles || [],
+            countries: [],
+            workModes: [],
+            contractTypes: [],
+            roles: [],
           };
           setBar(next);
           setApplied(next);
+          setPrefsSeeded(true);
           void loadFeed(true, next);
         }}
       />
@@ -352,15 +355,15 @@ export default function JobsPage() {
             onAction={
               emptyKind === "filters"
                 ? () => {
-                    const prefs = profile?.search_preferences;
                     const next: JobsBarFilters = {
-                      countries: (prefs?.countries || []).map((c) => c.toUpperCase()),
-                      workModes: prefs?.work_modes || [],
-                      contractTypes: prefs?.contract_types || [],
-                      roles: prefs?.preferred_roles || [],
+                      countries: [],
+                      workModes: [],
+                      contractTypes: [],
+                      roles: [],
                     };
                     setBar(next);
                     setApplied(next);
+                    setPrefsSeeded(true);
                     void loadFeed(true, next);
                   }
                 : undefined

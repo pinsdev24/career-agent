@@ -3,6 +3,10 @@
 import { createClient } from "@/lib/supabase/client";
 import { JOB_ENGINE_URL, formatErrorDetail } from "@/lib/api-base";
 import type { JobListResponse, JobPosting, JobSignalType } from "@/lib/job-engine-types";
+import { applyJobFilters, type JobSearchFilters } from "@/lib/job-filters";
+
+export type { JobSearchFilters };
+export { applyJobFilters };
 
 class JobEngineError extends Error {
   status: number;
@@ -66,21 +70,6 @@ export async function getRecommendedJobs(
   if (cursor) params.set("cursor", cursor);
   applyJobFilters(params, filters);
   return request<JobListResponse>(`/v1/jobs/recommend?${params}`);
-}
-
-export type JobSearchFilters = {
-  countries?: string[];
-  workModes?: string[];
-  contractTypes?: string[];
-  roles?: string[];
-};
-
-function applyJobFilters(params: URLSearchParams, filters?: JobSearchFilters) {
-  if (!filters) return;
-  if (filters.countries?.length) params.set("countries", filters.countries.join(","));
-  if (filters.workModes?.length) params.set("work_modes", filters.workModes.join(","));
-  if (filters.contractTypes?.length) params.set("contract_types", filters.contractTypes.join(","));
-  if (filters.roles?.length) params.set("roles", filters.roles.join(","));
 }
 
 export async function searchJobs(opts: {

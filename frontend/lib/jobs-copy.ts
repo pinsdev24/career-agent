@@ -9,6 +9,8 @@ export type JobsCopyContext = {
   location?: string | null;
   remote?: boolean | null;
   structuredFilters?: boolean | null;
+  /** Jobs bar applied filters. false → warming/catalog, not "clear filters". */
+  uiFiltersActive?: boolean | null;
 };
 
 function nonEmpty(value: string | null | undefined): string {
@@ -17,6 +19,7 @@ function nonEmpty(value: string | null | undefined): string {
 
 /** Most specific empty: filters > geo+role > geo | role > warming. Ready users only. */
 export function selectJobsEmptyKind(ctx: JobsCopyContext): JobsEmptyKind {
+  if (ctx.uiFiltersActive === false) return "warming";
   if (ctx.structuredFilters) return "filters";
   const title = Boolean(nonEmpty(ctx.title));
   const location = Boolean(nonEmpty(ctx.location));
