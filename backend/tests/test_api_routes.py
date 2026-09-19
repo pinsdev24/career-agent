@@ -18,6 +18,21 @@ class TestHealthEndpoint:
         assert response.json() == {"status": "ok"}
 
 
+class TestOpenAPIMetadata:
+    """Landing PRD Cut 4 — OpenAPI /docs title is Ariadne, not CareerAgent."""
+
+    @pytest.mark.asyncio
+    async def test_openapi_title_is_ariadne(self, async_client) -> None:
+        response = await async_client.get("/openapi.json")
+        assert response.status_code == 200
+        info = response.json()["info"]
+        assert info["title"] == "Ariadne API"
+        assert "CareerAgent" not in info["title"]
+        assert "CareerAgent" not in (info.get("description") or "")
+        assert "MACA" not in (info.get("description") or "")
+        assert "ariadne.app" not in (info.get("description") or "")
+
+
 # ---------------------------------------------------------------------------
 # Profile endpoints
 # ---------------------------------------------------------------------------
