@@ -92,7 +92,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="features" className="relative border-t border-foreground/10 py-24 lg:py-32">
+        <section id="features" className="relative scroll-mt-28 border-t border-foreground/10 py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 lg:mb-24">
               <SectionEyebrow>{t("features.badge")}</SectionEyebrow>
@@ -131,7 +131,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="relative overflow-hidden bg-foreground py-24 text-background lg:py-32">
+        <section id="how-it-works" className="relative scroll-mt-28 overflow-hidden bg-foreground py-24 text-background lg:py-32">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.03]"
             style={{
@@ -217,7 +217,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="control" className="relative overflow-hidden py-24 lg:py-32">
+        <section id="control" className="relative scroll-mt-28 overflow-hidden py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 max-w-3xl lg:mb-24">
               <SectionEyebrow>{t("control.badge")}</SectionEyebrow>
@@ -240,7 +240,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="faq" className="relative border-t border-foreground/10 py-24 lg:py-32">
+        <section id="faq" className="relative scroll-mt-28 border-t border-foreground/10 py-24 lg:py-32">
           <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
             <div className="mb-16 lg:mb-24">
               <SectionEyebrow>{t("faq.badge")}</SectionEyebrow>

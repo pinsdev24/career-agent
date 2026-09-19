@@ -38,7 +38,7 @@ export function BoardsSync() {
   const facts = t.raw("facts") as Fact[];
 
   return (
-    <section id="boards" className="relative overflow-hidden py-24 lg:py-32">
+    <section id="boards" className="relative scroll-mt-28 overflow-hidden py-24 lg:py-32">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
         <div className="grid items-start gap-16 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:gap-20">
           <div>

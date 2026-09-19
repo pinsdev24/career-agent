@@ -46,7 +46,7 @@ export function ProductInsight() {
   const insights = t.raw("insights") as { k: string; v: string }[];
 
   return (
-    <section id="product" className="relative overflow-hidden border-b border-foreground/10 py-20 lg:py-28">
+    <section id="product" className="relative scroll-mt-28 overflow-hidden border-b border-foreground/10 py-20 lg:py-28">
       <div className="relative mx-auto grid max-w-[1200px] items-center gap-10 px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14 lg:px-12">
         <div className="max-w-md">
           <span className="mb-5 inline-flex items-center gap-3 font-mono text-sm text-muted-foreground">
